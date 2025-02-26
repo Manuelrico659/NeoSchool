@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Iniciar Sesión</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/login.css') }}">
+</head>
+<body>
+    <div class="overlay"></div>
+    <div class="container">
+        <img src="logo.png" alt="Logo de la Escuela" class="logo">
+        <form action="/login" method="POST">
+            <input type="email" name="email" class="input" placeholder="Correo electrónico" required>
+            <input type="password" name="password" class="input" placeholder="Contraseña" required>
+            <button type="submit" class="btn">Ingresar</button>
+        </form>
+        <a href="forgot-password.html" class="forgot-password">¿Olvidaste tu contraseña?</a>
+    </div>
+</body>
+</html>
