@@ -56,8 +56,8 @@ def home():
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
-        id_usuario = request.form['id_usuario']
-        contraseña = request.form['contraseña']
+        id_usuario = request.form.get("registro")
+        password = request.form.get("password")
 
         # Verificar si el usuario existe en la base de datos PostgreSQL
         conn = get_db_connection()
@@ -67,8 +67,19 @@ def login():
         cursor.close()
         conn.close()
 
+        if user and password == user[-1]:  # user[-1] es la columna de la contraseña sin encriptar
+            # Redirigir según el rol
+            if user[-2] == 'administrativo':
+                return redirect(url_for('admin'))
+            elif user[-2] == 'maestro':
+                return redirect(url_for('profesor'))
+            elif user[-2] == 'direccion':
+                return redirect(url_for('director'))
+        else:
+            return "Correo o contraseña incorrectos", 401
 
-        if user and bcrypt.checkpw(contraseña.encode('utf-8'), user[-1].encode('utf-8')):  # user[2] es la columna de la contraseña encriptada
+'''
+        if user and bcrypt.checkpw(password.encode('utf-8'), user[-1].encode('utf-8')):  # user[2] es la columna de la contraseña encriptada
             # Redirigir según el rol
             if user[-2] == 'administrativo':
                 return redirect(url_for('admin'))
@@ -81,6 +92,7 @@ def login():
             return "Correo o contraseña incorrectos", 401
 
     return render_template('login.html')
+'''
 
 @app.route('/admin')
 def admin():
