@@ -1,14 +1,50 @@
 from flask import Flask, render_template, request, redirect, url_for
 from flask_mysqldb import MySQL
 import bcrypt
+from datetime import timedelta
+import os
+from cryptography.fernet import Fernet
+import psycopg2
+from flask_bcrypt import Bcrypt
 
 app = Flask(__name__, template_folder='templates')
 
-# Configuración de la base de datos
-app.config['MYSQL_HOST'] = 'http://dpg-cuvnkjtds78s73co00gg-a.oregon-postgres.render.com'
-app.config['MYSQL_USER'] = 'neoschool_db_user'  # Asegúrate de tener el usuario adecuado
-app.config['MYSQL_PASSWORD'] = '9UJKJWvgdvOC5bT2fuu9y3fan5DvD9Wz'  # Añadir la contraseña de la base de datos
-app.config['MYSQL_DB'] = 'neoschool_db'
+# Configuración de la clave secreta (cargar desde variables de entorno)
+app.secret_key = os.getenv("FLASK_SECRET_KEY")
+if not app.secret_key:
+    raise ValueError("La clave secreta no está definida. Establezca FLASK_SECRET_KEY en las variables de entorno.")
+
+app.permanent_session_lifetime = timedelta(minutes=30)
+
+# Cargar o generar la clave para cifrado
+key_path = "secret.key"
+if os.path.exists(key_path):
+    with open(key_path, "rb") as key_file:
+        key = key_file.read()
+else:
+    key = Fernet.generate_key()
+    with open(key_path, "wb") as key_file:
+        key_file.write(key)
+cipher_suite = Fernet(key)
+
+# Configuración de PostgreSQL (para registro y login)
+app.config['POSTGRES_HOST'] = os.getenv('POSTGRES_HOST')
+app.config['POSTGRES_USER'] = os.getenv('POSTGRES_USER')
+app.config['POSTGRES_PASSWORD'] = os.getenv('POSTGRES_PASSWORD')
+app.config['POSTGRES_DB'] = os.getenv('POSTGRES_DB')
+
+# Inicializando PostgreSQL y Bcrypt
+bcrypt = Bcrypt(app)
+
+# Conexión a PostgreSQL
+def get_db_connection():
+    conn = psycopg2.connect(
+        host=os.getenv('POSTGRES_HOST'),
+        user=os.getenv('POSTGRES_USER'),
+        password=os.getenv('POSTGRES_PASSWORD'),
+        dbname=os.getenv('POSTGRES_DB')
+    )
+    return conn
 
 mysql = MySQL(app)
 
@@ -22,18 +58,24 @@ def login():
         email = request.form['email']
         password = request.form['password']
 
-        cursor = mysql.connection.cursor()
+        # Verificar si el usuario existe en la base de datos PostgreSQL
+        conn = get_db_connection()
+        cursor = conn.cursor()
         cursor.execute("SELECT * FROM users WHERE email = %s", (email,))
         user = cursor.fetchone()
+        cursor.close()
+        conn.close()
 
-        if user and bcrypt.checkpw(password.encode('utf-8'), user[2].encode('utf-8')):  # user[2] es la columna de la contraseña encriptada
+
+        if user and bcrypt.checkpw(password.encode('utf-8'), user[-1].encode('utf-8')):  # user[2] es la columna de la contraseña encriptada
             # Redirigir según el rol
-            if user[3] == 'administrativo':
+            if user[-2] == 'administrativo':
                 return redirect(url_for('admin'))
-            elif user[3] == 'maestro':
+            elif user[-2] == 'maestro':
                 return redirect(url_for('teacher'))
-            elif user[3] == 'direccion':
+            elif user[-2] == 'direccion':
                 return redirect(url_for('director'))
+            
         else:
             return "Correo o contraseña incorrectos", 401
 
