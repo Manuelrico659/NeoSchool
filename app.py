@@ -75,6 +75,8 @@ def login():
                 return redirect(url_for('profesor'))
             elif user[-2] == 'direccion':
                 return redirect(url_for('director'))
+            else:
+                return "Rol desconocido", 400  # Agregado para capturar cualquier rol no esperado
         else:
             return "Correo o contraseña incorrectos", 401
         
