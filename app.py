@@ -5,6 +5,9 @@ import os
 from cryptography.fernet import Fernet
 import psycopg2
 from flask_bcrypt import Bcrypt
+from dotenv import load_dotenv
+
+load_dotenv("variables.env")
 
 app = Flask(__name__, template_folder='templates')
 
