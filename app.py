@@ -62,7 +62,7 @@ def login():
         # Verificar si el usuario existe en la base de datos PostgreSQL
         conn = get_db_connection()
         cursor = conn.cursor()
-        cursor.execute("SELECT * FROM usuarios WHERE  = %i", (id_usuario,))
+        cursor.execute("SELECT * FROM usuarios WHERE id_usuario = %s", (id_usuario))
         user = cursor.fetchone()
         cursor.close()
         conn.close()
@@ -99,7 +99,7 @@ def login():
 def admin():
     return "<h1>Rol: Administrativo</h1>"
 
-@app.route('/teacher')
+@app.route('/profesor')
 def teacher():
     return "<h1>Rol: Maestro</h1>"
 
