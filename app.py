@@ -73,7 +73,7 @@ def login():
             if user[-2] == 'administrativo':
                 return redirect(url_for('admin'))
             elif user[-2] == 'maestro':
-                return redirect(url_for('teacher'))
+                return redirect(url_for('profesor'))
             elif user[-2] == 'direccion':
                 return redirect(url_for('director'))
             
