@@ -5,7 +5,7 @@ import os
 from cryptography.fernet import Fernet
 import psycopg2
 from flask_bcrypt import Bcrypt
-from dotenv import load_dotenv
+from dotenv import load_dotenvñ
 
 # Cargar variables de entorno
 load_dotenv(dotenv_path='variables.env')
@@ -56,19 +56,19 @@ def home():
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
-        email = request.form['email']
-        password = request.form['password']
+        id_usuario = request.form['id_usuario']
+        contraseña = request.form['contraseña']
 
         # Verificar si el usuario existe en la base de datos PostgreSQL
         conn = get_db_connection()
         cursor = conn.cursor()
-        cursor.execute("SELECT * FROM users WHERE email = %s", (email,))
+        cursor.execute("SELECT * FROM usuarios WHERE  = %s", (id_usuario,))
         user = cursor.fetchone()
         cursor.close()
         conn.close()
 
 
-        if user and bcrypt.checkpw(password.encode('utf-8'), user[-1].encode('utf-8')):  # user[2] es la columna de la contraseña encriptada
+        if user and bcrypt.checkpw(contraseña.encode('utf-8'), user[-1].encode('utf-8')):  # user[2] es la columna de la contraseña encriptada
             # Redirigir según el rol
             if user[-2] == 'administrativo':
                 return redirect(url_for('admin'))
