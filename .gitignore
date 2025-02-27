@@ -1,0 +1,49 @@
+# Ignorar cachés de Python
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Ignorar ambientes virtuales
+venv/
+env/
+*.env
+
+# Ignorar instancias y caches
+instance/
+.webassess-cache
+
+# Ignorar bases de datos locales
+*.db
+
+# Ignorar configuraciones de IDEs
+.vscode/
+.idea/
+
+# Ignorar archivos del sistema operativo
+.DS_Store
+Thumbs.db
+
+# Ignorar archivos de logs y temporales
+*.log
+*.tmp
+
+# Adiciones para evitar archivos innecesarios en tu repo
+
+# Ignorar compilaciones y distribuciones
+build/
+dist/
+*.egg-info/
+*.dist-info/
+
+# Ignorar archivos de claves y certificados
+*.key
+*.pem
+*.crt
+
+# Ignorar archivos de texto de paquetes o configuraciones adicionales
+*.lock
+*.bak
+*.swp
+*~
+venvTODOLIST/pyvenv.cfg
+venvTODOLIST/variables.env
