@@ -5,7 +5,7 @@ import os
 from cryptography.fernet import Fernet
 import psycopg2
 from flask_bcrypt import Bcrypt
-from dotenv import load_dotenvñ
+from dotenv import load_dotenv
 
 # Cargar variables de entorno
 load_dotenv(dotenv_path='variables.env')
