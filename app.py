@@ -97,15 +97,15 @@ def login():
 
 @app.route('/admin')
 def admin():
-    return "<h1>Rol: Administrativo</h1>"
+    return render_template('admin.html')
 
 @app.route('/profesor')
-def teacher():
-    return "<h1>Rol: Maestro</h1>"
+def profesor():
+    return render_template('profesor.html')
 
 @app.route('/director')
 def director():
-    return "<h1>Rol: Dirección</h1>"
+    return render_template('directivo.html')
 
 if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0', port=5000)
