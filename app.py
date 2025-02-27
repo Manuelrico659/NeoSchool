@@ -76,7 +76,7 @@ def login():
             elif user[-2] == 'profesor':
                 return redirect(url_for('profesor'))
             elif user[-2] == 'director':
-                return redirect(url_for('directivo'))
+                return redirect(url_for('director'))
             else:
                 return "Rol desconocido", 400  # Agregado para capturar cualquier rol no esperado
         else:
@@ -109,7 +109,7 @@ def profesor():
 
 @app.route('/director')
 def director():
-    return render_template('directivo.html')
+    return render_template('director.html')
 
 if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0', port=5000)
