@@ -1,5 +1,4 @@
 from flask import Flask, render_template, request, redirect, url_for
-from flask_mysqldb import MySQL
 import bcrypt
 from datetime import timedelta
 import os
@@ -45,8 +44,6 @@ def get_db_connection():
         dbname=os.getenv('POSTGRES_DB')
     )
     return conn
-
-mysql = MySQL(app)
 
 @app.route('/')
 def home():
