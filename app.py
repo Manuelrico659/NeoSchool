@@ -77,6 +77,8 @@ def login():
                 return redirect(url_for('director'))
         else:
             return "Correo o contraseña incorrectos", 401
+        
+    return render_template('login.html')
 
 '''
         if user and bcrypt.checkpw(password.encode('utf-8'), user[-1].encode('utf-8')):  # user[2] es la columna de la contraseña encriptada
@@ -91,7 +93,6 @@ def login():
         else:
             return "Correo o contraseña incorrectos", 401
 
-    return render_template('login.html')
 '''
 
 @app.route('/admin')
