@@ -68,6 +68,8 @@ def login():
         conn.close()
 
         if user and password == user[-1]:  # user[-1] es la columna de la contraseña sin encriptar
+            print("User:", user)
+            print("Password:", password)
             # Redirigir según el rol
             if user[-2] == 'administrativo':
                 return redirect(url_for('admin'))
