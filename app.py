@@ -62,7 +62,7 @@ def login():
         # Verificar si el usuario existe en la base de datos PostgreSQL
         conn = get_db_connection()
         cursor = conn.cursor()
-        cursor.execute("SELECT * FROM usuarios WHERE id_usuario = %s", (id_usuario))
+        cursor.execute("SELECT * FROM usuarios WHERE id_usuario = %s", (id_usuario,))
         user = cursor.fetchone()
         cursor.close()
         conn.close()
