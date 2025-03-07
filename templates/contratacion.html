@@ -1,0 +1,27 @@
+<!-- Formulario de Contratación -->
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contratación de Personal</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+</head>
+<body>
+    <div class="form-container">
+        <h2>Contratación de Personal</h2>
+        <form id="contratacion-form">
+            <input type="text" name="nombre" placeholder="Nombre" required>
+            <input type="text" name="apellido_paterno" placeholder="Apellido Paterno" required>
+            <input type="text" name="apellido_materno" placeholder="Apellido Materno" required>
+            <input type="date" name="fecha_nacimiento" required>
+            <select name="rol" required>
+                <option value="maestro">Maestro</option>
+                <option value="directivo">Directivo</option>
+                <option value="administracion">Administración</option>
+            </select>
+            <button type="submit">Registrar</button>
+        </form>
+    </div>
+</body>
+</html>

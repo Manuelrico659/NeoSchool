@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Inscripción de Alumnos</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+    <script>
+        function updateGradoOptions() {
+            var nivel = document.getElementById("nivel").value;
+            var grado = document.getElementById("grado");
+            grado.innerHTML = "";
+            var options = [];
+            if (nivel === "kinder") {
+                options = ["1", "2", "3"];
+            } else if (nivel === "primaria") {
+                options = ["1", "2", "3", "4", "5", "6"];
+            } else if (nivel === "secundaria") {
+                options = ["1", "2", "3"];
+            }
+            options.forEach(function (opt) {
+                var option = document.createElement("option");
+                option.value = opt;
+                option.textContent = opt;
+                grado.appendChild(option);
+            });
+        }
+
+        function nextStep(step) {
+            if (!validateStep(step - 1)) return; 
+            document.querySelectorAll(".step-content").forEach(s => s.style.display = "none");
+            document.getElementById("step" + step).style.display = "block";
+            updateProgress(step);
+        }
+
+        function prevStep(step) {
+            document.querySelectorAll(".step-content").forEach(s => s.style.display = "none");
+            document.getElementById("step" + step).style.display = "block";
+            updateProgress(step);
+        }
+
+        function updateProgress(step) {
+            var steps = document.querySelectorAll(".step");
+            var progressFill = document.querySelector(".progress-fill");
+            steps.forEach((s, index) => s.classList.toggle("active", index < step));
+            progressFill.style.width = `${(step - 1) * 50}%`;
+        }
+
+        function toggleFamilia() {
+            var checkbox = document.getElementById("familia-toggle");
+            var familiaExistente = document.getElementById("familia-existente");
+            var nuevaFamilia = document.getElementById("nueva-familia");
+            if (checkbox.checked) {
+                familiaExistente.style.display = "block";
+                nuevaFamilia.querySelectorAll("input").forEach(input => input.removeAttribute("required"));
+                nuevaFamilia.style.display = "none";
+            } else {
+                familiaExistente.style.display = "none";
+                nuevaFamilia.querySelectorAll("input").forEach(input => input.setAttribute("required", "true"));
+                nuevaFamilia.style.display = "block";
+            }
+        }
+
+        function validateStep(step) {
+            var stepContent = document.getElementById("step" + step);
+            var inputs = stepContent.querySelectorAll("input[required], select[required]");
+            for (var input of inputs) {
+                if (input.value.trim() === "") {
+                    alert("Por favor, completa todos los campos obligatorios.");
+                    return false;
+                }
+            }
+            return true;
+        }
+
+        function validateBeca(){
+            var beca = document.querySelector("input[name='beca']");
+            if (beca.value < 0 || beca.value > 100) {
+                alert("El valor de la beca debe estar entre 0 y 100.");
+                return false;
+            }
+            return true;
+        }
+
+        function validateForm(event) {
+            if (!validateStep(3) || !validateBeca()) {
+                event.preventDefault();
+            } else {
+                alert("Formulario enviado correctamente.");
+            }
+        }
+    </script>
+</head>
+<body>
+    <div class="form-container">
+        <h2>Inscripción de Alumnos</h2>
+        <div class="progress-bar">
+            <div class="progress-fill"></div>
+            <div class="step active">1</div>
+            <div class="step">2</div>
+            <div class="step">3</div>
+        </div>
+        <form id="inscripcion-form" onsubmit="validateForm(event)">
+            <div class="step-content" id="step1">
+                <h3>Datos del Alumno</h3>
+                <input type="text" name="nombre" placeholder="Nombre(s)" required>
+                <input type="text" name="apellido_paterno" placeholder="Apellido Paterno" required>
+                <input type="text" name="apellido_materno" placeholder="Apellido Materno" required>
+                <input type="text" name="escuela_inscripcion" placeholder="Escuela de Inscripción" required>
+                <select id="nivel" name="nivel" required onchange="updateGradoOptions()">
+                    <option value="">Seleccione Nivel</option>
+                    <option value="kinder">Kinder</option>
+                    <option value="primaria">Primaria</option>
+                    <option value="secundaria">Secundaria</option>
+                </select>
+                <select id="grado" name="grado" required>
+                    <option value="">Seleccione Grado</option>
+                </select>
+                <button type="button" onclick="nextStep(2)">Siguiente</button>
+            </div>
+            <div class="step-content" id="step2" style="display: none;">
+                <h3>Información Familiar</h3>
+                <label>¿Tiene una familia registrada?</label>
+                <input type="checkbox" id="familia-toggle" onchange="toggleFamilia()">
+                <div id="familia-existente" style="display: none;">
+                    <input type="number" name="id_familia" placeholder="ID de Familia">
+                </div>
+                <div id="nueva-familia">
+                    <input type="text" name="tutor" placeholder="Tutor" required>
+                    <input type="text" name="tel_emergencia" placeholder="Teléfono de Emergencia" required>
+                </div>
+                <button type="button" onclick="prevStep(1)">Atrás</button>
+                <button type="button" onclick="nextStep(3)">Siguiente</button>
+            </div>
+            <div class="step-content" id="step3" style="display: none;">
+                <h3>Datos Generales</h3>
+                <input type="text" name="curp" placeholder="CURP" required>
+                <input type="date" name="fecha_nacimiento" required>
+                <input type="text" name="alergias" placeholder="Alergias" required>
+                <input type="text" name="capilla" placeholder="Capilla" required>
+                <input type="number" name="beca" placeholder="Beca (0-100)" min="0" max="100" required>
+                <select name="Sexo">
+                    <option value="">Seleccione Sexo</option>
+                    <option value="Hombre">Hombre</option>
+                    <option value="Mujer">Mujer</option>
+                </select>
+                <select name="tipo_sangre" required>
+                    <option value="">Seleccione Tipo de Sangre</option>
+                    <option value="A+">A+</option>
+                    <option value="A-">A-</option>
+                    <option value="B+">B+</option>
+                    <option value="B-">B-</option>
+                    <option value="AB+">AB+</option>
+                    <option value="AB-">AB-</option>
+                    <option value="O+">O+</option>
+                    <option value="O-">O-</option>
+                </select>
+                <button type="button" onclick="prevStep(2)">Atrás</button>
+                <button type="submit">Registrar</button>
+            </div>
+        </form>
+    </div>
+</body>
+</html>
