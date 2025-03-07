@@ -4,38 +4,132 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>NeoSchool - Administrativo</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/interfaces.css') }}">
+    <link rel="stylesheet" href="interfaces.css">
+    <script>
+        // Función para cambiar el contenido dinámicamente
+        function loadContent(section) {
+            const mainContent = document.querySelector(".main-content");
+
+            switch (section) {
+                case "inicio":
+                    mainContent.innerHTML = `
+                        <h1>Bienvenido, Administrativo</h1>
+                        <div class="content-section">
+                            <h2>Gestión de Usuarios</h2>
+                            <p>Aquí se podrá gestionar la información de los profesores y directivos.</p>
+                        </div>
+                    `;
+                    break;
+
+                    case "gestion-alumnos":
+                        mainContent.innerHTML = `
+                            <h1>Gestión de Alumnos</h1>
+                            <div class="content-grid">
+                                <div class="content-section">
+                                    <h2>Altas</h2>
+                                    <div class="button-container">
+                                        <button onclick="location.href='inscripcion.html'">Alumnos</button>
+                                        <button onclick="location.href='contratacion.html'">Colaboradores</button>
+                                    </div>
+                                </div>
+                                <div class="content-section">
+                                    <h2>Edición</h2>
+                                    <div class="button-container">
+                                        <button onclick="location.href='edicion-alumnos.html'">Alumnos</button>
+                                        <button onclick="location.href='edicion-colaboradores.html'">Colaboradores</button>
+                                    </div>
+                                </div>
+                            </div>
+                    `;
+                    break;
+
+                case "gestion-usuarios":
+                    mainContent.innerHTML = `
+                        <h1>Gestión de Usuarios</h1>
+                        <div class="content-section">
+                            <p>Contenido de gestión de usuarios.</p>
+                        </div>
+                    `;
+                    break;
+
+                case "edicion-bases":
+                    mainContent.innerHTML = `
+                        <h1>Edición de Bases de Datos</h1>
+                        <div class="content-section">
+                            <p>Contenido de edición de bases de datos.</p>
+                        </div>
+                    `;
+                    break;
+
+                case "agregar-materias":
+                    mainContent.innerHTML = `
+                        <h1>Agregar Materias</h1>
+                        <div class="content-section">
+                            <p>Contenido para agregar materias.</p>
+                        </div>
+                    `;
+                    break;
+
+                case "asignar-profesores":
+                    mainContent.innerHTML = `
+                        <h1>Asignar Profesores</h1>
+                        <div class="content-section">
+                            <p>Contenido para asignar profesores.</p>
+                        </div>
+                    `;
+                    break;
+
+                case "visualizar-reportes":
+                    mainContent.innerHTML = `
+                        <h1>Visualizar Reportes</h1>
+                        <div class="content-section">
+                            <p>Contenido para visualizar reportes.</p>
+                        </div>
+                    `;
+                    break;
+
+                case "configuracion":
+                    mainContent.innerHTML = `
+                        <h1>Configuración</h1>
+                        <div class="content-section">
+                            <p>Contenido de configuración.</p>
+                        </div>
+                    `;
+                    break;
+
+                default:
+                    mainContent.innerHTML = `
+                        <h1>Bienvenido, Administrativo</h1>
+                        <div class="content-section">
+                            <h2>Gestión de Usuarios</h2>
+                            <p>Aquí se podrá gestionar la información de los profesores y directivos.</p>
+                        </div>
+                    `;
+            }
+        }
+
+        // Cargar el contenido inicial al abrir la página
+        document.addEventListener("DOMContentLoaded", () => {
+            loadContent("inicio");
+        });
+    </script>
 </head>
 <body>
     <div class="sidebar">
         <h2>NeoSchool</h2>
         <ul>
-            <li><a href="#">Inicio</a></li>
-            <li><a href="#">Gestión de Usuarios</a></li>
-            <li><a href="#">Agregar Materias</a></li>
-            <li><a href="#">Asignar Profesores</a></li>
-            <li><a href="#">Visualizar Reportes</a></li>
-            <li><a href="#">Configuración</a></li>
+            <li><a href="#" onclick="loadContent('inicio')">Inicio</a></li>
+            <li><a href="#" onclick="loadContent('gestion-alumnos')">Gestión de Alumnos</a></li>
+            <li><a href="#" onclick="loadContent('gestion-usuarios')">Gestión de Usuarios</a></li>
+            <li><a href="#" onclick="loadContent('edicion-bases')">Edición de Bases de Datos</a></li>
+            <li><a href="#" onclick="loadContent('agregar-materias')">Agregar Materias</a></li>
+            <li><a href="#" onclick="loadContent('asignar-profesores')">Asignar Profesores</a></li>
+            <li><a href="#" onclick="loadContent('visualizar-reportes')">Visualizar Reportes</a></li>
+            <li><a href="#" onclick="loadContent('configuracion')">Configuración</a></li>
         </ul>
     </div>
     <div class="main-content">
-        <h1>Gestión de usuarios</h1>
-        <div class="content-section">
-            <h2>Altas</h2>
-            <p>Aquí se podrá gestionar la información de los profesores y directivos.</p>
-            <div class="button-container">
-                <button class="big-button">Alumno</button>
-                <button class="big-button">Colaborador</button>
-            </div>
-        </div>
-        <div class="content-section">
-            <h2>Edición</h2>
-            <p>Aquí se podrá editar la información de los usuarios existentes.</p>
-            <div class="button-container">
-                <button class="big-button">Alumno</button>
-                <button class="big-button">Colaborador</button>
-            </div>
-        </div>
+        <!-- El contenido se cargará dinámicamente aquí -->
     </div>
 </body>
 </html>
