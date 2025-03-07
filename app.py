@@ -53,6 +53,50 @@ def get_db_connection():
 def home():
     return render_template('Index.html')
 
+bcrypt = Bcrypt(app)
+
+@app.route('/contratar', methods=['POST'])
+def contratar():
+    if request.method == 'POST':
+        # Obtener los datos del formulario
+        nombre = request.form['nombre']
+        apellido_paterno = request.form['apellido_paterno']
+        apellido_materno = request.form['apellido_materno']
+        fecha_nacimiento = request.form['fecha_nacimiento']
+        rol = request.form['rol']
+
+        # Extraer el año de nacimiento
+        año_nacimiento = fecha_nacimiento.split('-')[0]  # Formato: YYYY-MM-DD
+
+        # Generar la contraseña por defecto
+        contraseña_por_defecto = f"BOSCO@{año_nacimiento}"
+
+        # Cifrar la contraseña
+        contraseña_cifrada = bcrypt.generate_password_hash(contraseña_por_defecto).decode('utf-8')
+
+        # Conectar a la base de datos
+        conn = get_db_connection()
+        cursor = conn.cursor()
+
+        # Insertar los datos en la tabla usuarios
+        try:
+            cursor.execute(
+                "INSERT INTO usuarios (nombre, apellido_paterno, apellido_materno, fecha_nacimiento, rol, password) "
+                "VALUES (%s, %s, %s, %s, %s, %s)",
+                (nombre, apellido_paterno, apellido_materno, fecha_nacimiento, rol, contraseña_cifrada)
+            )
+            conn.commit()  # Guardar los cambios en la base de datos
+        except Exception as e:
+            conn.rollback()  # Revertir cambios en caso de error
+            print(f"Error al registrar el usuario: {str(e)}")  # Opcional: Imprimir el error en la consola
+        finally:
+            cursor.close()
+            conn.close()
+
+        # Redirigir a la página de administración
+        return redirect(url_for('admin'))
+
+
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
