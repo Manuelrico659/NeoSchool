@@ -12,24 +12,14 @@
 
             switch (section) {
                 case "inicio":
-                    mainContent.innerHTML = `
-                        <h1>Bienvenido, Administrativo</h1>
-                        <div class="content-section">
-                            <h2>Gestión de Usuarios</h2>
-                            <p>Aquí se podrá gestionar la información de los profesores y directivos.</p>
-                        </div>
-                    `;
-                    break;
-
-                    case "gestion-alumnos":
-                        mainContent.innerHTML = `
+                mainContent.innerHTML = `
                             <h1>Gestión de Alumnos</h1>
                             <div class="content-grid">
                                 <div class="content-section">
                                     <h2>Altas</h2>
                                     <div class="button-container">
-                                        <button onclick="location.href='inscripcion.html'">Alumnos</button>
-                                        <button onclick="location.href='contratacion.html'">Colaboradores</button>
+                                        <button onclick="location.href='{{ url_for('static', filename='inscripcion.html') }}'">Alumnos</button>
+                                        <button onclick="location.href='{{ url_for('static', filename='contratacion.html') }}'">Colaboradores</button>
                                     </div>
                                 </div>
                                 <div class="content-section">
@@ -40,6 +30,15 @@
                                     </div>
                                 </div>
                             </div>
+                    `;
+                    break;
+
+                    case "gestion-alumnos":
+                    mainContent.innerHTML = `
+                        <h1>Gestión de Usuarios</h1>
+                        <div class="content-section">
+                            <p>Contenido de gestión de usuarios.</p>
+                        </div>
                     `;
                     break;
 
