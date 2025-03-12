@@ -206,16 +206,16 @@ def login():
 
         if user and password == user[-1]:  # user[-1] es la columna de la contraseña sin encriptar
             # Almacenar el ID del usuario en la sesión
-            session['id_usuario'] = user[0]  # user[0] es el id_usuario
-            session['rol'] = user[-2]  # user[-2] es el rol
+            #session['id_usuario'] = user[0]  # user[0] es el id_usuario
+            #session['rol'] = user[-2]  # user[-2] es el rol
 
             # Redirigir según el rol
             if user[-2] == 'admin':
-                return redirect(url_for('admin.html'))
+                return redirect(url_for('admin'))
             elif user[-2] == 'profesor':
-                return redirect(url_for('profesor.html'))
+                return redirect(url_for('profesor'))
             elif user[-2] == 'director':
-                return redirect(url_for('director.html'))
+                return redirect(url_for('director'))
             else:
                 return "Rol desconocido", 400
         else:
