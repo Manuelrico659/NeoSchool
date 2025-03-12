@@ -96,3 +96,21 @@ body {
 .button-container button:hover {
     background-color: rgb(28, 94, 140);
 }
+
+
+.btn {
+    background: #4D869C;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    text-decoration: none;
+    font-size: 18px;
+    width: 100%;
+    transition: background 0.3s ease;
+}
+
+.btn:hover {
+    background: #2f5d73;
+}

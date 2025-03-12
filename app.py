@@ -205,10 +205,8 @@ def login():
         conn.close()
 
         if user and password == user[-1]:  # user[-1] es la columna de la contraseña sin encriptar
-            # Almacenar el ID del usuario en la sesión
-            #session['id_usuario'] = user[0]  # user[0] es el id_usuario
-            #session['rol'] = user[-2]  # user[-2] es el rol
-
+            print("User:", user[-2])
+            print("Password:", password)
             # Redirigir según el rol
             if user[-2] == 'admin':
                 return redirect(url_for('admin'))
@@ -217,7 +215,7 @@ def login():
             elif user[-2] == 'director':
                 return redirect(url_for('director'))
             else:
-                return "Rol desconocido", 400
+                return "Rol desconocido", 400  # Agregado para capturar cualquier rol no esperado
         else:
             return "Correo o contraseña incorrectos", 401
         
