@@ -6,6 +6,7 @@ from cryptography.fernet import Fernet
 import psycopg2
 from flask_bcrypt import Bcrypt
 from dotenv import load_dotenv
+from flask import session  # Asegúrate de importar session
 
 # Cargar variables de entorno
 load_dotenv(dotenv_path='variables.env')
@@ -158,6 +159,37 @@ def inscripcion():
     return render_template('inscripcion.html')
 
 
+@app.route('/profesor')
+def profesor():
+    # Verificar si el usuario está autenticado
+    if 'id_usuario' not in session or session['rol'] != 'profesor':
+        return redirect(url_for('login'))  # Redirigir al login si no está autenticado
+
+    # Obtener el ID del profesor desde la sesión
+    id_profesor = session['id_usuario']
+
+    # Conectar a la base de datos
+    conn = get_db_connection()
+    cursor = conn.cursor()
+
+    try:
+        # Obtener las materias del profesor
+        cursor.execute(
+            "SELECT id_materia, nombre FROM materia WHERE id_usuario = %s",
+            (id_profesor,)
+        )
+        materias = cursor.fetchall()  # Obtener todas las materias
+    except Exception as e:
+        print(f"Error al obtener las materias: {str(e)}")
+        materias = []  # En caso de error, devolver una lista vacía
+    finally:
+        cursor.close()
+        conn.close()
+
+    # Pasar las materias a la plantilla
+    return render_template('profesor.html', materias=materias)
+
+
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
@@ -173,8 +205,10 @@ def login():
         conn.close()
 
         if user and password == user[-1]:  # user[-1] es la columna de la contraseña sin encriptar
-            print("User:", user[-2])
-            print("Password:", password)
+            # Almacenar el ID del usuario en la sesión
+            session['id_usuario'] = user[0]  # user[0] es el id_usuario
+            session['rol'] = user[-2]  # user[-2] es el rol
+
             # Redirigir según el rol
             if user[-2] == 'admin':
                 return redirect(url_for('admin'))
@@ -183,12 +217,11 @@ def login():
             elif user[-2] == 'director':
                 return redirect(url_for('director'))
             else:
-                return "Rol desconocido", 400  # Agregado para capturar cualquier rol no esperado
+                return "Rol desconocido", 400
         else:
             return "Correo o contraseña incorrectos", 401
         
     return render_template('login.html')
-
 '''
         if user and bcrypt.checkpw(password.encode('utf-8'), user[-1].encode('utf-8')):  # user[2] es la columna de la contraseña encriptada
             # Redirigir según el rol
