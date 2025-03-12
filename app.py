@@ -211,11 +211,11 @@ def login():
 
             # Redirigir según el rol
             if user[-2] == 'admin':
-                return redirect(url_for('admin'))
+                return redirect(url_for('admin.html'))
             elif user[-2] == 'profesor':
-                return redirect(url_for('profesor'))
+                return redirect(url_for('profesor.html'))
             elif user[-2] == 'director':
-                return redirect(url_for('director'))
+                return redirect(url_for('director.html'))
             else:
                 return "Rol desconocido", 400
         else:
