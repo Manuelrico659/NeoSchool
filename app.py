@@ -97,6 +97,67 @@ def contratar():
         return redirect(url_for('admin'))
 
 
+@app.route('/inscripcion', methods=['GET', 'POST'])
+def inscripcion():
+    if request.method == 'POST':
+        # Obtener los datos del formulario
+        nombre = request.form['nombre']
+        apellido_paterno = request.form['apellido_paterno']
+        apellido_materno = request.form['apellido_materno']
+        escuela_inscripcion = request.form['escuela_inscripcion']
+        nivel = request.form['nivel']
+        grado = request.form['grado']
+        curp = request.form['curp']
+        fecha_nacimiento = request.form['fecha_nacimiento']
+        alergias = request.form['alergias']
+        capilla = request.form['capilla']
+        beca = request.form['beca']
+        sexo = request.form['Sexo']
+        tipo_sangre = request.form['tipo_sangre']
+
+        # Información familiar
+        familia_existente = 'id_familia' in request.form
+        if familia_existente:
+            id_familia = request.form['id_familia']
+        else:
+            tutor = request.form['tutor']
+            tel_emergencia = request.form['tel_emergencia']
+
+        # Conectar a la base de datos
+        conn = get_db_connection()
+        cursor = conn.cursor()
+
+        try:
+            # Insertar la familia si no existe
+            if not familia_existente:
+                cursor.execute(
+                    "INSERT INTO familias (tutor, tel_emergencia) VALUES (%s, %s) RETURNING id_familia",
+                    (tutor, tel_emergencia)
+                )
+                id_familia = cursor.fetchone()[0]
+
+            # Insertar los datos del alumno
+            cursor.execute(
+                "INSERT INTO alumnos (nombre, apellido_paterno, apellido_materno, escuela_inscripcion, nivel, grado, curp, fecha_nacimiento, alergias, capilla, beca, sexo, tipo_sangre, id_familia) "
+                "VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)",
+                (nombre, apellido_paterno, apellido_materno, escuela_inscripcion, nivel, grado, curp, fecha_nacimiento, alergias, capilla, beca, sexo, tipo_sangre, id_familia)
+            )
+            conn.commit()  # Guardar los cambios en la base de datos
+        except Exception as e:
+            conn.rollback()  # Revertir cambios en caso de error
+            print(f"Error al registrar el alumno: {str(e)}")  # Opcional: Imprimir el error en la consola
+            return "Error al registrar el alumno", 500
+        finally:
+            cursor.close()
+            conn.close()
+
+        # Redirigir a la página de administración o confirmación
+        return redirect(url_for('admin'))
+
+    # Si es GET, mostrar el formulario de inscripción
+    return render_template('inscripcion.html')
+
+
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
