@@ -241,10 +241,6 @@ def login():
 def admin():
     return render_template('admin.html')
 
-@app.route('/profesor')
-def profesor():
-    return render_template('profesor.html')
-
 @app.route('/director')
 def director():
     return render_template('director.html')
