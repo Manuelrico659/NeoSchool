@@ -98,6 +98,22 @@ def contratar():
         return redirect(url_for('admin'))
 
 
+@app.route('/materia/<int:id_materia>')
+def detalle_materia(id_materia):
+    # Obtener los detalles de la materia desde la base de datos
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    cursor.execute("SELECT * FROM materia WHERE id_materia = %s", (id_materia,))
+    materia = cursor.fetchone()
+    cursor.close()
+    conn.close()
+
+    if materia:
+        return render_template('detalle_materia.html', materia=materia)
+    else:
+        return "Materia no encontrada", 404
+
+
 @app.route('/inscripcion', methods=['GET', 'POST'])
 def inscripcion():
     if request.method == 'POST':

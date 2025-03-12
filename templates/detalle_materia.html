@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Detalle de Materia</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/interfaces.css') }}">
+</head>
+<body>
+    <div class="sidebar">
+        <h2>NeoSchool</h2>
+        <ul>
+            <li><a href="{{ url_for('profesor') }}">Volver a Materias</a></li>
+        </ul>
+    </div>
+    <div class="main-content">
+        <h1>Detalle de la Materia: {{ materia[1] }}</h1>
+        <div class="content-section">
+            <h2>Opciones</h2>
+            <ul>
+                <li><a href="{{ url_for('calificar_tareas', id_materia=materia[0]) }}">Calificar Tareas</a></li>
+                <li><a href="{{ url_for('generar_reportes', id_materia=materia[0]) }}">Generar Reportes</a></li>
+                <li><a href="{{ url_for('calificar_examenes', id_materia=materia[0]) }}">Calificar Exámenes</a></li>
+                <li><a href="{{ url_for('asistencias', id_materia=materia[0]) }}">Asistencias</a></li>
+            </ul>
+        </div>
+    </div>
+</body>
+</html>
