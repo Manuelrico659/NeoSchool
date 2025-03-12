@@ -18,8 +18,8 @@
                                 <div class="content-section">
                                     <h2>Altas</h2>
                                     <div class="button-container">
-                                        <button onclick="location.href='{{ url_for('static', filename='inscripcion.html') }}'">Alumnos</button>
-                                        <button onclick="location.href='{{ url_for('static', filename='contratacion.html') }}'">Colaboradores</button>
+                                        <button onclick="location.href='{{ url_for('templates', filename='inscripcion.html') }}'">Alumnos</button>
+                                        <button onclick="location.href='{{ url_for('templates', filename='contratacion.html') }}'">Colaboradores</button>
                                     </div>
                                 </div>
                                 <div class="content-section">
@@ -35,9 +35,9 @@
 
                 case "gestion-alumnos":
                     mainContent.innerHTML = `
-                        <h1>Gestión de Usuarios</h1>
+                        <h1>Gestión de Alumnos</h1>
                         <div class="content-section">
-                            <p>Contenido de gestión de usuarios.</p>
+                            <p>Contenido de gestión de alumnos.</p>
                         </div>
                     `;
                     break;
