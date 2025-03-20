@@ -265,6 +265,12 @@ def inscripcion():
 def director():
     return render_template('director.html')
 
+@app.route('/registrar_materia')
+def registrar_materia():
+    # Your code to handle this route
+    return render_template('registrar_materia.html')
+
+
 @app.route('/cambiar_contrasena', methods=['GET', 'POST'])
 def cambiar_contrasena():
     if 'id_usuario' not in session:
