@@ -56,6 +56,38 @@ def home():
 
 bcrypt = Bcrypt(app)
 
+
+@app.route('/login', methods=['GET', 'POST'])
+def login():
+    if request.method == 'POST':
+        id_usuario = int(request.form.get("registro"))
+        password = request.form.get("password")
+
+        # Verificar si el usuario existe en la base de datos PostgreSQL
+        conn = get_db_connection()
+        cursor = conn.cursor()
+        cursor.execute("SELECT * FROM usuarios WHERE id_usuario = %s", (id_usuario,))
+        user = cursor.fetchone()
+        cursor.close()
+        conn.close()
+
+        if user and password == user[-2]:  # user[-2] es la columna de la contraseña sin encriptar
+            print("User:", user[-3])
+            print("Password:", password)
+            # Redirigir según el rol
+            if user[-3] == 'admin':
+                return redirect(url_for('admin'))
+            elif user[-3] == 'profesor':
+                return redirect(url_for('profesor'))
+            elif user[-3] == 'director':
+                return redirect(url_for('director'))
+            else:
+                return "Rol desconocido", 400  # Agregado para capturar cualquier rol no esperado
+        else:
+            return "Correo o contraseña incorrectos", 401
+        
+    return render_template('login.html')
+
 @app.route('/profesor')
 def profesor():
     # Verificar si el usuario está autenticado
@@ -86,6 +118,23 @@ def profesor():
     # Pasar las materias a la plantilla
     return render_template('profesor.html', materias=materias)
 
+
+@app.route('/materia/<int:id_materia>')
+def detalle_materia(id_materia):
+    # Obtener los detalles de la materia desde la base de datos
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    cursor.execute("SELECT * FROM materia WHERE id_materia = %s", (id_materia,))
+    materia = cursor.fetchone()
+    cursor.close()
+    conn.close()
+
+    # Pasar las materias a la plantilla
+    return render_template('profesor.html', materias=materias)
+
+@app.route('/admin')
+def admin():
+    return render_template('admin.html')
 
 @app.route('/contratar', methods=['POST'])
 def contratar():
@@ -124,9 +173,11 @@ def contratar():
         finally:
             cursor.close()
             conn.close()
-
         # Redirigir a la página de administración
         return redirect(url_for('admin'))
+    
+    if request.method == 'GET':
+        return render_template('contratar.html')  # Muestra el formulario
 
 @app.route('/inscripcion', methods=['GET', 'POST'])
 def inscripcion():
@@ -185,57 +236,8 @@ def inscripcion():
         # Redirigir a la página de administración o confirmación
         return redirect(url_for('admin'))
 
-    # Si es GET, mostrar el formulario de inscripción
-    return render_template('inscripcion.html')
-
-@app.route('/materia/<int:id_materia>')
-def detalle_materia(id_materia):
-    # Obtener los detalles de la materia desde la base de datos
-    conn = get_db_connection()
-    cursor = conn.cursor()
-    cursor.execute("SELECT * FROM materia WHERE id_materia = %s", (id_materia,))
-    materia = cursor.fetchone()
-    cursor.close()
-    conn.close()
-
-    # Pasar las materias a la plantilla
-    return render_template('profesor.html', materias=materias)
-
-
-@app.route('/login', methods=['GET', 'POST'])
-def login():
-    if request.method == 'POST':
-        id_usuario = int(request.form.get("registro"))
-        password = request.form.get("password")
-
-        # Verificar si el usuario existe en la base de datos PostgreSQL
-        conn = get_db_connection()
-        cursor = conn.cursor()
-        cursor.execute("SELECT * FROM usuarios WHERE id_usuario = %s", (id_usuario,))
-        user = cursor.fetchone()
-        cursor.close()
-        conn.close()
-
-        if user and password == user[-2]:  # user[-2] es la columna de la contraseña sin encriptar
-            print("User:", user[-3])
-            print("Password:", password)
-            # Redirigir según el rol
-            if user[-3] == 'admin':
-                return redirect(url_for('admin'))
-            elif user[-3] == 'profesor':
-                return redirect(url_for('profesor'))
-            elif user[-3] == 'director':
-                return redirect(url_for('director'))
-            else:
-                return "Rol desconocido", 400  # Agregado para capturar cualquier rol no esperado
-        else:
-            return "Correo o contraseña incorrectos", 401
-        
-    return render_template('login.html')
-
-@app.route('/admin')
-def admin():
-    return render_template('admin.html')
+    if request.method == 'GET':
+        return render_template('inscripcion.html')  # Muestra el formulario
 
 @app.route('/director')
 def director():
