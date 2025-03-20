@@ -171,7 +171,7 @@ def contratar():
         # Insertar los datos en la tabla usuarios
         try:
             cursor.execute(
-                "INSERT INTO usuarios (nombre, apellido_paterno, apellido_materno, rol, password,fecha_nacimiento) "
+                "INSERT INTO usuarios (nombre, apellido_paterno, apellido_materno, rol, contrasena,fecha_nacimiento) "
                 "VALUES (%s, %s, %s, %s, %s, %s)",
                 (nombre, apellido_paterno, apellido_materno, rol, contraseña_cifrada, fecha_nacimiento)
             )
