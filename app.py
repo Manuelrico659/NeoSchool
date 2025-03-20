@@ -397,7 +397,16 @@ def cambiar_contrasena():
                 conn.close()
 
                 mensaje = "Contraseña cambiada exitosamente."
-                return render_template('admin.html', mensaje=mensaje)
+                
+                # Redireccionar según el rol del usuario
+                rol = session.get('rol', None)
+                if rol == 'admin':
+                    return render_template('admin.html', mensaje="Contraseña actualizada correctamente")
+                elif rol == 'profesor':
+                    return render_template('profesor.html', mensaje="Contraseña actualizada correctamente")
+                else:
+                    return redirect(url_for('director'))  # Página principal por defecto
+
             else:
                 mensaje = "La contraseña actual es incorrecta."
 

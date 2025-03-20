@@ -31,7 +31,7 @@
         {% endif %}
 
         <br>
-        <a href="{{ url_for('admin') }}">Volver al inicio</a>
+        <a href="{% if session['rol'] == 'admin' %}{{ url_for('admin') }}{% elif session['rol'] == 'profesor' %}{{ url_for('profesor') }}{% else %}{{ request.referrer or url_for('director') }}{% endif %}">Volver al inicio</a>
     </div>
 </body>
 </html>
