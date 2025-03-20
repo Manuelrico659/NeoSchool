@@ -304,16 +304,16 @@ def agregar_materia():
                     retardos = 0
 
                     # Calcular la calificación final (promedio de los primeros 4 valores)
-                    calificacion_final = (participacion + ejercicios_practicas + tareas_trabajo + examen) / 4
+                    calificacion_parcial = (participacion + ejercicios_practicas + tareas_trabajo + examen) / 4
 
                     cursor.execute(
                         """INSERT INTO parciales 
                         (id_alumno, id_materia, parcial, participacion, ejercicios_practicas, 
-                        tareas_trabajo, examen, asistencia_misa, retardos, calificacion_final) 
+                        tareas_trabajo, examen, asistencia_misa, retardos, calificacion_parcial) 
                         VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)""",
                         (id_alumno, id_materia, parcial, participacion, 
-                        ejercicios_practicas, tareas_trabajo, examen, 
-                        asistencia_misa, retardos, calificacion_final)
+                        ejercicios_practicas, tareas_trabajo, examen,   
+                        asistencia_misa, retardos, calificacion_parcial)
                     )
 
             # 3️⃣ Confirmar los cambios
