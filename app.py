@@ -145,7 +145,7 @@ def detalle_materia(id_materia):
 def admin():
     return render_template('admin.html')
 
-@app.route('/contratar', methods=['POST'])
+@app.route('/contratacion', methods=['POST'])
 def contratar():
     if request.method == 'POST':
         # Obtener los datos del formulario
@@ -186,9 +186,9 @@ def contratar():
         return redirect(url_for('admin'))
     
     if request.method == 'GET':
-        return render_template('contratar.html')  # Muestra el formulario
+        return render_template('contratacion.html')  # Muestra el formulario
 
-@app.route('/inscripcion', methods=['GET', 'POST'])
+@app.route('/Inscripcion', methods=['GET', 'POST'])
 def inscripcion():
     if request.method == 'POST':
         # Obtener los datos del formulario
@@ -246,7 +246,7 @@ def inscripcion():
         return redirect(url_for('admin'))
 
     if request.method == 'GET':
-        return render_template('inscripcion.html')  # Muestra el formulario
+        return render_template('Inscripcion.html')  # Muestra el formulario
 
 @app.route('/director')
 def director():
