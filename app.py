@@ -297,14 +297,14 @@ def agregar_materia():
     return render_template('agregar_materia.html', maestros=get_maestros())
 
 def get_maestros():
-    # Obtener la lista de maestros desde la base de datos
     conn = get_db_connection()
-    cursor = conn.cursor()
-    cursor.execute("SELECT id_usuario, nombre, apellido_paterno FROM usuarios WHERE rol = 'profesor'")
+    cursor = conn.cursor(dictionary=True)  # Devuelve los resultados como diccionario
+    cursor.execute("SELECT id_usuario, nombre, apellido_paterno FROM usuario WHERE rol = 'profesor'")
     maestros = cursor.fetchall()
     cursor.close()
     conn.close()
     return maestros
+
 
 
 @app.route('/cambiar_contrasena', methods=['GET', 'POST'])
