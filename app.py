@@ -328,6 +328,7 @@ def get_alumnos():
     alumnos = cursor.fetchall()
     cursor.close()
     conn.close()
+    print (alumnos)
     return alumnos
 
 
