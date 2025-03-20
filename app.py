@@ -265,5 +265,51 @@ def inscripcion():
 def director():
     return render_template('director.html')
 
+@app.route('/cambiar_contrasena', methods=['GET', 'POST'])
+def cambiar_contrasena():
+    if 'id_usuario' not in session:
+        return redirect(url_for('login'))  # Redirigir al login si no está autenticado
+
+    mensaje = None
+
+    if request.method == 'POST':
+        id_usuario = session['id_usuario']
+        contraseña_actual = request.form['current_password']
+        nueva_contraseña = request.form['new_password']
+        confirmar_contraseña = request.form['confirm_password']
+
+        # Verificar que las nuevas contraseñas coincidan
+        if nueva_contraseña != confirmar_contraseña:
+            mensaje = "Las nuevas contraseñas no coinciden."
+        else:
+            # Obtener la contraseña actual del usuario desde la base de datos
+            conn = get_db_connection()
+            cursor = conn.cursor()
+            cursor.execute("SELECT contrasena FROM usuarios WHERE id_usuario = %s", (id_usuario,))
+            usuario = cursor.fetchone()
+            cursor.close()
+            conn.close()
+
+            if usuario and bcrypt.check_password_hash(usuario[0], contraseña_actual):
+                # Encriptar la nueva contraseña
+                nueva_contraseña_encriptada = bcrypt.generate_password_hash(nueva_contraseña).decode('utf-8')
+
+                # Actualizar la contraseña en la base de datos
+                conn = get_db_connection()
+                cursor = conn.cursor()
+                cursor.execute(
+                    "UPDATE usuarios SET contrasena = %s WHERE id_usuario = %s",
+                    (nueva_contraseña_encriptada, id_usuario)
+                )
+                conn.commit()
+                cursor.close()
+                conn.close()
+
+                mensaje = "Contraseña cambiada exitosamente."
+            else:
+                mensaje = "La contraseña actual es incorrecta."
+
+    return render_template('cambiar_contrasena.html', mensaje=mensaje)
+
 if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0', port=5000)
