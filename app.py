@@ -284,7 +284,7 @@ def agregar_materia():
         cursor = conn.cursor()
         try:
             cursor.execute(
-                "INSERT INTO materia (nombre, id_usuario) VALUES (%s, %s) RETURNING id_materia",
+                "INSERT INTO materia (nombre, id_usuario)" "VALUES (%s, %s) RETURNING id_materia",
                 (nombre, id_usuario)
             )
             id_materia = cursor.fetchone()[0]
@@ -304,13 +304,8 @@ def agregar_materia():
 
                     # Insertar el registro en la tabla parciales
                     cursor.execute(
-                        """
-                        INSERT INTO parciales (
-                            id_alumno, id_materia, parcial, participacion, 
-                            ejercicios_practicas, tareas_trabajo, examen, 
-                            asistencia_misa, retardos, calificacion_final
-                        ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
-                        """,
+                        "INSERT INTO parciales (id_alumno, id_materia, parcial, participacion, ejercicios_practicas, tareas_trabajo, examen, asistencia_misa, retardos, calificacion_final)"
+                        "VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)",
                         (id_alumno, id_materia, parcial, participacion, 
                         ejercicios_practicas, tareas_trabajo, examen, 
                         asistencia_misa, retardos, calificacion_final)
