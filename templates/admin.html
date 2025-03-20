@@ -47,10 +47,15 @@
 
                 case "agregar-materias":
                     mainContent.innerHTML = `
-                        <h1>Agregar Materias</h1>
-                        <div class="content-section">
-                            <p>Contenido para agregar materias.</p>
-                        </div>
+                        <h1>Materias</h1>
+                        <div class="content-grid">
+                                <div class="content-section">
+                                    <h2>Altas</h2>
+                                    <div class="button-container">
+                                        <button onclick="window.location.href='{{ url_for('registrar_materia') }}'">Registrar nueva materia</button>
+                                    </div>
+                                </div>
+                            </div>
                     `;
                     break;
 
