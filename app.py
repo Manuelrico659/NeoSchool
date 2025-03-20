@@ -124,6 +124,14 @@ def profesor():
     # Pasar las materias a la plantilla
     return render_template('profesor.html', materias=materias)
 
+@app.route('/detalle_materia.html')
+def detalle_materia():
+    materia_id = request.args.get('id')
+    materia = next((m for m in materia if str(m[0]) == materia_id), None)
+    if materia:
+        return f"Detalle de la materia: {materia[1]}"
+    return "Materia no encontrada", 404
+
 
 @app.route('/materia/<int:id_materia>')
 def detalle_materia(id_materia):
