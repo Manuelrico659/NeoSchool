@@ -132,7 +132,7 @@ def detalle_materia():
         return f"Detalle de la materia: {materia[1]}"
     return "Materia no encontrada", 404
 
-
+"""
 @app.route('/materia/<int:id_materia>')
 def detalle_materia(id_materia):
     # Obtener los detalles de la materia desde la base de datos
@@ -145,7 +145,7 @@ def detalle_materia(id_materia):
 
     # Pasar las materias a la plantilla
     return render_template('detalle_materia.html', materia=materia)
-
+"""
 
 @app.route('/admin')
 def admin():
