@@ -195,7 +195,7 @@ def inscripcion():
         nombre = request.form['nombre']
         apellido_paterno = request.form['apellido_paterno']
         apellido_materno = request.form['apellido_materno']
-        escuela_inscripcion = request.form['escuela_inscripcion']
+        campus = request.form['escuela_inscripcion']
         nivel = request.form['nivel']
         grado = request.form['grado']
         curp = request.form['curp']
@@ -206,16 +206,22 @@ def inscripcion():
         sexo = request.form['Sexo']
         tipo_sangre = request.form['tipo_sangre']
 
-        # Información familiar
-        familia_existente = 'id_familia' in request.form
-        if familia_existente:
-            id_familia = int(request.form['id_familia'])
-        else:
-            tutor = request.form['tutor']
-            tel_emergencia = request.form['tel_emergencia']
+        tiene_familia = request.form.get('tiene_familia')  # Checkbox: "Tiene familia registrada"
 
-        # Mostrar los datos recibidos (depuración)
-        print(f"Datos recibidos: {nombre}, {apellido_paterno}, {apellido_materno}, {escuela_inscripcion}, {nivel}, {grado}, {curp}, {fecha_nacimiento}, {alergias}, {capilla}, {beca}, {sexo}, {tipo_sangre}, Familia Existente: {familia_existente}")
+        if tiene_familia:
+            # Si el usuario tiene una familia registrada, tomamos el ID de la familia
+            id_familia = request.form.get('id_familia')
+            if not id_familia or not id_familia.isdigit():
+                return "Por favor ingrese un ID de Familia válido", 400
+            id_familia = int(id_familia)
+
+        else:
+            # Si no tiene familia registrada, tomamos los datos de nueva familia
+            tutor = request.form.get('tutor')
+            tel_emergencia = request.form.get('tel_emergencia')
+            
+            if not tutor or not tel_emergencia:
+                return "Por favor ingrese todos los campos para la nueva familia", 400
 
         # Conectar a la base de datos
         conn = get_db_connection()
@@ -223,7 +229,7 @@ def inscripcion():
 
         try:
             # Insertar la familia si no existe
-            if not familia_existente:
+            if not tiene_familia:
                 cursor.execute(
                     "INSERT INTO familias (tutor, tel_emergencia) VALUES (%s, %s) RETURNING id_familia",
                     (tutor, tel_emergencia)
@@ -232,9 +238,17 @@ def inscripcion():
 
             # Insertar los datos del alumno
             cursor.execute(
-                "INSERT INTO alumnos (nombre, apellido_paterno, apellido_materno, escuela_inscripcion, nivel, grado, curp, fecha_nacimiento, alergias, capilla, beca, sexo, tipo_sangre, id_familia) "
-                "VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)",
-                (nombre, apellido_paterno, apellido_materno, escuela_inscripcion, nivel, grado, curp, fecha_nacimiento, alergias, capilla, beca, sexo, tipo_sangre, id_familia)
+                "INSERT INTO alumnos (nombre, apellido_paterno, apellido_materno, nivel, grado, campus, id_familia) "
+                "VALUES (%s, %s, %s, %s, %s, %s, %s)",
+                (nombre, apellido_paterno, apellido_materno, nivel, grado, campus, id_familia)
+            )
+            id_alumno = cursor.fetchone()[0]
+
+            # Insertar los datos generales
+            cursor.execute(
+                "INSERT INTO datos_generales (id_alumno, curp, sexo, tipo_sangre, alergias, capilla, beca, fecha_nacimiento) "
+                "VALUES (%s, %s, %s, %s, %s, %s, %s, %s)",
+                (id_alumno, curp, sexo, tipo_sangre, alergias, capilla, beca, fecha_nacimiento)
             )
             conn.commit()  # Guardar los cambios en la base de datos
         except Exception as e:
@@ -250,7 +264,6 @@ def inscripcion():
     
     if request.method == 'GET':
         return render_template('Inscripcion.html')  # Muestra el formulario
-
 
 @app.route('/director')
 def director():
