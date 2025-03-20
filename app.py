@@ -145,7 +145,7 @@ def detalle_materia(id_materia):
 def admin():
     return render_template('admin.html')
 
-@app.route('/contratar', methods=['POST'])
+@app.route('/contratar', methods=['GET', 'POST'])
 def contratar():
     if request.method == 'POST':
         # Obtener los datos del formulario
@@ -171,9 +171,9 @@ def contratar():
         # Insertar los datos en la tabla usuarios
         try:
             cursor.execute(
-                "INSERT INTO usuarios (nombre, apellido_paterno, apellido_materno, fecha_nacimiento, rol, password) "
+                "INSERT INTO usuarios (nombre, apellido_paterno, apellido_materno, rol, password,fecha_nacimiento) "
                 "VALUES (%s, %s, %s, %s, %s, %s)",
-                (nombre, apellido_paterno, apellido_materno, fecha_nacimiento, rol, contraseña_cifrada)
+                (nombre, apellido_paterno, apellido_materno, rol, contraseña_cifrada, fecha_nacimiento)
             )
             conn.commit()  # Guardar los cambios en la base de datos
         except Exception as e:
