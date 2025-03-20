@@ -239,7 +239,7 @@ def inscripcion():
             # Insertar los datos del alumno
             cursor.execute(
                 "INSERT INTO alumno (nombre, apellido_paterno, apellido_materno, nivel, grado, campus, id_familia) "
-                "VALUES (%s, %s, %s, %s, %s, %s, %s)",
+                "VALUES (%s, %s, %s, %s, %s, %s, %s) RETURNING id_alumno",
                 (nombre, apellido_paterno, apellido_materno, nivel, grado, campus, id_familia)
             )
             id_alumno = cursor.fetchone()[0]
