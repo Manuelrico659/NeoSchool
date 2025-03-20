@@ -220,7 +220,7 @@ def inscripcion():
             
             if not tutor or not tel_emergencia:
                 return "Por favor ingrese todos los campos para la nueva familia", 400
-
+        
         # Conectar a la base de datos
         conn = get_db_connection()
         cursor = conn.cursor()
@@ -279,8 +279,9 @@ def agregar_materia():
         if not alumnos_seleccionados:
             return render_template('agregar_materia.html', mensaje="Debes seleccionar al menos un alumno.", maestros=get_maestros(), alumnos=get_alumnos())
 
-        print("---------------------------")
-        print(alumnos_seleccionados)
+        print(f"🔹 Nombre de la materia: {nombre}")
+        print(f"🔹 ID del maestro: {id_usuario}")
+        print(f"🔹 Alumnos seleccionados: {alumnos_seleccionados}")
 
         # Insertar la materia en la base de datos
         conn = get_db_connection()
