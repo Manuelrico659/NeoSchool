@@ -5,6 +5,30 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>NeoSchool - Profesor</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/interfaces.css') }}">
+    <style>
+        .materia-button {
+            display: block;
+            width: 100%;
+            padding: 15px;
+            margin: 10px 0;
+            border: none;
+            background-color: #4D869C; /* Color de fondo */
+            color: white;
+            font-size: 18px;
+            text-align: left;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background 0.3s ease;
+        }
+
+        .materia-button:hover {
+            background-color: #356e82; /* Cambio de color al pasar el mouse */
+        }
+
+        .materia-button strong {
+            display: block;
+        }
+    </style>
     <script>
         function loadContent(section) {
             const mainContent = document.querySelector(".main-content");
@@ -25,16 +49,12 @@
                         <h1>Materias Activas</h1>
                         <div class="content-section">
                             {% if materias %}
-                                <ul>
-                                    {% for materia in materias %}
-                                        <li>
-                                            <button onclick="window.location.href='detalle_materia.html?id={{ materia[0] }}'">
-                                                <strong>ID:</strong> {{ materia[0] }}, 
-                                                <strong>Nombre:</strong> {{ materia[1] }}
-                                            </button>
-                                        </li>
-                                    {% endfor %}
-                                </ul>
+                                {% for materia in materias %}
+                                    <button class="materia-button" onclick="window.location.href='detalle_materia.html?id={{ materia[0] }}'">
+                                        <strong>ID:</strong> {{ materia[0] }} <br>
+                                        <strong>Nombre:</strong> {{ materia[1] }}
+                                    </button>
+                                {% endfor %}
                             {% else %}
                                 <p>No tienes materias asignadas.</p>
                             {% endif %}
