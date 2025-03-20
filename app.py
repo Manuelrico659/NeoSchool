@@ -305,6 +305,7 @@ def get_maestros():
     maestros = cursor.fetchall()
     cursor.close()
     conn.close()
+    print(maestros)
     return maestros
 
 
