@@ -26,7 +26,7 @@
             <div class="alumnos-container">
                 <label for="buscar-alumno">Buscar Alumno:</label>
                 <div class="search-box">
-                    <input type="text" id="buscar-alumno" placeholder="Ingrese un nombre...">
+                    <input type="text" id="buscar-alumno" placeholder="Ingrese un nombre..." oninput="buscarAlumno()">
                     <button type="button" onclick="buscarAlumno()">Buscar</button>
                 </div>
                 
@@ -34,7 +34,7 @@
                 <div id="lista-alumnos">
                     {% for alumno in alumnos %}
                         <label class="alumno-item">
-                            <input type="checkbox" name="alumnos" value="{{ alumno.id_usuario }}">
+                            <input type="checkbox" name="alumnos" value="{{ alumno.id_alumno }}">
                             {{ alumno.nombre }} {{ alumno.apellido_paterno }} {{ alumno.apellido_materno }}
                         </label>
                     {% endfor %}
@@ -57,7 +57,7 @@
         function buscarAlumno() {
             let filtro = document.getElementById('buscar-alumno').value.toLowerCase();
             let alumnos = document.querySelectorAll('.alumno-item');
-
+    
             alumnos.forEach(function(alumno) {
                 let nombre = alumno.textContent.toLowerCase();
                 alumno.style.display = nombre.includes(filtro) ? "block" : "none";
@@ -65,52 +65,60 @@
         }
     </script>
 
-    <style>
-        .alumnos-container {
-            border: 1px solid #ccc;
-            padding: 10px;
-            margin-top: 15px;
-            border-radius: 5px;
-            background: #f9f9f9;
-        }
+<style>
+    .alumnos-container {
+        border: 1px solid #ccc;
+        padding: 10px;
+        margin-top: 15px;
+        border-radius: 5px;
+        background: #f9f9f9;
+    }
 
-        .search-box {
-            display: flex;
-            gap: 10px;
-            margin-bottom: 10px;
-        }
+    .search-box {
+        display: flex;
+        gap: 10px;
+        margin-bottom: 10px;
+    }
 
-        .search-box input {
-            flex: 1;
-            padding: 5px;
-        }
+    .search-box input {
+        flex: 1;
+        padding: 5px;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+    }
 
-        .search-box button {
-            padding: 5px 10px;
-            background: #4D869C;
-            color: white;
-            border: none;
-            cursor: pointer;
-        }
+    .search-box button {
+        padding: 5px 10px;
+        background: #4D869C;
+        color: white;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+    }
 
-        .search-box button:hover {
-            background: #3b6a80;
-        }
+    .search-box button:hover {
+        background: #3b6a80;
+    }
 
-        #lista-alumnos {
-            max-height: 200px;
-            overflow-y: auto;
-            border: 1px solid #ddd;
-            padding: 5px;
-            background: white;
-        }
+    #lista-alumnos {
+        max-height: 200px;
+        overflow-y: auto;
+        border: 1px solid #ddd;
+        padding: 5px;
+        background: white;
+        border-radius: 4px;
+    }
 
-        .alumno-item {
-            display: block;
-            padding: 5px;
-            border-bottom: 1px solid #eee;
-        }
-    </style>
+    .alumno-item {
+        display: block;
+        padding: 5px;
+        border-bottom: 1px solid #eee;
+    }
+
+    .alumno-item:last-child {
+        border-bottom: none;
+    }
+</style>
 
 </body>
 </html>
