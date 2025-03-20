@@ -289,10 +289,30 @@ def agregar_materia():
 
             # Insertar los alumnos en la relación materia-alumno
             for id_alumno in alumnos_seleccionados:
-                cursor.execute(
-                    "INSERT INTO materia_alumno (id_materia, id_usuario) VALUES (%s, %s)",
-                    (id_materia, id_alumno)
-                )
+                for parcial in range(1, 6):  # 1 a 5
+                    participacion = 100
+                    ejercicios_practicas = 100
+                    tareas_trabajo = 100
+                    examen = 100
+                    asistencia_misa = 0
+                    retardos = 0
+
+                    # Calcular la calificación final como el promedio de los primeros 4 campos
+                    calificacion_final = (participacion + ejercicios_practicas + tareas_trabajo + examen) / 4
+
+                    # Insertar el registro en la tabla parciales
+                    cursor.execute(
+                        """
+                        INSERT INTO parciales (
+                            id_alumno, id_materia, parcial, participacion, 
+                            ejercicios_practicas, tareas_trabajo, examen, 
+                            asistencia_misa, retardos, calificacion_final
+                        ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+                        """,
+                        (id_alumno, id_materia, parcial, participacion, 
+                        ejercicios_practicas, tareas_trabajo, examen, 
+                        asistencia_misa, retardos, calificacion_final)
+                    )
 
             conn.commit()
             mensaje = "Materia y alumnos agregados exitosamente."
