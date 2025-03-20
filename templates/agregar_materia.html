@@ -22,6 +22,20 @@
                 {% endfor %}
             </select>
 
+            <!-- Campo de búsqueda para filtrar alumnos -->
+            <label for="buscar-alumno">Buscar Alumno:</label>
+            <input type="text" id="buscar-alumno" placeholder="Escriba un nombre...">
+
+            <!-- Lista de alumnos con checkboxes -->
+            <div id="lista-alumnos">
+                {% for alumno in alumnos %}
+                    <label class="alumno-item">
+                        <input type="checkbox" name="alumnos" value="{{ alumno.id_usuario }}">
+                        {{ alumno.nombre }} {{ alumno.apellido_paterno }} {{ alumno.apellido_materno }}
+                    </label>
+                {% endfor %}
+            </div>
+
             <!-- Botón para enviar el formulario -->
             <button type="submit">Agregar Materia</button>
         </form>
@@ -33,5 +47,23 @@
         <br>
         <a href="{{ url_for('admin') }}">Volver al inicio</a>
     </div>
+
+    <script>
+        // Filtrar alumnos en tiempo real
+        document.getElementById('buscar-alumno').addEventListener('input', function() {
+            let filtro = this.value.toLowerCase();
+            let alumnos = document.querySelectorAll('.alumno-item');
+
+            alumnos.forEach(function(alumno) {
+                let nombre = alumno.textContent.toLowerCase();
+                if (nombre.includes(filtro)) {
+                    alumno.style.display = "block";
+                } else {
+                    alumno.style.display = "none";
+                }
+            });
+        });
+    </script>
+
 </body>
 </html>

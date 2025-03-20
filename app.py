@@ -274,18 +274,28 @@ def agregar_materia():
 
     if request.method == 'POST':
         nombre = request.form['nombre']
-        id_usuario = request.form['id_usuario']  # Obtener el ID del maestro seleccionado
+        id_usuario = request.form['id_usuario']  # Maestro seleccionado
+        alumnos_seleccionados = request.form.getlist('alumnos')  # Lista de alumnos seleccionados
 
         # Insertar la materia en la base de datos
         conn = get_db_connection()
         cursor = conn.cursor()
         try:
             cursor.execute(
-                "INSERT INTO materia (nombre, id_usuario) VALUES (%s, %s)",
+                "INSERT INTO materia (nombre, id_usuario) VALUES (%s, %s) RETURNING id_materia",
                 (nombre, id_usuario)
             )
+            id_materia = cursor.fetchone()[0]
+
+            # Insertar los alumnos en la relación materia-alumno
+            for id_alumno in alumnos_seleccionados:
+                cursor.execute(
+                    "INSERT INTO materia_alumno (id_materia, id_usuario) VALUES (%s, %s)",
+                    (id_materia, id_alumno)
+                )
+
             conn.commit()
-            mensaje = "Materia agregada exitosamente."
+            mensaje = "Materia y alumnos agregados exitosamente."
         except Exception as e:
             conn.rollback()
             mensaje = f"Error al agregar la materia: {str(e)}"
@@ -293,10 +303,11 @@ def agregar_materia():
             cursor.close()
             conn.close()
 
-        return render_template('admin.html', mensaje=mensaje, maestros=get_maestros())
+        return render_template('admin.html', mensaje=mensaje, maestros=get_maestros(), alumnos=get_alumnos())
 
-    # Obtener la lista de maestros para el formulario
-    return render_template('agregar_materia.html', maestros=get_maestros())
+    # Obtener la lista de maestros y alumnos para el formulario
+    return render_template('agregar_materia.html', maestros=get_maestros(), alumnos=get_alumnos())
+
 
 def get_maestros():
     conn = get_db_connection()
@@ -308,6 +319,16 @@ def get_maestros():
     print(maestros)
     return maestros
 
+import psycopg2.extras
+
+def get_alumnos():
+    conn = get_db_connection()
+    cursor = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)  # Usa DictCursor aquí
+    cursor.execute("SELECT id_usuario, nombre, apellido_paterno, apellido_materno FROM usuario WHERE rol = 'alumno'")
+    alumnos = cursor.fetchall()
+    cursor.close()
+    conn.close()
+    return alumnos
 
 
 @app.route('/cambiar_contrasena', methods=['GET', 'POST'])
