@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Agregar Materia</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/forms.css') }}">
+</head>
+<body>
+    <div class="form-container">
+        <h2>Agregar Materia</h2>
+        <form id="agregar-materia-form" method="POST" action="/agregar_materia">
+            <!-- Campo para el nombre de la materia -->
+            <input type="text" name="nombre" placeholder="Nombre de la Materia" required>
+
+            <!-- Campo para seleccionar el maestro -->
+            <label for="id_usuario">Seleccione el Maestro:</label>
+            <select id="id_usuario" name="id_usuario" required>
+                <option value="">Seleccione un Maestro</option>
+                {% for maestro in maestros %}
+                    <option value="{{ maestro.id_usuario }}">{{ maestro.nombre }} {{ maestro.apellido_paterno }} (ID: {{ maestro.id_usuario }})</option>
+                {% endfor %}
+            </select>
+
+            <!-- Botón para enviar el formulario -->
+            <button type="submit">Agregar Materia</button>
+        </form>
+
+        {% if mensaje %}
+            <p>{{ mensaje }}</p>
+        {% endif %}
+
+        <br>
+        <a href="{{ url_for('home') }}">Volver al inicio</a>
+    </div>
+</body>
+</html>

@@ -265,10 +265,46 @@ def inscripcion():
 def director():
     return render_template('director.html')
 
-@app.route('/registrar_materia')
-def registrar_materia():
-    # Your code to handle this route
-    return render_template('registrar_materia.html')
+@app.route('/agregar_materia', methods=['GET', 'POST'])
+def agregar_materia():
+    if 'id_usuario' not in session or session['rol'] != 'admin':
+        return redirect(url_for('login'))  # Solo administradores pueden agregar materias
+
+    if request.method == 'POST':
+        nombre = request.form['nombre']
+        id_usuario = request.form['id_usuario']  # Obtener el ID del maestro seleccionado
+
+        # Insertar la materia en la base de datos
+        conn = get_db_connection()
+        cursor = conn.cursor()
+        try:
+            cursor.execute(
+                "INSERT INTO materia (nombre, id_usuario) VALUES (%s, %s)",
+                (nombre, id_usuario)
+            )
+            conn.commit()
+            mensaje = "Materia agregada exitosamente."
+        except Exception as e:
+            conn.rollback()
+            mensaje = f"Error al agregar la materia: {str(e)}"
+        finally:
+            cursor.close()
+            conn.close()
+
+        return render_template('agregar_materia.html', mensaje=mensaje, maestros=get_maestros())
+
+    # Obtener la lista de maestros para el formulario
+    return render_template('agregar_materia.html', maestros=get_maestros())
+
+def get_maestros():
+    # Obtener la lista de maestros desde la base de datos
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    cursor.execute("SELECT id_usuario, nombre, apellido_paterno FROM usuarios WHERE rol = 'profesor'")
+    maestros = cursor.fetchall()
+    cursor.close()
+    conn.close()
+    return maestros
 
 
 @app.route('/cambiar_contrasena', methods=['GET', 'POST'])
@@ -315,7 +351,7 @@ def cambiar_contrasena():
             else:
                 mensaje = "La contraseña actual es incorrecta."
 
-    return render_template('admin.html', mensaje=mensaje)
+    return render_template('cambiar_contrasena.html', mensaje=mensaje)
 
 if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0', port=5000)
