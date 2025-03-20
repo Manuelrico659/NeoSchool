@@ -231,14 +231,14 @@ def inscripcion():
             # Insertar la familia si no existe
             if not tiene_familia:
                 cursor.execute(
-                    "INSERT INTO familias (tutor, tel_emergencia) VALUES (%s, %s) RETURNING id_familia",
+                    "INSERT INTO familia (tutor, tel_emergencia) VALUES (%s, %s) RETURNING id_familia",
                     (tutor, tel_emergencia)
                 )
                 id_familia = cursor.fetchone()[0]
 
             # Insertar los datos del alumno
             cursor.execute(
-                "INSERT INTO alumnos (nombre, apellido_paterno, apellido_materno, nivel, grado, campus, id_familia) "
+                "INSERT INTO alumno (nombre, apellido_paterno, apellido_materno, nivel, grado, campus, id_familia) "
                 "VALUES (%s, %s, %s, %s, %s, %s, %s)",
                 (nombre, apellido_paterno, apellido_materno, nivel, grado, campus, id_familia)
             )
