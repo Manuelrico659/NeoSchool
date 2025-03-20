@@ -326,7 +326,7 @@ def agregar_materia():
             cursor.close()
             conn.close()
 
-        return render_template('admin.html', mensaje=mensaje, maestros=get_maestros(), alumnos=get_alumnos())
+        return render_template('agregar_materia.html', mensaje=mensaje, maestros=get_maestros(), alumnos=get_alumnos())
 
     # Obtener la lista de maestros y alumnos para el formulario
     return render_template('agregar_materia.html', maestros=get_maestros(), alumnos=get_alumnos())
