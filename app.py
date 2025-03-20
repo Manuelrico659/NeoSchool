@@ -188,7 +188,7 @@ def contratar():
     if request.method == 'GET':
         return render_template('contratacion.html')  # Muestra el formulario
 
-@app.route('/Inscripcion', methods=['GET', 'POST'])
+@app.route('/inscripcion', methods=['GET', 'POST'])
 def inscripcion():
     if request.method == 'POST':
         # Obtener los datos del formulario
