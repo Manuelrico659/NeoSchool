@@ -287,25 +287,26 @@ def agregar_materia():
         conn = get_db_connection()
         cursor = conn.cursor()
         try:
+            print(cursor.query)
             cursor.execute(
                 "INSERT INTO materia (nombre, id_usuario) VALUES (%s, %s) RETURNING id_materia",
                 (nombre, id_usuario)
             )
             id_materia = cursor.fetchone()[0]  # Obtener el ID de la materia recién insertada
-
+            conn.commit()
             # Insertar los alumnos en la relación materia-alumno
             for id_alumno in alumnos_seleccionados:
                 for parcial in range(1, 6):  # 5 parciales (1 al 5)
-                    participacion = 100
-                    ejercicios_practicas = 100
-                    tareas_trabajo = 100
-                    examen = 100
+                    participacion = 10
+                    ejercicios_practicas = 10
+                    tareas_trabajo = 10
+                    examen = 10
                     asistencia_misa = 0
                     retardos = 0
 
                     # Calcular la calificación final (promedio de los primeros 4 valores)
                     calificacion_parcial = (participacion + ejercicios_practicas + tareas_trabajo + examen) / 4
-
+                    print(cursor.query)
                     cursor.execute(
                         """INSERT INTO parciales 
                         (id_alumno, id_materia, parcial, participacion, ejercicios_practicas, 
