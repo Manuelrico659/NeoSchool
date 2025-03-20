@@ -54,7 +54,6 @@ def get_db_connection():
 def home():
     return render_template('Index.html')
 
-bcrypt = Bcrypt(app)
 
 
 @app.route('/login', methods=['GET', 'POST'])
@@ -62,6 +61,8 @@ def login():
     if request.method == 'POST':
         id_usuario = int(request.form.get("registro"))
         password = request.form.get("password")
+
+
 
         # Verificar si el usuario existe en la base de datos PostgreSQL
         conn = get_db_connection()
@@ -71,7 +72,14 @@ def login():
         cursor.close()
         conn.close()
 
+        """ 
+        if user and bcrypt.check_password_hash(user[-2], password):
+
+        """
+
         if user and password == user[-2]:  # user[-2] es la columna de la contraseña sin encriptar
+            session['id_usuario'] = user[0]  # Suponiendo que user[0] es el ID del usuario
+            session['rol'] = user[-3]  # Almacenar el rol en la sesión
             print("User:", user[-3])
             print("Password:", password)
             # Redirigir según el rol
@@ -130,7 +138,8 @@ def detalle_materia(id_materia):
     conn.close()
 
     # Pasar las materias a la plantilla
-    return render_template('profesor.html', materias=materias)
+    return render_template('detalle_materia.html', materia=materia)
+
 
 @app.route('/admin')
 def admin():
@@ -200,7 +209,7 @@ def inscripcion():
         # Información familiar
         familia_existente = 'id_familia' in request.form
         if familia_existente:
-            id_familia = request.form['id_familia']
+            id_familia = int(request.form['id_familia'])
         else:
             tutor = request.form['tutor']
             tel_emergencia = request.form['tel_emergencia']
