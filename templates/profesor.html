@@ -6,7 +6,6 @@
     <title>NeoSchool - Profesor</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/interfaces.css') }}">
     <script>
-        // Función para cambiar el contenido dinámicamente
         function loadContent(section) {
             const mainContent = document.querySelector(".main-content");
 
@@ -29,8 +28,10 @@
                                 <ul>
                                     {% for materia in materias %}
                                         <li>
-                                            <strong>ID:</strong> {{ materia[0] }}, 
-                                            <strong>Nombre:</strong> {{ materia[1] }}
+                                            <button onclick="window.location.href='detalle_materia.html?id={{ materia[0] }}'">
+                                                <strong>ID:</strong> {{ materia[0] }}, 
+                                                <strong>Nombre:</strong> {{ materia[1] }}
+                                            </button>
                                         </li>
                                     {% endfor %}
                                 </ul>
@@ -67,28 +68,10 @@
                     break;
 
                 default:
-                    mainContent.innerHTML = `
-                        <h1>Bienvenido, Profesor</h1>
-                        <div class="content-section">
-                            <h2>Materias Activas</h2>
-                            {% if materias %}
-                                <ul>
-                                    {% for materia in materias %}
-                                        <li>
-                                            <strong>ID:</strong> {{ materia[0] }}, 
-                                            <strong>Nombre:</strong> {{ materia[1] }}
-                                        </li>
-                                    {% endfor %}
-                                </ul>
-                            {% else %}
-                                <p>No tienes materias asignadas.</p>
-                            {% endif %}
-                        </div>
-                    `;
+                    loadContent("inicio");
             }
         }
 
-        // Cargar el contenido inicial al abrir la página
         document.addEventListener("DOMContentLoaded", () => {
             loadContent("inicio");
         });
