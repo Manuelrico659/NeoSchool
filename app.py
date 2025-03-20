@@ -145,7 +145,7 @@ def detalle_materia(id_materia):
 def admin():
     return render_template('admin.html')
 
-@app.route('/contratacion', methods=['POST'])
+@app.route('/contratar', methods=['POST'])
 def contratar():
     if request.method == 'POST':
         # Obtener los datos del formulario
@@ -214,6 +214,9 @@ def inscripcion():
             tutor = request.form['tutor']
             tel_emergencia = request.form['tel_emergencia']
 
+        # Mostrar los datos recibidos (depuración)
+        print(f"Datos recibidos: {nombre}, {apellido_paterno}, {apellido_materno}, {escuela_inscripcion}, {nivel}, {grado}, {curp}, {fecha_nacimiento}, {alergias}, {capilla}, {beca}, {sexo}, {tipo_sangre}, Familia Existente: {familia_existente}")
+
         # Conectar a la base de datos
         conn = get_db_connection()
         cursor = conn.cursor()
@@ -244,9 +247,10 @@ def inscripcion():
 
         # Redirigir a la página de administración o confirmación
         return redirect(url_for('admin'))
-
+    
     if request.method == 'GET':
         return render_template('Inscripcion.html')  # Muestra el formulario
+
 
 @app.route('/director')
 def director():
