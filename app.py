@@ -7,6 +7,8 @@ import psycopg2
 from flask_bcrypt import Bcrypt
 from dotenv import load_dotenv
 from flask import session  # Asegúrate de importar session
+import psycopg2.extras
+
 
 # Cargar variables de entorno
 load_dotenv(dotenv_path='variables.env')
@@ -298,8 +300,8 @@ def agregar_materia():
 
 def get_maestros():
     conn = get_db_connection()
-    cursor = conn.cursor(dictionary=True)  # Devuelve los resultados como diccionario
-    cursor.execute("SELECT id_usuario, nombre, apellido_paterno FROM usuario WHERE rol = 'profesor'")
+    cursor = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)  # Usa DictCursor aquí
+    cursor.execute("SELECT id_usuario, nombre, apellido_paterno FROM usuario WHERE rol = 'maestro'")
     maestros = cursor.fetchall()
     cursor.close()
     conn.close()
