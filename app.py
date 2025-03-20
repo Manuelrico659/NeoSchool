@@ -220,15 +220,15 @@ def login():
         cursor.close()
         conn.close()
 
-        if user and password == user[-1]:  # user[-1] es la columna de la contraseña sin encriptar
-            print("User:", user[-2])
+        if user and password == user[-2]:  # user[-1] es la columna de la contraseña sin encriptar
+            print("User:", user[-3])
             print("Password:", password)
             # Redirigir según el rol
-            if user[-2] == 'admin':
+            if user[-3] == 'admin':
                 return redirect(url_for('admin'))
-            elif user[-2] == 'profesor':
+            elif user[-3] == 'profesor':
                 return redirect(url_for('profesor'))
-            elif user[-2] == 'director':
+            elif user[-3] == 'director':
                 return redirect(url_for('director'))
             else:
                 return "Rol desconocido", 400  # Agregado para capturar cualquier rol no esperado
