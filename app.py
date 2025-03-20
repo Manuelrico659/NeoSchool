@@ -276,6 +276,9 @@ def agregar_materia():
         nombre = request.form['nombre']
         id_usuario = request.form['id_usuario']  # Maestro seleccionado
         alumnos_seleccionados = request.form.getlist('alumnos')  # Lista de alumnos seleccionados
+        if not alumnos_seleccionados:
+            return render_template('agregar_materia.html', mensaje="Debes seleccionar al menos un alumno.", maestros=get_maestros(), alumnos=get_alumnos())
+
         print("---------------------------")
         print(alumnos_seleccionados)
 
@@ -284,14 +287,14 @@ def agregar_materia():
         cursor = conn.cursor()
         try:
             cursor.execute(
-                "INSERT INTO materia (nombre, id_usuario)" "VALUES (%s, %s) RETURNING id_materia",
+                "INSERT INTO materia (nombre, id_usuario) VALUES (%s, %s) RETURNING id_materia",
                 (nombre, id_usuario)
             )
-            id_materia = cursor.fetchone()[0]
+            id_materia = cursor.fetchone()[0]  # Obtener el ID de la materia recién insertada
 
             # Insertar los alumnos en la relación materia-alumno
             for id_alumno in alumnos_seleccionados:
-                for parcial in range(1, 6):  # 1 a 5
+                for parcial in range(1, 6):  # 5 parciales (1 al 5)
                     participacion = 100
                     ejercicios_practicas = 100
                     tareas_trabajo = 100
@@ -299,18 +302,20 @@ def agregar_materia():
                     asistencia_misa = 0
                     retardos = 0
 
-                    # Calcular la calificación final como el promedio de los primeros 4 campos
+                    # Calcular la calificación final (promedio de los primeros 4 valores)
                     calificacion_final = (participacion + ejercicios_practicas + tareas_trabajo + examen) / 4
 
-                    # Insertar el registro en la tabla parciales
                     cursor.execute(
-                        "INSERT INTO parciales (id_alumno, id_materia, parcial, participacion, ejercicios_practicas, tareas_trabajo, examen, asistencia_misa, retardos, calificacion_final)"
-                        "VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)",
+                        """INSERT INTO parciales 
+                        (id_alumno, id_materia, parcial, participacion, ejercicios_practicas, 
+                        tareas_trabajo, examen, asistencia_misa, retardos, calificacion_final) 
+                        VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)""",
                         (id_alumno, id_materia, parcial, participacion, 
                         ejercicios_practicas, tareas_trabajo, examen, 
                         asistencia_misa, retardos, calificacion_final)
                     )
 
+            # 3️⃣ Confirmar los cambios
             conn.commit()
             mensaje = "Materia y alumnos agregados exitosamente."
         except Exception as e:
