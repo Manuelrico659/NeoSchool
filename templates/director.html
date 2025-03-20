@@ -6,25 +6,90 @@
     <title>NeoSchool - Director</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/interfaces.css') }}">
     
+    <script>
+        function loadContent(section) {
+            const mainContent = document.querySelector(".main-content");
+
+            switch (section) {
+                case "inicio":
+                    mainContent.innerHTML = `
+                        <h1>Bienvenido, Director</h1>
+                        <div class="content-section">
+                            <h2>Control de Alumnos</h2>
+                            <p>Aquí se gestionará la información de los alumnos.</p>
+                        </div>
+                    `;
+                    break;
+
+                case "agregar-materias":
+                    mainContent.innerHTML = `
+                        <h1>Agregar Materias</h1>
+                        <div class="content-section">
+                            <p>Formulario para agregar nuevas materias.</p>
+                            <button onclick="window.location.href='{{ url_for('agregar_materia') }}'">Agregar Materia</button>
+                        </div>
+                    `;
+                    break;
+
+                case "generar-reporte":
+                    mainContent.innerHTML = `
+                        <h1>Generar Reporte</h1>
+                        <div class="content-section">
+                            <p>Generar reportes administrativos.</p>
+                            <button onclick="window.location.href='{{ url_for('generar_reporte') }}'">Generar Reporte</button>
+                        </div>
+                    `;
+                    break;
+
+                case "visualizar-reportes":
+                    mainContent.innerHTML = `
+                        <h1>Visualizar Reportes</h1>
+                        <div class="content-section">
+                            <p>Lista de reportes generados previamente.</p>
+                            <button onclick="window.location.href='{{ url_for('visualizar_reportes') }}'">Ver Reportes</button>
+                        </div>
+                    `;
+                    break;
+
+                case "configuracion":
+                    mainContent.innerHTML = `
+                        <h1>Configuración</h1>
+                        <div class="content-section">
+                            <button onclick="window.location.href='{{ url_for('cambiar_contrasena') }}'">Cambiar contraseña</button>
+                            <button onclick="window.location.href='{{ url_for('logout') }}'">Cerrar sesión</button>
+                        </div>
+                    `;
+                    break;
+
+                default:
+                    mainContent.innerHTML = `
+                        <h1>Bienvenido, Director</h1>
+                        <div class="content-section">
+                            <h2>Control de Alumnos</h2>
+                            <p>Aquí se gestionará la información de los alumnos.</p>
+                        </div>
+                    `;
+            }
+        }
+
+        document.addEventListener("DOMContentLoaded", () => {
+            loadContent("inicio");
+        });
+    </script>
 </head>
 <body>
     <div class="sidebar">
         <h2>NeoSchool</h2>
         <ul>
-            <li><a href="#">Inicio</a></li>
-            <li><a href="#">Control de Alumnos</a></li>
-            <li><a href="#">Agregar materias</a></li>
-            <li><a href="#">Generar Reporte</a></li>
-            <li><a href="#">Visualizar Reportes</a></li>
-            <li><a href="#">Configuración</a></li>
+            <li><a href="#" onclick="loadContent('inicio')">Inicio</a></li>
+            <li><a href="#" onclick="loadContent('agregar-materias')">Agregar Materias</a></li>
+            <li><a href="#" onclick="loadContent('generar-reporte')">Generar Reporte</a></li>
+            <li><a href="#" onclick="loadContent('visualizar-reportes')">Visualizar Reportes</a></li>
+            <li><a href="#" onclick="loadContent('configuracion')">Configuración</a></li>
         </ul>
     </div>
     <div class="main-content">
-        <h1>Bienvenido, Director</h1>
-        <div class="content-section">
-            <h2>Control de Alumnos</h2>
-            <p>Aquí se gestionará la información de los alumnos.</p>
-        </div>
+        <!-- El contenido se cargará dinámicamente aquí -->
     </div>
 </body>
 </html>
