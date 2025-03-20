@@ -301,7 +301,7 @@ def agregar_materia():
 def get_maestros():
     conn = get_db_connection()
     cursor = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)  # Usa DictCursor aquí
-    cursor.execute("SELECT id_usuario, nombre, apellido_paterno FROM usuario WHERE rol = 'maestro'")
+    cursor.execute("SELECT id_usuario, nombre, apellido_paterno FROM usuarios WHERE rol = 'maestro'")
     maestros = cursor.fetchall()
     cursor.close()
     conn.close()
