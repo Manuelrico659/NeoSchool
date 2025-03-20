@@ -72,12 +72,8 @@ def login():
         cursor.close()
         conn.close()
 
-        """ 
-        if user and bcrypt.check_password_hash(user[-2], password):
 
-        """
-
-        if user and password == user[-2]:  # user[-2] es la columna de la contraseña sin encriptar
+        if user and bcrypt.check_password_hash(user[-2], password):  # user[-2] es la columna de la contraseña sin encriptar
             session['id_usuario'] = user[0]  # Suponiendo que user[0] es el ID del usuario
             session['rol'] = user[-3]  # Almacenar el rol en la sesión
             print("User:", user[-3])
