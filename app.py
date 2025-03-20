@@ -276,6 +276,8 @@ def agregar_materia():
         nombre = request.form['nombre']
         id_usuario = request.form['id_usuario']  # Maestro seleccionado
         alumnos_seleccionados = request.form.getlist('alumnos')  # Lista de alumnos seleccionados
+        print("---------------------------")
+        print(alumnos_seleccionados)
 
         # Insertar la materia en la base de datos
         conn = get_db_connection()
