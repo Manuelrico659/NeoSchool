@@ -324,7 +324,7 @@ import psycopg2.extras
 def get_alumnos():
     conn = get_db_connection()
     cursor = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)  # Usa DictCursor aquí
-    cursor.execute("SELECT id_usuario, nombre, apellido_paterno, apellido_materno FROM usuario WHERE rol = 'alumno'")
+    cursor.execute("SELECT id_usuario, nombre, apellido_paterno, apellido_materno FROM usuarios WHERE rol = 'alumno'")
     alumnos = cursor.fetchall()
     cursor.close()
     conn.close()
