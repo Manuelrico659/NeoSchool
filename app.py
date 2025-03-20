@@ -56,51 +56,6 @@ def home():
 
 bcrypt = Bcrypt(app)
 
-@app.route('/login', methods=['GET', 'POST'])
-def login():
-    if request.method == 'POST':
-        id_usuario = int(request.form.get("registro"))
-        password = request.form.get("password")
-
-        # Verificar si el usuario existe en la base de datos PostgreSQL
-        conn = get_db_connection()
-        cursor = conn.cursor()
-        cursor.execute("SELECT * FROM usuarios WHERE id_usuario = %s", (id_usuario,))
-        user = cursor.fetchone()
-        cursor.close()
-        conn.close()
-
-        if user and password == user[-1]:  # user[-1] es la columna de la contraseña sin encriptar
-            print("User:", user[-2])
-            print("Password:", password)
-            # Redirigir según el rol
-            if user[-2] == 'admin':
-                return redirect(url_for('admin'))
-            elif user[-2] == 'profesor':
-                return redirect(url_for('profesor'))
-            elif user[-2] == 'director':
-                return redirect(url_for('director'))
-            else:
-                return "Rol desconocido", 400  # Agregado para capturar cualquier rol no esperado
-        else:
-            return "Correo o contraseña incorrectos", 401
-        
-    return render_template('login.html')
-'''
-        if user and bcrypt.checkpw(password.encode('utf-8'), user[-1].encode('utf-8')):  # user[2] es la columna de la contraseña encriptada
-            # Redirigir según el rol
-            if user[-2] == 'administrativo':
-                return redirect(url_for('admin'))
-            elif user[-2] == 'maestro':
-                return redirect(url_for('profesor'))
-            elif user[-2] == 'direccion':
-                return redirect(url_for('director'))
-            
-        else:
-            return "Correo o contraseña incorrectos", 401
-
-'''
-
 @app.route('/profesor')
 def profesor():
     # Verificar si el usuario está autenticado
@@ -131,13 +86,6 @@ def profesor():
     # Pasar las materias a la plantilla
     return render_template('profesor.html', materias=materias)
 
-@app.route('/director')
-def director():
-    return render_template('director.html')
-
-@app.route('/admin')
-def admin():
-    return render_template('admin.html')
 
 @app.route('/contratar', methods=['POST'])
 def contratar():
@@ -268,7 +216,7 @@ def login():
         cursor.close()
         conn.close()
 
-        if user and password == user[-2]:  # user[-1] es la columna de la contraseña sin encriptar
+        if user and password == user[-2]:  # user[-2] es la columna de la contraseña sin encriptar
             print("User:", user[-3])
             print("Password:", password)
             # Redirigir según el rol
@@ -284,20 +232,6 @@ def login():
             return "Correo o contraseña incorrectos", 401
         
     return render_template('login.html')
-'''
-        if user and bcrypt.checkpw(password.encode('utf-8'), user[-1].encode('utf-8')):  # user[2] es la columna de la contraseña encriptada
-            # Redirigir según el rol
-            if user[-2] == 'administrativo':
-                return redirect(url_for('admin'))
-            elif user[-2] == 'maestro':
-                return redirect(url_for('profesor'))
-            elif user[-2] == 'direccion':
-                return redirect(url_for('director'))
-            
-        else:
-            return "Correo o contraseña incorrectos", 401
-
-'''
 
 @app.route('/admin')
 def admin():
