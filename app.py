@@ -348,10 +348,16 @@ def cambiar_contrasena():
                 conn.close()
 
                 mensaje = "Contraseña cambiada exitosamente."
+                return render_template('admin.html', mensaje=mensaje)
             else:
                 mensaje = "La contraseña actual es incorrecta."
 
     return render_template('cambiar_contrasena.html', mensaje=mensaje)
+
+@app.route('/logout')
+def logout():
+    session.clear()  # Elimina todos los datos de sesión
+    return redirect(url_for('login'))  # Redirige a la página de login
 
 if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0', port=5000)
