@@ -50,7 +50,7 @@
                         <div class="content-section">
                             {% if materias %}
                                 {% for materia in materias %}
-                                    <button class="materia-button" onclick="window.location.href='detalle_materia.html?id={{ materia[0] }}'">
+                                    <button class="materia-button" onclick="window.location.href="/materia/{{ materia.id_materia }}">
                                         <strong>ID:</strong> {{ materia[0] }} <br>
                                         <strong>Nombre:</strong> {{ materia[1] }}
                                     </button>
