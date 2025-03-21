@@ -149,7 +149,7 @@ def detalle_materia(id_materia):
 
     # Consulta para obtener las asistencias de los últimos 3 días
     asistencias_query = """
-        SELECT a.id_estudiante, a.fecha, a.asistencia
+        SELECT a.id_estudiante, a.fecha, a.estado
         FROM asistencia a
         WHERE a.id_materia = %s AND a.fecha BETWEEN %s AND %s
     """
