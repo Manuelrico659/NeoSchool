@@ -8,6 +8,7 @@ from flask_bcrypt import Bcrypt
 from dotenv import load_dotenv
 from flask import session  # Asegúrate de importar session
 import psycopg2.extras
+from datetime import datetime, timedelta
 
 
 # Cargar variables de entorno
@@ -125,19 +126,77 @@ def profesor():
     return render_template('profesor.html', materias=materias)
 
 
-@app.route('/detalle_materia/<int:id_materia>')
+@app.route('/detalle_materia/<int:id_materia>', methods=['GET'])
 def detalle_materia(id_materia):
-    # Obtener los detalles de la materia desde la base de datos
+    # Fecha de los últimos 3 días
+    fecha_hoy = datetime.now()
+    fechas = [fecha_hoy - timedelta(days=i) for i in range(3)]
+
+    # Conexión a la base de datos
     conn = get_db_connection()
     cursor = conn.cursor()
-    cursor.execute("SELECT * FROM materia WHERE id_materia = %s", (id_materia,))
-    materia = cursor.fetchone()
+
+    # Consulta para obtener los estudiantes asociados con la materia
+    estudiantes_query = """
+        SELECT e.id_estudiante, e.nombre, e.apellido
+        FROM estudiantes e
+        JOIN matriculas m ON e.id_estudiante = m.id_estudiante
+        WHERE m.id_materia = %s
+    """
+    cursor.execute(estudiantes_query, (id_materia,))
+    estudiantes = cursor.fetchall()
+
+    # Consulta para obtener las asistencias de los últimos 3 días
+    asistencias_query = """
+        SELECT a.id_estudiante, a.fecha, a.asistencia
+        FROM asistencia a
+        WHERE a.id_materia = %s AND a.fecha BETWEEN %s AND %s
+    """
+    cursor.execute(asistencias_query, (id_materia, fechas[-1], fechas[0]))
+    asistencias = cursor.fetchall()
+
+    # Crear un diccionario de asistencias por estudiante para fácil acceso
+    asistencia_por_estudiante = {}
+    for asistencia in asistencias:
+        estudiante_id = asistencia[0]
+        if estudiante_id not in asistencia_por_estudiante:
+            asistencia_por_estudiante[estudiante_id] = {}
+        asistencia_por_estudiante[estudiante_id][asistencia[1].strftime('%Y-%m-%d')] = asistencia[2]
+
     cursor.close()
     conn.close()
 
-    # Pasar los detalles de la materia a la plantilla
-    return render_template('detalle_materia.html', materia=materia)
+    # Pasar los datos al template
+    return render_template('detalle_materia.html', materia_id=id_materia, estudiantes=estudiantes, asistencia_por_estudiante=asistencia_por_estudiante, fechas=fechas)
 
+@app.route('/actualizar_asistencias', methods=['POST'])
+def actualizar_asistencias():
+    id_materia = request.args.get('id_materia')
+
+    # Conexión a la base de datos
+    conn = get_db_connection()
+    cursor = conn.cursor()
+
+    for key, value in request.form.items():
+        if key.startswith('asistencia_'):
+            partes = key.split('_')
+            id_estudiante = int(partes[1])
+            fecha = datetime.strptime(partes[2], '%Y-%m-%d')
+            asistencia = bool(value)  # "1" significa True
+
+            # Insertar o actualizar la asistencia
+            cursor.execute("""
+                INSERT INTO asistencia (id_estudiante, id_materia, fecha, asistencia)
+                VALUES (%s, %s, %s, %s)
+                ON CONFLICT (id_estudiante, id_materia, fecha)
+                DO UPDATE SET asistencia = %s
+            """, (id_estudiante, id_materia, fecha, asistencia, asistencia))
+
+    conn.commit()
+    cursor.close()
+    conn.close()
+
+    return redirect(url_for('detalle_materia', id_materia=id_materia))
 
 
 @app.route('/admin')

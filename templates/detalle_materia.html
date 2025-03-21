@@ -21,19 +21,46 @@
         <div class="content-section">
             <h1>Detalles de la Materia</h1>
 
-            {% if materia %}
-                <p><strong>ID:</strong> {{ materia[0] }}</p>
-                <p><strong>Nombre:</strong> {{ materia[1] }}</p>
-                <p><strong>Descripción:</strong> {{ materia[2] }}</p>
-                <p><strong>Profesor:</strong> {{ materia[3] }}</p>
-            {% else %}
-                <p>No se encontró la materia.</p>
-            {% endif %}
+            <p><strong>ID:</strong> {{ materia_id }}</p>
 
-            <div class="button-container">
-                <button class="btn">Asistencia</button>
-                <button class="btn">Modificar Calificaciones</button>
-            </div>
+            <h2>Asistencias de los últimos 3 días</h2>
+
+            <form method="POST" action="{{ url_for('actualizar_asistencias', id_materia=materia_id) }}">
+                <table border="1">
+                    <thead>
+                        <tr>
+                            <th>Estudiante</th>
+                            {% for fecha in fechas %}
+                                <th>{{ fecha.strftime('%d-%m-%Y') }}</th>
+                            {% endfor %}
+                            <th>Total Faltas</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for estudiante in estudiantes %}
+                            <tr>
+                                <td>{{ estudiante[1] }} {{ estudiante[2] }}</td>
+                                {% set total_faltas = 0 %}
+                                {% for fecha in fechas %}
+                                    <td>
+                                        <input type="checkbox" 
+                                               name="asistencia_{{ estudiante[0] }}_{{ fecha.strftime('%Y-%m-%d') }}" 
+                                               {% if asistencia_por_estudiante[estudiante[0]] and asistencia_por_estudiante[estudiante[0]].get(fecha.strftime('%Y-%m-%d')) %}
+                                                   checked
+                                               {% endif %}>
+                                    </td>
+                                    {% if not asistencia_por_estudiante[estudiante[0]] or not asistencia_por_estudiante[estudiante[0]].get(fecha.strftime('%Y-%m-%d')) %}
+                                        {% set total_faltas = total_faltas + 1 %}
+                                    {% endif %}
+                                {% endfor %}
+                                <td>{{ total_faltas }}</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+                <br>
+                <button type="submit">Guardar Cambios</button>
+            </form>
         </div>
     </div>
 </body>
