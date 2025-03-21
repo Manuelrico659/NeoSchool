@@ -138,9 +138,9 @@ def detalle_materia(id_materia):
 
     # Consulta para obtener los estudiantes asociados con la materia
     estudiantes_query = """
-        SELECT e.id_estudiante, e.nombre, e.apellido
+        SELECT e.id_alumno, e.nombre, e.apellido
         FROM alumno e
-        JOIN parciales m ON e.id_alumno = m.id_estudiante
+        JOIN parciales m ON e.id_alumno = m.id_alumno
         WHERE m.id_materia = %s
     """
     cursor.execute(estudiantes_query, (id_materia,))
@@ -148,7 +148,7 @@ def detalle_materia(id_materia):
 
     # Consulta para obtener las asistencias de los últimos 3 días
     asistencias_query = """
-        SELECT a.id_estudiante, a.fecha, a.asistencia
+        SELECT a.id_id_alumno, a.fecha, a.asistencia
         FROM asistencia a
         WHERE a.id_materia = %s AND a.fecha BETWEEN %s AND %s
     """
