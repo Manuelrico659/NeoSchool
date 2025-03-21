@@ -139,7 +139,7 @@ def detalle_materia(id_materia):
     # Consulta para obtener los estudiantes asociados con la materia
     estudiantes_query = """
         SELECT e.id_estudiante, e.nombre, e.apellido
-        FROM estudiantes e
+        FROM alumno e
         JOIN matriculas m ON e.id_estudiante = m.id_estudiante
         WHERE m.id_materia = %s
     """
