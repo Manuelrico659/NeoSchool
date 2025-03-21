@@ -125,7 +125,7 @@ def profesor():
     return render_template('profesor.html', materias=materias)
 
 
-@app.route('/materia/<int:id_materia>')
+@app.route('/detalle_materia/<int:id_materia>')
 def detalle_materia(id_materia):
     # Obtener los detalles de la materia desde la base de datos
     conn = get_db_connection()

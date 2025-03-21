@@ -50,9 +50,9 @@
                         <div class="content-section">
                             {% if materias %}
                                 {% for materia in materias %}
-                                    <button class="materia-button" onclick="window.location.href='materia.html?id={{ materia[0] }}'">
+                                    <button class="materia-button" onclick="window.location.href='{{ url_for('detalle_materia', id_materia=materia[0]) }}'">
                                         <strong>ID:</strong> {{ materia[0] }} <br>
-                                        <strong>Nombre:</strong> {{ materia[1] }}
+                                        <strong>Nombre:</strong> {{ materia[1] }}
                                     </button>
                                 {% endfor %}
                             {% else %}
