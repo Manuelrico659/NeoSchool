@@ -140,7 +140,7 @@ def detalle_materia(id_materia):
     estudiantes_query = """
         SELECT e.id_estudiante, e.nombre, e.apellido
         FROM alumno e
-        JOIN parciales m ON e.id_estudiante = m.id_estudiante
+        JOIN parciales m ON e.id_alumno = m.id_estudiante
         WHERE m.id_materia = %s
     """
     cursor.execute(estudiantes_query, (id_materia,))
