@@ -5,6 +5,21 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Detalle de Materia</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/interfaces.css') }}">
+    <script>
+        function actualizarAsistencia(estudianteId, fecha, checked) {
+            fetch("{{ url_for('actualizar_asistencias', id_materia=materia_id) }}", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    estudiante_id: estudianteId,
+                    fecha: fecha,
+                    asistencia: checked
+                })
+            });
+        }
+    </script>
 </head>
 <body>
     <div class="sidebar">
@@ -21,46 +36,32 @@
         <div class="content-section">
             <h1>Detalles de la Materia</h1>
 
-            <p><strong>ID:</strong> {{ materia_id }}</p>
+            <h2>Asistencias</h2>
 
-            <h2>Asistencias de los últimos 3 días</h2>
-
-            <form method="POST" action="{{ url_for('actualizar_asistencias', id_materia=materia_id) }}">
-                <table border="1">
-                    <thead>
-                        <tr>
-                            <th>Estudiante</th>
+            <div class="asistencias-container">
+                {% for estudiante in estudiantes %}
+                    <div class="estudiante-card">
+                        <h3>{{ estudiante[1] }} {{ estudiante[2] }}</h3>
+                        <div class="fechas-container">
+                            {% set total_faltas = 0 %}
                             {% for fecha in fechas %}
-                                <th>{{ fecha.strftime('%d-%m-%Y') }}</th>
-                            {% endfor %}
-                            <th>Total Faltas</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for estudiante in estudiantes %}
-                            <tr>
-                                <td>{{ estudiante[1] }} {{ estudiante[2] }}</td>
-                                {% set total_faltas = 0 %}
-                                {% for fecha in fechas %}
-                                    <td>
+                                <div class="fecha-item">
+                                    <label>
                                         <input type="checkbox" 
-                                               name="asistencia_{{ estudiante[0] }}_{{ fecha.strftime('%Y-%m-%d') }}" 
-                                               {% if asistencia_por_estudiante[estudiante[0]] and asistencia_por_estudiante[estudiante[0]].get(fecha.strftime('%Y-%m-%d')) %}
-                                                   checked
-                                               {% endif %}>
-                                    </td>
-                                    {% if not asistencia_por_estudiante[estudiante[0]] or not asistencia_por_estudiante[estudiante[0]].get(fecha.strftime('%Y-%m-%d')) %}
-                                        {% set total_faltas = total_faltas + 1 %}
-                                    {% endif %}
-                                {% endfor %}
-                                <td>{{ total_faltas }}</td>
-                            </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
-                <br>
-                <button type="submit">Guardar Cambios</button>
-            </form>
+                                               checked
+                                               onchange="actualizarAsistencia('{{ estudiante[0] }}', '{{ fecha.strftime('%Y-%m-%d') }}', this.checked)">
+                                        {{ fecha.strftime('%d-%m-%Y') }}
+                                    </label>
+                                </div>
+                                {% if not asistencia_por_estudiante[estudiante[0]] or not asistencia_por_estudiante[estudiante[0]].get(fecha.strftime('%Y-%m-%d')) %}
+                                    {% set total_faltas = total_faltas + 1 %}
+                                {% endif %}
+                            {% endfor %}
+                        </div>
+                        <p class="faltas">Total Faltas: {{ total_faltas }}</p>
+                    </div>
+                {% endfor %}
+            </div>
         </div>
     </div>
 </body>
