@@ -146,6 +146,7 @@ def detalle_materia(id_materia):
     cursor.execute(estudiantes_query, (id_materia,))
     estudiantes = cursor.fetchall()
 
+
     # Consulta para obtener las asistencias de los últimos 3 días
     asistencias_query = """
         SELECT a.id_id_alumno, a.fecha, a.asistencia
