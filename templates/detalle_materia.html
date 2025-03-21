@@ -4,17 +4,37 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Detalle de Materia</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/interfaces.css') }}">
 </head>
 <body>
-    <h1>Detalles de la Materia</h1>
+    <div class="sidebar">
+        <h2>Gestión de Materias</h2>
+        <ul>
+            <li><a href="#">Inicio</a></li>
+            <li><a href="#">Materias</a></li>
+            <li><a href="#">Estudiantes</a></li>
+            <li><a href="#">Notas</a></li>
+        </ul>
+    </div>
 
-    {% if materia %}
-        <p><strong>ID:</strong> {{ materia[0] }}</p>
-        <p><strong>Nombre:</strong> {{ materia[1] }}</p>
-        <p><strong>Descripción:</strong> {{ materia[2] }}</p>
-        <p><strong>Profesor:</strong> {{ materia[3] }}</p>
-    {% else %}
-        <p>No se encontró la materia.</p>
-    {% endif %}
+    <div class="main-content">
+        <div class="content-section">
+            <h1>Detalles de la Materia</h1>
+
+            {% if materia %}
+                <p><strong>ID:</strong> {{ materia[0] }}</p>
+                <p><strong>Nombre:</strong> {{ materia[1] }}</p>
+                <p><strong>Descripción:</strong> {{ materia[2] }}</p>
+                <p><strong>Profesor:</strong> {{ materia[3] }}</p>
+            {% else %}
+                <p>No se encontró la materia.</p>
+            {% endif %}
+
+            <div class="button-container">
+                <button class="btn">Asistencia</button>
+                <button class="btn">Modificar Calificaciones</button>
+            </div>
+        </div>
+    </div>
 </body>
 </html>
