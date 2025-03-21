@@ -6,17 +6,17 @@
     <title>Detalle de Materia</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/interfaces.css') }}">
     <script>
-        function actualizarAsistencia(estudianteId, fecha, checked) {
-            fetch("{{ url_for('actualizar_asistencias', id_materia=materia_id) }}", {
+        function actualizarAsistencia(estudianteId, fecha, checkbox) {
+            fetch("{{ url_for('actualizar_asistencias') }}?id_materia={{ materia_id }}", {
                 method: "POST",
                 headers: {
-                    "Content-Type": "application/json"
+                    "Content-Type": "application/x-www-form-urlencoded",
                 },
-                body: JSON.stringify({
-                    estudiante_id: estudianteId,
-                    fecha: fecha,
-                    asistencia: checked
-                })
+                body: `asistencia_${estudianteId}_${fecha}=${checkbox.checked ? '1' : '0'}`
+            }).then(response => {
+                console.log("Asistencia actualizada");
+            }).catch(error => {
+                console.error("Error al actualizar asistencia", error);
             });
         }
     </script>
@@ -40,26 +40,19 @@
 
             <div class="asistencias-container">
                 {% for estudiante in estudiantes %}
-                    <div class="estudiante-card">
-                        <h3>{{ estudiante[1] }} {{ estudiante[2] }}</h3>
-                        <div class="fechas-container">
-                            {% set total_faltas = 0 %}
-                            {% for fecha in fechas %}
-                                <div class="fecha-item">
-                                    <label>
-                                        <input type="checkbox" 
-                                               checked
-                                               onchange="actualizarAsistencia('{{ estudiante[0] }}', '{{ fecha.strftime('%Y-%m-%d') }}', this.checked)">
-                                        {{ fecha.strftime('%d-%m-%Y') }}
-                                    </label>
-                                </div>
-                                {% if not asistencia_por_estudiante[estudiante[0]] or not asistencia_por_estudiante[estudiante[0]].get(fecha.strftime('%Y-%m-%d')) %}
-                                    {% set total_faltas = total_faltas + 1 %}
-                                {% endif %}
-                            {% endfor %}
-                        </div>
-                        <p class="faltas">Total Faltas: {{ total_faltas }}</p>
+                <div class="estudiante-card">
+                    <h3>{{ estudiante[1] }} {{ estudiante[2] }}</h3>
+                    <div class="asistencia-dias">
+                        {% for fecha in fechas %}
+                        <label class="asistencia-checkbox">
+                            <input type="checkbox" 
+                                   checked
+                                   onchange="actualizarAsistencia({{ estudiante[0] }}, '{{ fecha.strftime('%Y-%m-%d') }}', this)">
+                            {{ fecha.strftime('%d-%m-%Y') }}
+                        </label>
+                        {% endfor %}
                     </div>
+                </div>
                 {% endfor %}
             </div>
         </div>

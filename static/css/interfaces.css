@@ -114,3 +114,29 @@ body {
 .btn:hover {
     background: #2f5d73;
 }
+
+
+.asistencias-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 15px;
+    justify-content: center;
+}
+
+.estudiante-card {
+    background: #EEF7FF;
+    padding: 15px;
+    border-radius: 10px;
+    box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.1);
+    width: 300px;
+    text-align: center;
+}
+
+.asistencia-dias {
+    margin-top: 10px;
+}
+
+.asistencia-checkbox {
+    display: block;
+    margin: 5px 0;
+}
