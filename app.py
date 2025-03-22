@@ -185,31 +185,33 @@ def detalle_materia(id_materia):
 
 @app.route('/actualizar_asistencias', methods=['POST'])
 def actualizar_asistencias():
-    id_materia = request.args.get('id_materia')
+    try:
+        data = request.get_json()  # Ensure you are receiving JSON data
 
-    # Conexión a la base de datos
-    conn = get_db_connection()
-    cursor = conn.cursor()
+        conn = get_db_connection()
+        cursor = conn.cursor()
 
-    for key, value in request.form.items():
-        if key.startswith('asistencia_'):
-            partes = key.split('_')
-            id_estudiante = int(partes[1])
-            fecha = datetime.strptime(partes[2], '%Y-%m-%d')
-            asistencia = bool(value)  # "1" significa True
+        for item in data:
+            id_alumno = item.get('id_alumno')
+            fecha = item.get('fecha')
+            estado = item.get('estado')
 
-            # Insertar o actualizar la asistencia
-            cursor.execute("""
-                INSERT INTO asistencia (id_estudiante, id_materia, fecha, estado)
-                VALUES (%s, %s, %s, %s)
-                ON DUPLICATE KEY UPDATE estado = %s
-            """, (id_estudiante, id_materia, fecha, asistencia, asistencia))
+            if id_alumno is None or fecha is None or estado is None:
+                continue  # Skip invalid entries
 
-    conn.commit()
-    cursor.close()
-    conn.close()
+            sql = """
+                INSERT INTO asistencia (id_alumno, fecha, estado) 
+                VALUES (%s, %s, %s) 
+                ON DUPLICATE KEY UPDATE estado = VALUES(estado)
+            """
+            cursor.execute(sql, (id_alumno, fecha, estado))
 
-    return redirect(url_for('detalle_materia', id_materia=id_materia))
+        conn.commit()
+        cursor.close()
+        conn.close()
+
+    except Exception as e:
+        app.logger.error(f"Error updating attendance: {str(e)}")
 
 
 @app.route('/admin')

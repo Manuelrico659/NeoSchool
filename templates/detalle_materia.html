@@ -50,24 +50,21 @@
             <div class="asistencias-container">
                 {% for estudiante in estudiantes %}
                 <div class="estudiante-card">
-                    <span class="estudiante-nombre">{{ estudiante[1] }} {{ estudiante[2] }}</span>
-                
+                    <div class="estudiante-nombre">
+                        {{ estudiante.nombre }} {{ estudiante.apellido_paterno }}
+                    </div>
                     <div class="asistencia-dias">
                         {% for fecha in fechas %}
-                        <label class="asistencia-checkbox">
-                            <input type="checkbox" checked
-                                   onchange="actualizarAsistencia({{ estudiante[0] }}, '{{ fecha.strftime('%Y-%m-%d') }}', this)">
-                            {{ fecha.strftime('%d-%m-%Y') }}
-                        </label>
+                        <div class="asistencia-checkbox">
+                            <input type="checkbox" name="asistencia_{{ estudiante.id }}_{{ fecha }}" 
+                                   id="asistencia_{{ estudiante.id }}_{{ fecha }}" value="1">
+                        </div>
                         {% endfor %}
                     </div>
-                
-                    <span class="faltas">Faltas: <span id="faltas_{{ estudiante[0] }}">
-                        {{ faltas_por_estudiante.get(estudiante[0], 0) }}
-                    </span></span>                    
-                </div>                
+                </div>
                 {% endfor %}
             </div>
+            
         </div>
     </div>
 </body>

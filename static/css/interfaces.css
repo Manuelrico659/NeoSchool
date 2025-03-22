@@ -114,12 +114,14 @@ body {
 .btn:hover {
     background: #2f5d73;
 }
-
 .asistencias-container {
     display: flex;
-    flex-direction: column; /* Asegura que cada estudiante esté en una fila nueva */
+    flex-direction: column;
     gap: 10px;
     width: 100%;
+    max-width: 800px; /* Limita el ancho */
+    margin: auto; /* Centra el contenedor */
+    padding: 10px;
 }
 
 .estudiante-card {
@@ -130,11 +132,12 @@ body {
     padding: 15px;
     border-radius: 10px;
     box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.1);
-    width: 100%; /* Ocupa todo el ancho */
+    width: 100%;
+    max-width: 100%;
 }
 
 .estudiante-nombre {
-    flex: 1; /* Permite que el nombre ocupe su espacio */
+    flex: 1;
     font-weight: bold;
     text-align: left;
 }
@@ -143,8 +146,10 @@ body {
     display: flex;
     gap: 10px;
     flex-wrap: wrap;
+    justify-content: flex-end; /* Asegura que los checkboxes estén alineados a la derecha */
 }
 
 .asistencia-checkbox input {
-    transform: scale(1.2); /* Hace los checkboxes un poco más grandes */
+    transform: scale(1.2);
+    margin-right: 5px;
 }
