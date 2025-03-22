@@ -46,8 +46,8 @@
                         {% for fecha in fechas %}
                         <label class="asistencia-checkbox">
                             <input type="checkbox" 
-                                   checked
-                                   onchange="actualizarAsistencia({{ estudiante[0] }}, '{{ fecha.strftime('%Y-%m-%d') }}', this)">
+                                checked 
+                                onchange="actualizarAsistencia({{ estudiante[0] }}, '{{ fecha.strftime('%Y-%m-%d') }}', this)">
                             {{ fecha.strftime('%d-%m-%Y') }}
                         </label>
                         {% endfor %}
