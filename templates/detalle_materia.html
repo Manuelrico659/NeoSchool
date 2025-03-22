@@ -7,7 +7,7 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='css/interfaces.css') }}">
     <script>
         function actualizarAsistencia(estudianteId, fecha, checkbox) {
-            print(estudianteId,fecha,checkbox)
+            console.log(estudianteId, fecha, checkbox); // Use console.log instead of print
             fetch("{{ url_for('actualizar_asistencias') }}?id_materia={{ materia_id }}", {
                 method: "POST",
                 headers: {
@@ -15,14 +15,15 @@
                 },
                 body: `asistencia_${estudianteId}_${fecha}=${checkbox.checked ? '1' : '0'}`
             }).then(response => response.json())
-              .then(data => {
-                  if (!checkbox.checked) {
-                      incrementarFaltas(estudianteId);
-                  }
-              }).catch(error => {
-                  console.error("Error al actualizar asistencia", error);
-              });
+            .then(data => {
+                if (!checkbox.checked) {
+                    incrementarFaltas(estudianteId);
+                }
+            }).catch(error => {
+                console.error("Error al actualizar asistencia", error);
+            });
         }
+
     
         function incrementarFaltas(estudianteId) {
             let faltasSpan = document.getElementById(`faltas_${estudianteId}`);
