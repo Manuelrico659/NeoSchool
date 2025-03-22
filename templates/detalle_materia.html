@@ -7,6 +7,7 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='css/interfaces.css') }}">
     <script>
         function actualizarAsistencia(estudianteId, fecha, checkbox) {
+            print(estudianteId,fecha,checkbox)
             fetch("{{ url_for('actualizar_asistencias') }}?id_materia={{ materia_id }}", {
                 method: "POST",
                 headers: {

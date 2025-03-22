@@ -199,7 +199,8 @@ def actualizar_asistencias():
             cursor.execute("""
                 INSERT INTO asistencia (id_estudiante, id_materia, fecha, estado)
                 VALUES (%s, %s, %s, %s)
-                ON DUPLICATE KEY UPDATE estado = %s
+                ON CONFLICT (id_estudiante, id_materia, fecha)
+                DO UPDATE SET asistencia = %s
             """, (id_estudiante, id_materia, fecha, asistencia, asistencia))
 
     conn.commit()
