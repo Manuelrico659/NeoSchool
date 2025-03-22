@@ -128,23 +128,27 @@ def profesor():
 
 @app.route('/detalle_materia/<int:id_materia>', methods=['GET'])
 def detalle_materia(id_materia):
+    # Fecha de los últimos 3 días
     fecha_hoy = datetime.now()
     fechas = [fecha_hoy - timedelta(days=i) for i in range(3)]
 
+    # Conexión a la base de datos
     conn = get_db_connection()
     cursor = conn.cursor()
 
-    # Obtener los estudiantes de la materia
+    # Consulta para obtener los estudiantes asociados con la materia
     estudiantes_query = """
-        SELECT e.id_alumno, e.nombre, e.apellido_paterno
+        SELECT DISTINCT e.id_alumno, e.nombre, e.apellido_paterno
         FROM alumno e
         JOIN parciales m ON e.id_alumno = m.id_alumno
         WHERE m.id_materia = %s
     """
+
     cursor.execute(estudiantes_query, (id_materia,))
     estudiantes = cursor.fetchall()
 
-    # Obtener las asistencias de los últimos 3 días
+
+    # Consulta para obtener las asistencias de los últimos 3 días
     asistencias_query = """
         SELECT a.id_estudiante, a.fecha, a.estado
         FROM asistencia a
@@ -153,65 +157,56 @@ def detalle_materia(id_materia):
     cursor.execute(asistencias_query, (id_materia, fechas[-1], fechas[0]))
     asistencias = cursor.fetchall()
 
-    # Diccionario de asistencias por estudiante
+    # Crear un diccionario de asistencias y calcular faltas
     asistencia_por_estudiante = {}
-    faltas_por_estudiante = {}  # Nuevo diccionario para contar faltas
-
-    for estudiante in estudiantes:
-        estudiante_id = estudiante[0]
-        asistencia_por_estudiante[estudiante_id] = {}
-        faltas_por_estudiante[estudiante_id] = 0  # Inicializar en 0
+    faltas_por_estudiante = {}
 
     for asistencia in asistencias:
-        estudiante_id, fecha, estado = asistencia
-        fecha_str = fecha.strftime('%Y-%m-%d')
-        asistencia_por_estudiante[estudiante_id][fecha_str] = estado
+        estudiante_id = asistencia[0]
+        fecha_str = asistencia[1].strftime('%Y-%m-%d')
+        
+        if estudiante_id not in asistencia_por_estudiante:
+            asistencia_por_estudiante[estudiante_id] = {}
+            faltas_por_estudiante[estudiante_id] = 0  # Inicializar faltas
 
-        if estado == 0:  # Si estado es 0, cuenta como falta
+        asistencia_por_estudiante[estudiante_id][fecha_str] = asistencia[2]
+
+        # Si la asistencia es "0" (falta), incrementamos el contador de faltas
+        if asistencia[2] == 0:
             faltas_por_estudiante[estudiante_id] += 1
-
     cursor.close()
     conn.close()
 
-    return render_template(
-        'detalle_materia.html',
-        materia_id=id_materia,
-        estudiantes=estudiantes,
-        asistencia_por_estudiante=asistencia_por_estudiante,
-        faltas_por_estudiante=faltas_por_estudiante,  # Asegurar que se pase al template
-        fechas=fechas
-    )
-
+    # Pasar los datos al template
+    return render_template('detalle_materia.html', materia_id=id_materia, estudiantes=estudiantes, asistencia_por_estudiante=asistencia_por_estudiante, fechas=fechas)
 
 @app.route('/actualizar_asistencias', methods=['POST'])
 def actualizar_asistencias():
-    try:
-        data = request.get_json()  # Ensure you are receiving JSON data
+    id_materia = request.args.get('id_materia')
 
-        conn = get_db_connection()
-        cursor = conn.cursor()
+    # Conexión a la base de datos
+    conn = get_db_connection()
+    cursor = conn.cursor()
 
-        for item in data:
-            id_alumno = item.get('id_alumno')
-            fecha = item.get('fecha')
-            estado = item.get('estado')
+    for key, value in request.form.items():
+        if key.startswith('asistencia_'):
+            partes = key.split('_')
+            id_estudiante = int(partes[1])
+            fecha = datetime.strptime(partes[2], '%Y-%m-%d')
+            asistencia = bool(value)  # "1" significa True
 
-            if id_alumno is None or fecha is None or estado is None:
-                continue  # Skip invalid entries
+            # Insertar o actualizar la asistencia
+            cursor.execute("""
+                INSERT INTO asistencia (id_estudiante, id_materia, fecha, estado)
+                VALUES (%s, %s, %s, %s)
+                ON DUPLICATE KEY UPDATE estado = %s
+            """, (id_estudiante, id_materia, fecha, asistencia, asistencia))
 
-            sql = """
-                INSERT INTO asistencia (id_alumno, fecha, estado) 
-                VALUES (%s, %s, %s) 
-                ON DUPLICATE KEY UPDATE estado = VALUES(estado)
-            """
-            cursor.execute(sql, (id_alumno, fecha, estado))
+    conn.commit()
+    cursor.close()
+    conn.close()
 
-        conn.commit()
-        cursor.close()
-        conn.close()
-
-    except Exception as e:
-        app.logger.error(f"Error updating attendance: {str(e)}")
+    return redirect(url_for('detalle_materia', id_materia=id_materia))
 
 
 @app.route('/admin')
