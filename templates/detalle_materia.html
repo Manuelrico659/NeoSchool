@@ -6,8 +6,30 @@
     <title>Detalle de Materia</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/interfaces.css') }}">
     <script>
+        // Se ejecuta cuando la página se carga
+        document.addEventListener("DOMContentLoaded", function() {
+            // Inicializar todos los checkboxes con palomita (asistencia marcada)
+            inicializarAsistencia();
+        });
+
+        function inicializarAsistencia() {
+            // Marcar todos los checkboxes de los días futuros
+            const today = new Date();
+            const checkboxes = document.querySelectorAll('.asistencia-checkbox input');
+            
+            checkboxes.forEach(checkbox => {
+                const fechaCheckbox = new Date(checkbox.dataset.fecha);
+                // Si el checkbox es de un día futuro, lo dejamos marcado
+                if (fechaCheckbox >= today) {
+                    checkbox.checked = true;
+                }
+            });
+        }
+
         function actualizarAsistencia(estudianteId, fecha, checkbox) {
-            console.log(estudianteId, fecha, checkbox); // Use console.log instead of print
+            console.log(estudianteId, fecha, checkbox); // Depuración en consola
+
+            // Actualizamos el estado de la asistencia en el servidor
             fetch("{{ url_for('actualizar_asistencias') }}?id_materia={{ materia_id }}", {
                 method: "POST",
                 headers: {
@@ -16,20 +38,34 @@
                 body: `asistencia_${estudianteId}_${fecha}=${checkbox.checked ? '1' : '0'}`
             }).then(response => response.json())
             .then(data => {
-                if (!checkbox.checked) {
-                    incrementarFaltas(estudianteId);
+                if (checkbox.checked) {
+                    // Si el checkbox está marcado (asistencia), no incrementamos faltas
+                    actualizarFaltas(estudianteId, false);
+                } else {
+                    // Si no está marcado (falta), incrementamos faltas
+                    actualizarFaltas(estudianteId, true);
                 }
             }).catch(error => {
                 console.error("Error al actualizar asistencia", error);
             });
         }
 
-    
-        function incrementarFaltas(estudianteId) {
+        // Incrementa o decrementa el contador de faltas dependiendo de si hubo asistencia o no
+        function actualizarFaltas(estudianteId, esFalta) {
             let faltasSpan = document.getElementById(`faltas_${estudianteId}`);
             let faltasActuales = parseInt(faltasSpan.innerText);
-            faltasSpan.innerText = faltasActuales + 1;
+
+            // Si es falta, incrementamos el contador
+            if (esFalta) {
+                faltasSpan.innerText = faltasActuales + 1;
+            } else {
+                // Si es asistencia, decrementamos el contador (si hay faltas para quitar)
+                if (faltasActuales > 0) {
+                    faltasSpan.innerText = faltasActuales - 1;
+                }
+            }
         }
+
     </script>
 </head>
 <body>
@@ -56,13 +92,16 @@
                 
                     <div class="asistencia-dias">
                         {% for fecha in fechas %}
-                        <label class="asistencia-checkbox">
-                            <input type="checkbox" checked
-                                   onchange="actualizarAsistencia({{ estudiante[0] }}, '{{ fecha.strftime('%Y-%m-%d') }}', this)">
-                            {{ fecha.strftime('%d-%m-%Y') }}
-                        </label>
+                            <label class="asistencia-checkbox">
+                                <input type="checkbox" 
+                                       {% if asistencia[fecha.strftime('%Y-%m-%d')] == 1 %}checked{% endif %}
+                                       data-fecha="{{ fecha.strftime('%Y-%m-%d') }}"
+                                       onchange="actualizarAsistencia({{ estudiante[0] }}, '{{ fecha.strftime('%Y-%m-%d') }}', this)">
+                                {{ fecha.strftime('%d-%m-%Y') }}
+                            </label>
                         {% endfor %}
                     </div>
+                    
                 
                     <span class="faltas">Faltas: <span id="faltas_{{ estudiante[0] }}">0</span></span>
                 </div>                
