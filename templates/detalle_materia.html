@@ -32,9 +32,6 @@
             // Actualizamos el estado de la asistencia en el servidor
             fetch("{{ url_for('actualizar_asistencias') }}?id_materia={{ materia_id }}", {
                 method: "POST",
-                headers: {
-                    "Content-Type": "application/x-www-form-urlencoded",
-                },
                 body: `asistencia_${estudianteId}_${fecha}=${checkbox.checked ? '1' : '0'}`
             }).then(response => response.json())
             .then(data => {
@@ -103,7 +100,7 @@
                     </div>
                     
                 
-                    <span class="faltas">   Faltas: <span id="faltas_{{ estudiante[0] }}">{{ faltas_por_estudiante[estudiante[0]] }}</span></span>
+                    <span class="faltas"> |     Faltas: <span id="faltas_{{ estudiante[0] }}">{{ faltas_por_estudiante[estudiante[0]] }}</span></span>
                 </div>                
                 {% endfor %}
             </div>

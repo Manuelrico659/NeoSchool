@@ -180,7 +180,6 @@ def detalle_materia(id_materia):
     # Pasar los datos al template
     return render_template('detalle_materia.html', materia_id=id_materia, estudiantes=estudiantes, asistencia_por_estudiante=asistencia_por_estudiante, faltas_por_estudiante=faltas_por_estudiante, fechas=fechas)
 
-
 @app.route('/actualizar_asistencias', methods=['POST'])
 def actualizar_asistencias():
     id_materia = request.args.get('id_materia')
@@ -194,9 +193,9 @@ def actualizar_asistencias():
             partes = key.split('_')
             id_estudiante = int(partes[1])
             fecha = datetime.strptime(partes[2], '%Y-%m-%d')
-            asistencia = bool(value)  # "1" significa True
+            asistencia = bool(value)  # "1" significa True, "0" significa False
 
-            # Insertar o actualizar la asistencia
+            # Actualizar o insertar en la tabla de asistencia
             cursor.execute("""
                 INSERT INTO asistencia (id_estudiante, id_materia, fecha, estado)
                 VALUES (%s, %s, %s, %s)
@@ -205,20 +204,18 @@ def actualizar_asistencias():
             """, (id_estudiante, id_materia, fecha, asistencia, asistencia))
 
             # Actualizar faltas en la tabla parciales
-            if not asistencia:
+            if not asistencia:  # Si la asistencia es False, incrementamos faltas
                 cursor.execute("""
                     UPDATE parciales
                     SET faltas = faltas + 1
                     WHERE id_alumno = %s AND id_materia = %s
                 """, (id_estudiante, id_materia))
-            else:
+            else:  # Si la asistencia es True, decrementamos faltas
                 cursor.execute("""
                     UPDATE parciales
                     SET faltas = GREATEST(faltas - 1, 0)  -- Evita que las faltas sean negativas
                     WHERE id_alumno = %s AND id_materia = %s
                 """, (id_estudiante, id_materia))
-
-
 
     conn.commit()
     cursor.close()
