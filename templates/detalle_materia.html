@@ -19,6 +19,19 @@
                 console.error("Error al actualizar asistencia", error);
             });
         }
+        function actualizarFaltas(estudianteId) {
+            let checkboxes = document.querySelectorAll(`.estudiante-card:nth-child(${estudianteId}) .asistencia-checkbox input`);
+            let faltas = Array.from(checkboxes).filter(checkbox => !checkbox.checked).length;
+            document.getElementById(`faltas_${estudianteId}`).innerText = faltas;
+        }
+
+        // Ejecutar la función al cargar la página para calcular las faltas iniciales
+        document.addEventListener("DOMContentLoaded", function() {
+            document.querySelectorAll(".estudiante-card").forEach((card, index) => {
+                actualizarFaltas(index + 1);
+            });
+        });
+
     </script>
 </head>
 <body>
