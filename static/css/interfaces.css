@@ -117,7 +117,7 @@ body {
 
 .asistencias-container {
     display: flex;
-    flex-direction: column; /* Alinear en columna */
+    flex-direction: column; /* Asegura que cada estudiante esté en una fila nueva */
     gap: 10px;
     width: 100%;
 }
@@ -125,29 +125,26 @@ body {
 .estudiante-card {
     display: flex;
     align-items: center;
+    justify-content: space-between;
     background: #EEF7FF;
     padding: 15px;
     border-radius: 10px;
     box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.1);
-    width: 100%; /* Ocupar todo el ancho */
+    width: 100%; /* Ocupa todo el ancho */
 }
 
-.estudiante-card h3 {
-    flex: 1; /* Que el nombre ocupe espacio */
+.estudiante-nombre {
+    flex: 1; /* Permite que el nombre ocupe su espacio */
+    font-weight: bold;
     text-align: left;
-    margin: 0;
-    font-size: 18px;
 }
 
 .asistencia-dias {
     display: flex;
     gap: 10px;
     flex-wrap: wrap;
-    justify-content: center;
-    flex: 2; /* Que los checkboxes ocupen más espacio */
 }
 
-.asistencia-checkbox {
-    display: flex;
-    align-items: center;
-    gap:
+.asistencia-checkbox input {
+    transform: scale(1.2); /* Hace los checkboxes un poco más grandes */
+}

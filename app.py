@@ -138,11 +138,12 @@ def detalle_materia(id_materia):
 
     # Consulta para obtener los estudiantes asociados con la materia
     estudiantes_query = """
-        SELECT e.id_alumno, e.nombre, e.apellido_paterno
+        SELECT DISTINCT e.id_alumno, e.nombre, e.apellido_paterno
         FROM alumno e
         JOIN parciales m ON e.id_alumno = m.id_alumno
         WHERE m.id_materia = %s
     """
+
     cursor.execute(estudiantes_query, (id_materia,))
     estudiantes = cursor.fetchall()
 
@@ -156,14 +157,23 @@ def detalle_materia(id_materia):
     cursor.execute(asistencias_query, (id_materia, fechas[-1], fechas[0]))
     asistencias = cursor.fetchall()
 
-    # Crear un diccionario de asistencias por estudiante para fácil acceso
+    # Crear un diccionario de asistencias y calcular faltas
     asistencia_por_estudiante = {}
+    faltas_por_estudiante = {}
+
     for asistencia in asistencias:
         estudiante_id = asistencia[0]
+        fecha_str = asistencia[1].strftime('%Y-%m-%d')
+        
         if estudiante_id not in asistencia_por_estudiante:
             asistencia_por_estudiante[estudiante_id] = {}
-        asistencia_por_estudiante[estudiante_id][asistencia[1].strftime('%Y-%m-%d')] = asistencia[2]
+            faltas_por_estudiante[estudiante_id] = 0  # Inicializar faltas
 
+        asistencia_por_estudiante[estudiante_id][fecha_str] = asistencia[2]
+
+        # Si la asistencia es "0" (falta), incrementamos el contador de faltas
+        if asistencia[2] == 0:
+            faltas_por_estudiante[estudiante_id] += 1
     cursor.close()
     conn.close()
 
@@ -189,8 +199,7 @@ def actualizar_asistencias():
             cursor.execute("""
                 INSERT INTO asistencia (id_estudiante, id_materia, fecha, estado)
                 VALUES (%s, %s, %s, %s)
-                ON CONFLICT (id_estudiante, id_materia, fecha)
-                DO UPDATE SET asistencia = %s
+                ON DUPLICATE KEY UPDATE estado = %s
             """, (id_estudiante, id_materia, fecha, asistencia, asistencia))
 
     conn.commit()

@@ -13,25 +13,21 @@
                     "Content-Type": "application/x-www-form-urlencoded",
                 },
                 body: `asistencia_${estudianteId}_${fecha}=${checkbox.checked ? '1' : '0'}`
-            }).then(response => {
-                console.log("Asistencia actualizada");
-            }).catch(error => {
-                console.error("Error al actualizar asistencia", error);
-            });
+            }).then(response => response.json())
+              .then(data => {
+                  if (!checkbox.checked) {
+                      incrementarFaltas(estudianteId);
+                  }
+              }).catch(error => {
+                  console.error("Error al actualizar asistencia", error);
+              });
         }
-        function actualizarFaltas(estudianteId) {
-            let checkboxes = document.querySelectorAll(`.estudiante-card:nth-child(${estudianteId}) .asistencia-checkbox input`);
-            let faltas = Array.from(checkboxes).filter(checkbox => !checkbox.checked).length;
-            document.getElementById(`faltas_${estudianteId}`).innerText = faltas;
+    
+        function incrementarFaltas(estudianteId) {
+            let faltasSpan = document.getElementById(`faltas_${estudianteId}`);
+            let faltasActuales = parseInt(faltasSpan.innerText);
+            faltasSpan.innerText = faltasActuales + 1;
         }
-
-        // Ejecutar la función al cargar la página para calcular las faltas iniciales
-        document.addEventListener("DOMContentLoaded", function() {
-            document.querySelectorAll(".estudiante-card").forEach((card, index) => {
-                actualizarFaltas(index + 1);
-            });
-        });
-
     </script>
 </head>
 <body>
@@ -54,24 +50,22 @@
             <div class="asistencias-container">
                 {% for estudiante in estudiantes %}
                 <div class="estudiante-card">
-                    <!-- Nombre del estudiante -->
-                    <h3>{{ estudiante[1] }} {{ estudiante[2] }}</h3>
-            
-                    <!-- Checkboxes de asistencia -->
+                    <span class="estudiante-nombre">{{ estudiante[1] }} {{ estudiante[2] }}</span>
+                
                     <div class="asistencia-dias">
                         {% for fecha in fechas %}
                         <label class="asistencia-checkbox">
-                            <input type="checkbox" 
-                                   checked
-                                   onchange="actualizarAsistencia({{ estudiante[0] }}, '{{ fecha.strftime('%Y-%m-%d') }}', this); actualizarFaltas({{ estudiante[0] }})">
+                            <input type="checkbox" checked
+                                   onchange="actualizarAsistencia({{ estudiante[0] }}, '{{ fecha.strftime('%Y-%m-%d') }}', this)">
                             {{ fecha.strftime('%d-%m-%Y') }}
                         </label>
                         {% endfor %}
                     </div>
-            
-                    <!-- Campo de Faltas -->
-                    <div class="faltas" id="faltas_{{ estudiante[0] }}">0</div>
-                </div>
+                
+                    <span class="faltas">Faltas: <span id="faltas_{{ estudiante[0] }}">
+                        {{ faltas_por_estudiante.get(estudiante[0], 0) }}
+                    </span></span>                    
+                </div>                
                 {% endfor %}
             </div>
         </div>
