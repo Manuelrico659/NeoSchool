@@ -128,27 +128,23 @@ def profesor():
 
 @app.route('/detalle_materia/<int:id_materia>', methods=['GET'])
 def detalle_materia(id_materia):
-    # Fecha de los últimos 3 días
     fecha_hoy = datetime.now()
     fechas = [fecha_hoy - timedelta(days=i) for i in range(3)]
 
-    # Conexión a la base de datos
     conn = get_db_connection()
     cursor = conn.cursor()
 
-    # Consulta para obtener los estudiantes asociados con la materia
+    # Obtener los estudiantes de la materia
     estudiantes_query = """
-        SELECT DISTINCT e.id_alumno, e.nombre, e.apellido_paterno
+        SELECT e.id_alumno, e.nombre, e.apellido_paterno
         FROM alumno e
         JOIN parciales m ON e.id_alumno = m.id_alumno
         WHERE m.id_materia = %s
     """
-
     cursor.execute(estudiantes_query, (id_materia,))
     estudiantes = cursor.fetchall()
 
-
-    # Consulta para obtener las asistencias de los últimos 3 días
+    # Obtener las asistencias de los últimos 3 días
     asistencias_query = """
         SELECT a.id_estudiante, a.fecha, a.estado
         FROM asistencia a
@@ -157,28 +153,35 @@ def detalle_materia(id_materia):
     cursor.execute(asistencias_query, (id_materia, fechas[-1], fechas[0]))
     asistencias = cursor.fetchall()
 
-    # Crear un diccionario de asistencias y calcular faltas
+    # Diccionario de asistencias por estudiante
     asistencia_por_estudiante = {}
-    faltas_por_estudiante = {}
+    faltas_por_estudiante = {}  # Nuevo diccionario para contar faltas
+
+    for estudiante in estudiantes:
+        estudiante_id = estudiante[0]
+        asistencia_por_estudiante[estudiante_id] = {}
+        faltas_por_estudiante[estudiante_id] = 0  # Inicializar en 0
 
     for asistencia in asistencias:
-        estudiante_id = asistencia[0]
-        fecha_str = asistencia[1].strftime('%Y-%m-%d')
-        
-        if estudiante_id not in asistencia_por_estudiante:
-            asistencia_por_estudiante[estudiante_id] = {}
-            faltas_por_estudiante[estudiante_id] = 0  # Inicializar faltas
+        estudiante_id, fecha, estado = asistencia
+        fecha_str = fecha.strftime('%Y-%m-%d')
+        asistencia_por_estudiante[estudiante_id][fecha_str] = estado
 
-        asistencia_por_estudiante[estudiante_id][fecha_str] = asistencia[2]
-
-        # Si la asistencia es "0" (falta), incrementamos el contador de faltas
-        if asistencia[2] == 0:
+        if estado == 0:  # Si estado es 0, cuenta como falta
             faltas_por_estudiante[estudiante_id] += 1
+
     cursor.close()
     conn.close()
 
-    # Pasar los datos al template
-    return render_template('detalle_materia.html', materia_id=id_materia, estudiantes=estudiantes, asistencia_por_estudiante=asistencia_por_estudiante, fechas=fechas)
+    return render_template(
+        'detalle_materia.html',
+        materia_id=id_materia,
+        estudiantes=estudiantes,
+        asistencia_por_estudiante=asistencia_por_estudiante,
+        faltas_por_estudiante=faltas_por_estudiante,  # Asegurar que se pase al template
+        fechas=fechas
+    )
+
 
 @app.route('/actualizar_asistencias', methods=['POST'])
 def actualizar_asistencias():
