@@ -203,6 +203,22 @@ def actualizar_asistencias():
                 DO UPDATE SET estado = %s
             """, (id_estudiante, id_materia, fecha, asistencia, asistencia))
 
+            # Actualizar faltas en la tabla parciales
+            if not asistencia:
+                cursor.execute("""
+                    UPDATE parciales
+                    SET faltas = faltas + 1
+                    WHERE id_alumno = %s AND id_materia = %s
+                """, (id_estudiante, id_materia))
+            else:
+                cursor.execute("""
+                    UPDATE parciales
+                    SET faltas = GREATEST(faltas - 1, 0)  -- Evita que las faltas sean negativas
+                    WHERE id_alumno = %s AND id_materia = %s
+                """, (id_estudiante, id_materia))
+
+
+
     conn.commit()
     cursor.close()
     conn.close()
