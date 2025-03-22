@@ -178,7 +178,8 @@ def detalle_materia(id_materia):
     conn.close()
 
     # Pasar los datos al template
-    return render_template('detalle_materia.html', materia_id=id_materia, estudiantes=estudiantes, asistencia_por_estudiante=asistencia_por_estudiante, fechas=fechas)
+    return render_template('detalle_materia.html', materia_id=id_materia, estudiantes=estudiantes, asistencia_por_estudiante=asistencia_por_estudiante, faltas_por_estudiante=faltas_por_estudiante, fechas=fechas)
+
 
 @app.route('/actualizar_asistencias', methods=['POST'])
 def actualizar_asistencias():
