@@ -117,9 +117,9 @@ body {
 
 .asistencias-container {
     display: flex;
-    flex-direction: column; /* Alinear en una sola columna */
+    flex-direction: column; /* Alinear en columna */
     gap: 10px;
-    align-items: flex-start;
+    width: 100%;
 }
 
 .estudiante-card {
@@ -129,22 +129,25 @@ body {
     padding: 15px;
     border-radius: 10px;
     box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.1);
-    width: 100%;
-    max-width: 600px; /* Ajusta el tamaño máximo */
+    width: 100%; /* Ocupar todo el ancho */
 }
 
 .estudiante-card h3 {
-    flex: 1; /* Para que el nombre del estudiante ocupe todo el espacio posible */
+    flex: 1; /* Que el nombre ocupe espacio */
     text-align: left;
     margin: 0;
+    font-size: 18px;
 }
 
 .asistencia-dias {
     display: flex;
     gap: 10px;
+    flex-wrap: wrap;
+    justify-content: center;
+    flex: 2; /* Que los checkboxes ocupen más espacio */
 }
 
 .asistencia-checkbox {
     display: flex;
     align-items: center;
-}
+    gap:
