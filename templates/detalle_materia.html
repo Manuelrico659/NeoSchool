@@ -27,6 +27,12 @@
     .then(data => {
         if (data.success) {
             console.log('Asistencia actualizada correctamente');
+            
+            // Actualizar la cantidad de faltas
+            const faltasElement = document.querySelector(`#faltas-${estudianteId}`);
+            if (faltasElement) {
+                faltasElement.textContent = 'Faltas: ' + data.faltas;
+            }
         } else {
             console.log('Error al actualizar la asistencia');
         }
@@ -35,6 +41,7 @@
         console.error('Error:', error);
     });
 }
+
 
 </script>
 <body>
@@ -81,8 +88,8 @@
                         Faltas: {{ faltas_por_estudiante[estudiante[0]] }}
                     </div>
                     {% else %}
-                    <div class="faltas">
-                        Faltas: 0
+                    <div class="faltas" id="faltas-{{ estudiante[0] }}">
+                        Faltas: {{ faltas_por_estudiante.get(estudiante[0], 0) }}
                     </div>
                     {% endif %}
 

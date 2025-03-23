@@ -212,8 +212,7 @@ def actualizar_asistencia():
     """
     cursor.execute(actualizar_asistencia_query, (estado, estudiante_id, fecha))
     conn.commit()
-    print("---------------------------------------------------------------------")
-    print(estado)
+
     # Modificar la columna faltas en la tabla parciales según el estado
     if estado == False:  # Si el estado es false, incrementa la columna faltas
         actualizar_faltas_query = """
@@ -229,30 +228,20 @@ def actualizar_asistencia():
         """
     cursor.execute(actualizar_faltas_query, (estudiante_id,))
     conn.commit()
- 
+
+    # Obtener el nuevo valor de faltas para este estudiante
+    cursor.execute("""
+        SELECT faltas
+        FROM parciales 
+        WHERE id_alumno = %s AND parcial = 1
+    """, (estudiante_id,))
+    faltas_actualizadas = cursor.fetchone()[0]
+
     cursor.close()
     conn.close()
 
-@app.route('/mostrar_asistencias')
-def mostrar_asistencias():
-    conn = get_db_connection()
-    cursor = conn.cursor()
-
-    # Consulta para obtener los estudiantes
-    cursor.execute("SELECT id, nombre, apellido FROM estudiantes")
-    estudiantes = cursor.fetchall()
-
-    # Consulta para obtener las faltas de los estudiantes donde 'parcial = 1'
-    cursor.execute("""
-        SELECT id_estudiante, faltas
-        FROM parciales 
-        WHERE parcial = 1
-    """)
-    faltas_por_estudiante = {row[0]: row[1] for row in cursor.fetchall()}
-
-    conn.close()
-
-    return render_template('detalle_materia.html', estudiantes=estudiantes, faltas_por_estudiante=faltas_por_estudiante)
+    # Devolver el nuevo valor de faltas al frontend
+    return jsonify({'success': True, 'faltas': faltas_actualizadas})
 
 
 @app.route('/admin')
