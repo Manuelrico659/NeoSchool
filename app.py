@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, redirect, url_for
+from flask import Flask, render_template, request, redirect, url_for, jsonify
 import bcrypt
 from datetime import timedelta
 import os
@@ -240,7 +240,7 @@ def actualizar_asistencia():
 
     cursor.close()
     conn.close()
-
+    return jsonify({"success": True})  # Respuesta JSON al frontend
 
 
 @app.route('/admin')
