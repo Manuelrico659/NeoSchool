@@ -11,6 +11,18 @@
     // Obtener el estado del checkbox
     var estado = checkbox.checked ? true : false;
 
+    var faltasElemento = document.getElementById("faltas-" + estudianteId);
+        
+        // Obtener el número actual de faltas
+        var faltasActuales = parseInt(faltasElemento.textContent.replace("Faltas: ", ""));
+
+        // Modificar el número de faltas en vivo
+        if (estado) {
+            faltasElemento.textContent = "Faltas: " + (faltasActuales - 1);
+        } else {
+            faltasElemento.textContent = "Faltas: " + (faltasActuales + 1);
+        }
+
     // Enviar la solicitud AJAX al backend
     fetch('/actualizar_asistencia', {
         method: 'POST',
