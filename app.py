@@ -185,6 +185,14 @@ def detalle_materia(id_materia):
     for id_estudiante, fecha, estado in asistencias:
         asistencia_por_estudiante[id_estudiante][str(fecha)] = estado
 
+    # Get the absences for the students (faltas)
+    cursor.execute("""
+        SELECT id_estudiante, faltas
+        FROM parciales
+        WHERE parcial = 1
+    """)
+    faltas_por_estudiante = {row[0]: row[1] for row in cursor.fetchall()}
+
     cursor.close()
     conn.close()
 
@@ -192,7 +200,7 @@ def detalle_materia(id_materia):
                            materia_id=id_materia, 
                            estudiantes=estudiantes, 
                            fechas=fechas, 
-                           asistencia_por_estudiante=asistencia_por_estudiante)
+                           asistencia_por_estudiante=asistencia_por_estudiante, faltas_por_estudiante=faltas_por_estudiante)
 
 @app.route('/actualizar_asistencia', methods=['POST'])
 def actualizar_asistencia():
@@ -240,8 +248,6 @@ def actualizar_asistencia():
     cursor.close()
     conn.close()
 
-    # Devolver el nuevo valor de faltas al frontend
-    return jsonify({'success': True, 'faltas': faltas_actualizadas})
 
 
 @app.route('/admin')
