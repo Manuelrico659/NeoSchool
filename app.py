@@ -187,7 +187,7 @@ def detalle_materia(id_materia):
 
     # Get the absences for the students (faltas)
     cursor.execute("""
-        SELECT id_estudiante, faltas
+        SELECT id_alumno, faltas
         FROM parciales
         WHERE parcial = 1
     """)
