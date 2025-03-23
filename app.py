@@ -237,17 +237,10 @@ def actualizar_asistencia():
     cursor.execute(actualizar_faltas_query, (estudiante_id,))
     conn.commit()
 
-    # Obtener el nuevo valor de faltas para este estudiante
-    cursor.execute("""
-        SELECT faltas
-        FROM parciales 
-        WHERE id_alumno = %s AND parcial = 1
-    """, (estudiante_id,))
-    faltas_actualizadas = cursor.fetchone()[0]
 
     cursor.close()
     conn.close()
-
+    return redirect(url_for('detalle_materia'))
 
 
 @app.route('/admin')
