@@ -204,13 +204,33 @@ def detalle_materia(id_materia):
 
 @app.route('/actualizar_asistencia', methods=['POST'])
 def actualizar_asistencia():
-    data = request.get_json()
-    estudiante_id = data.get('estudiante_id')
-    fecha = data.get('fecha')
-    estado = data.get('estado')
+    try:
+        data = request.get_json()
+        estudiante_id = data.get('estudiante_id')
+        fecha = data.get('fecha')
+        estado = data.get('estado')
 
-    conn = get_db_connection()
-    cursor = conn.cursor()
+        conn = get_db_connection()
+        cursor = conn.cursor()
+
+        # Obtener el estado actual en la base de datos
+        cursor.execute(
+            "SELECT estado FROM asistencia WHERE id_estudiante = %s AND fecha = %s",
+            (estudiante_id, fecha)
+        )
+        resultado = cursor.fetchone()
+
+        if resultado is None:
+            return jsonify({"success": False, "error": "Registro no encontrado"}), 404
+        
+        estado_actual = resultado[0]
+
+        # Si el estado no ha cambiado, no hacer nada
+        if estado_actual == estado:
+            return jsonify({"success": False, "error": "Estado ya actualizado"}), 400
+
+    except Exception as e:
+        return jsonify({"success": False, "error": str(e)}), 500
 
     # Actualizar el estado de la asistencia
     actualizar_asistencia_query = """
