@@ -132,6 +132,12 @@ def detalle_materia(id_materia):
     fechas = [str(fecha_hoy - timedelta(days=i)) for i in range(3)]  # Últimos 3 días (hoy y 2 días pasados)
     fecha_mas_antigua = fecha_hoy - timedelta(days=3)  # Día a eliminar (hace 3 días)
 
+
+    print(fecha_hoy)
+    print(fecha_mas_antigua)
+    for fecha in fechas:
+        print(fecha)
+
     conn = get_db_connection()
     cursor = conn.cursor()
 
