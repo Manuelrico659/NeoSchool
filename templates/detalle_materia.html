@@ -14,12 +14,26 @@
     // Enviar la solicitud AJAX al backend
     fetch('/actualizar_asistencia', {
         method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
         body: JSON.stringify({
             estudiante_id: estudianteId,
             fecha: fecha,
             estado: estado
         })
     })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            console.log('Asistencia actualizada correctamente');
+        } else {
+            console.log('Error al actualizar la asistencia');
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+    });
 }
 
 </script>

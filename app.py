@@ -226,7 +226,7 @@ def actualizar_asistencia():
             SET faltas = faltas - 1
             WHERE id_estudiante = %s AND parcial=1
         """
-    cursor.execute(actualizar_faltas_query, (estudiante_id,))
+    cursor.execute(actualizar_faltas_query, (estudiante_id))
     conn.commit()
 
     cursor.close()
