@@ -200,7 +200,7 @@ def actualizar_asistencias():
                 INSERT INTO asistencia (id_estudiante, id_materia, fecha, estado)
                 VALUES (%s, %s, %s, %s)
                 ON CONFLICT (id_estudiante, id_materia, fecha)
-                DO UPDATE SET estado = %s
+                DO UPDATE SET estado = EXCLUDED.estado
             """, (id_estudiante, id_materia, fecha, asistencia, asistencia))
 
             # Actualizar faltas en la tabla parciales
