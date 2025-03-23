@@ -213,6 +213,22 @@ def actualizar_asistencia():
     cursor.execute(actualizar_asistencia_query, (estado, estudiante_id, fecha))
     conn.commit()
 
+    # Modificar la columna faltas en la tabla parciales según el estado
+    if estado == 'false':  # Si el estado es false, incrementa la columna faltas
+        actualizar_faltas_query = """
+            UPDATE parciales
+            SET faltas = faltas + 1
+            WHERE id_estudiante = %s AND parcial=1
+        """
+    elif estado == 'true':  # Si el estado es true, decrementa la columna faltas
+        actualizar_faltas_query = """
+            UPDATE parciales
+            SET faltas = faltas - 1
+            WHERE id_estudiante = %s AND parcial=1
+        """
+    cursor.execute(actualizar_faltas_query, (estudiante_id,))
+    conn.commit()
+
     cursor.close()
     conn.close()
 
