@@ -10,6 +10,7 @@ from flask import session  # Asegúrate de importar session
 import psycopg2.extras
 from datetime import datetime, timedelta
 import pytz
+from flask import jsonify
 
 # Cargar variables de entorno
 load_dotenv(dotenv_path='variables.env')
@@ -202,6 +203,7 @@ def detalle_materia(id_materia):
                            fechas=fechas, 
                            asistencia_por_estudiante=asistencia_por_estudiante, faltas_por_estudiante=faltas_por_estudiante)
 
+
 @app.route('/actualizar_asistencia', methods=['POST'])
 def actualizar_asistencia():
     data = request.get_json()
@@ -247,6 +249,11 @@ def actualizar_asistencia():
 
     cursor.close()
     conn.close()
+
+    return jsonify({
+        'success': True,
+        'faltas': faltas_actualizadas  # Devolver las faltas actualizadas
+    })
 
 
 
