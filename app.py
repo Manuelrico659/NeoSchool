@@ -137,7 +137,7 @@ def detalle_materia(id_materia):
     # Eliminar asistencias más antiguas (hace 3 días)
     eliminar_asistencias_query = "DELETE FROM asistencia WHERE fecha = %s AND id_materia = %s"
     cursor.execute(eliminar_asistencias_query, (fecha_mas_antigua, id_materia))
-
+    conn.commit()
     # Obtener los estudiantes asociados con la materia
     estudiantes_query = """
         SELECT DISTINCT e.id_alumno, e.nombre, e.apellido_paterno
@@ -146,11 +146,13 @@ def detalle_materia(id_materia):
         WHERE m.id_materia = %s
     """
     cursor.execute(estudiantes_query, (id_materia,))
+    conn.commit()
     estudiantes = cursor.fetchall()
 
     # Verificar si hay registros de asistencia para hoy
     asistencia_hoy_query = "SELECT COUNT(*) FROM asistencia WHERE fecha = %s AND id_materia = %s"
     cursor.execute(asistencia_hoy_query, (fecha_hoy, id_materia))
+    conn.commit()
     asistencia_hoy = cursor.fetchone()[0]
 
     # Si no hay registros de asistencia para hoy, crearlos
@@ -171,6 +173,7 @@ def detalle_materia(id_materia):
         WHERE a.id_materia = %s AND a.fecha IN (%s, %s, %s)
     """
     cursor.execute(asistencias_query, (id_materia, fechas[0], fechas[1], fechas[2]))
+    conn.commit()
     asistencias = cursor.fetchall()
 
     # Organizar las asistencias por estudiante y fecha
@@ -186,50 +189,6 @@ def detalle_materia(id_materia):
                            estudiantes=estudiantes, 
                            fechas=fechas, 
                            asistencia_por_estudiante=asistencia_por_estudiante)
-
-@app.route('/actualizar_asistencias', methods=['POST'])
-def actualizar_asistencias():
-    id_materia = request.args.get('id_materia')
-
-    # Conexión a la base de datos
-    conn = get_db_connection()
-    cursor = conn.cursor()
-
-    for key, value in request.form.items():
-        if key.startswith('asistencia_'):
-            partes = key.split('_')
-            id_estudiante = int(partes[1])
-            fecha = datetime.strptime(partes[2], '%Y-%m-%d')
-            asistencia = bool(value)  # "1" significa True, "0" significa False
-
-            # Actualizar o insertar en la tabla de asistencia
-            cursor.execute("""
-                INSERT INTO asistencia (id_estudiante, id_materia, fecha, estado)
-                VALUES (%s, %s, %s, %s)
-                ON CONFLICT (id_estudiante, id_materia, fecha)
-                DO UPDATE SET estado = 
-            """, (id_estudiante, id_materia, fecha, asistencia, asistencia))
-
-            # Actualizar faltas en la tabla parciales
-            if not asistencia:  # Si la asistencia es False, incrementamos faltas
-                cursor.execute("""
-                    UPDATE parciales
-                    SET faltas = faltas + 1
-                    WHERE id_alumno = %s AND id_materia = %s
-                """, (id_estudiante, id_materia))
-            else:  # Si la asistencia es True, decrementamos faltas
-                cursor.execute("""
-                    UPDATE parciales
-                    SET faltas = GREATEST(faltas - 1, 0)  -- Evita que las faltas sean negativas
-                    WHERE id_alumno = %s AND id_materia = %s
-                """, (id_estudiante, id_materia))
-
-    conn.commit()
-    cursor.close()
-    conn.close()
-
-    return redirect(url_for('detalle_materia', id_materia=id_materia))
-
 
 @app.route('/admin')
 def admin():
