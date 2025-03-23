@@ -58,6 +58,20 @@
                         {% endfor %}
                     </div>
                     
+                    <!-- Espacio después de los checkboxes -->
+                    <div class="faltas-espacio"></div>
+
+                    <!-- Mostrar faltas si existe en la tabla parciales y coincide con el estudiante -->
+                    {% if estudiante[0] in faltas_por_estudiante %}
+                    <div class="faltas">
+                        Faltas: {{ faltas_por_estudiante[estudiante[0]] }}
+                    </div>
+                    {% else %}
+                    <div class="faltas">
+                        Faltas: 0
+                    </div>
+                    {% endif %}
+
                 </div>                
                 {% endfor %}
             </div>

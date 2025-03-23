@@ -232,6 +232,27 @@ def actualizar_asistencia():
     cursor.close()
     conn.close()
 
+@app.route('/mostrar_asistencias')
+def mostrar_asistencias():
+    conn = get_db_connection()
+    cursor = conn.cursor()
+
+    # Consulta para obtener los estudiantes
+    cursor.execute("SELECT id, nombre, apellido FROM estudiantes")
+    estudiantes = cursor.fetchall()
+
+    # Consulta para obtener las faltas de los estudiantes donde 'parcial = 1'
+    cursor.execute("""
+        SELECT id_estudiante, faltas
+        FROM parciales 
+        WHERE parcial = 1
+    """)
+    faltas_por_estudiante = {row[0]: row[1] for row in cursor.fetchall()}
+
+    conn.close()
+
+    return render_template('detalle_materia.html', estudiantes=estudiantes, faltas_por_estudiante=faltas_por_estudiante)
+
 
 @app.route('/admin')
 def admin():
