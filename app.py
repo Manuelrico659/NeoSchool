@@ -229,7 +229,7 @@ def actualizar_asistencia():
         """
     cursor.execute(actualizar_faltas_query, (estudiante_id,))
     conn.commit()
-
+ 
     cursor.close()
     conn.close()
 
