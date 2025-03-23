@@ -8,6 +8,8 @@
 </head>
 <script>
     function actualizarAsistencia(estudianteId, fecha, checkbox) {
+    // Deshabilitar el checkbox temporalmente para evitar múltiples clics
+    checkbox.disabled = true;  
     // Obtener el estado del checkbox
     var estado = checkbox.checked ? true : false;
 
@@ -31,10 +33,16 @@
             location.reload();
         } else {
             console.log('Error al actualizar la asistencia');
+            checkbox.checked = !estado;  // Revertir el estado si hay un error
         }
     })
     .catch(error => {
         console.error('Error:', error);
+        checkbox.checked = !estado;  // Revertir en caso de fallo
+    })
+    .finally(() => {
+        // Rehabilitar el checkbox después de la respuesta del servidor
+        checkbox.disabled = false;
     });
 }
 
