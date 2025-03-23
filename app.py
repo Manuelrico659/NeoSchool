@@ -208,6 +208,7 @@ def actualizar_asistencia():
     estudiante_id = data.get('estudiante_id')
     fecha = data.get('fecha')
     estado = data.get('estado')
+    id_materia = data.get('id_materia')  # Obtener el id_materia del JSON
 
     conn = get_db_connection()
     cursor = conn.cursor()
@@ -240,7 +241,8 @@ def actualizar_asistencia():
 
     cursor.close()
     conn.close()
-    return redirect(url_for('detalle_materia'))
+    return redirect(url_for('detalle_materia', id_materia=id_materia))
+
 
 
 @app.route('/admin')

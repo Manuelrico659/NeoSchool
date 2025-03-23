@@ -20,7 +20,8 @@
         body: JSON.stringify({
             estudiante_id: estudianteId,
             fecha: fecha,
-            estado: estado
+            estado: estado,
+            id_materia: idMateria  // Agregar id_materia aquí
         })
     })
     .then(response => response.json())
@@ -44,9 +45,8 @@
         <h2>Gestión de Materias</h2>
         <ul>
             <li><a href="#">Inicio</a></li>
-            <li><a href="#">Materias</a></li>
-            <li><a href="#">Estudiantes</a></li>
-            <li><a href="#">Notas</a></li>
+            <li><a href="#">Asistencias</a></li>
+            <li><a href="#">Calificaciones</a></li>
         </ul>
     </div>
 
