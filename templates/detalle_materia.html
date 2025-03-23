@@ -8,10 +8,8 @@
 </head>
 <script>
     function actualizarAsistencia(estudianteId, fecha, checkbox) {
-    // Obtener el estado del checkbox
-    var estado = checkbox.checked ? true : false;
-
-    var faltasElemento = document.getElementById("faltas-" + estudianteId);
+        var estado = checkbox.checked ? true : false;
+        var faltasElemento = document.getElementById("faltas-" + estudianteId);
         
         // Obtener el número actual de faltas
         var faltasActuales = parseInt(faltasElemento.textContent.replace("Faltas: ", ""));
@@ -23,34 +21,42 @@
             faltasElemento.textContent = "Faltas: " + (faltasActuales + 1);
         }
 
-    // Enviar la solicitud AJAX al backend
-    fetch('/actualizar_asistencia', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-            estudiante_id: estudianteId,
-            fecha: fecha,
-            estado: estado
+        // Enviar la solicitud AJAX al backend
+        fetch('/actualizar_asistencia', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                estudiante_id: estudianteId,
+                fecha: fecha,
+                estado: estado
+            })
         })
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data.success) {
-            console.log('Asistencia actualizada correctamente');
-            // Recargar la página después de la actualización
-            location.reload();
-        } else {
-            console.log('Error al actualizar la asistencia');
-        }
-    })
-    .catch(error => {
-        console.error('Error:', error);
-    });
-}
-
+        .then(response => response.json())
+        .then(data => {
+            if (!data.success) {
+                console.log('Error al actualizar la asistencia');
+                // Revertir el cambio si falla
+                if (estado) {
+                    faltasElemento.textContent = "Faltas: " + (faltasActuales);
+                } else {
+                    faltasElemento.textContent = "Faltas: " + (faltasActuales);
+                }
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            // Revertir el cambio en caso de error
+            if (estado) {
+                faltasElemento.textContent = "Faltas: " + (faltasActuales);
+            } else {
+                faltasElemento.textContent = "Faltas: " + (faltasActuales);
+            }
+        });
+    }
 </script>
+
 <body>
     <div class="sidebar">
         <h2>Gestión de Materias</h2>
