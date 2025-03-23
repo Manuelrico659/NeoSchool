@@ -125,60 +125,67 @@ def profesor():
     # Pasar las materias a la plantilla
     return render_template('profesor.html', materias=materias)
 
-
 @app.route('/detalle_materia/<int:id_materia>', methods=['GET'])
 def detalle_materia(id_materia):
-    # Fecha de los últimos 3 días
-    fecha_hoy = datetime.now()
-    fechas = [fecha_hoy - timedelta(days=i) for i in range(3)]
+    fecha_hoy = datetime.now().date()
+    fechas = [fecha_hoy - timedelta(days=i) for i in range(3)]  # Últimos 3 días
+    fecha_mas_antigua = fecha_hoy - timedelta(days=3)  # Día a eliminar
 
-    # Conexión a la base de datos
     conn = get_db_connection()
     cursor = conn.cursor()
 
-    # Consulta para obtener los estudiantes asociados con la materia
+    # Eliminar asistencias más antiguas (hace 3 días)
+    eliminar_asistencias_query = "DELETE FROM asistencia WHERE fecha = %s AND id_materia = %s"
+    cursor.execute(eliminar_asistencias_query, (fecha_mas_antigua, id_materia))
+
+    # Obtener los estudiantes asociados con la materia
     estudiantes_query = """
         SELECT DISTINCT e.id_alumno, e.nombre, e.apellido_paterno
         FROM alumno e
         JOIN parciales m ON e.id_alumno = m.id_alumno
         WHERE m.id_materia = %s
     """
-
     cursor.execute(estudiantes_query, (id_materia,))
     estudiantes = cursor.fetchall()
 
+    # Verificar si hay registros de asistencia para hoy
+    asistencia_hoy_query = "SELECT COUNT(*) FROM asistencia WHERE fecha = %s AND id_materia = %s"
+    cursor.execute(asistencia_hoy_query, (fecha_hoy, id_materia))
+    asistencia_hoy = cursor.fetchone()[0]
 
-    # Consulta para obtener las asistencias de los últimos 3 días
+    # Si no hay registros de asistencia para hoy, crearlos
+    if asistencia_hoy == 0:
+        for estudiante in estudiantes:
+            insertar_asistencia_query = """
+                INSERT INTO asistencia (id_estudiante, id_materia, fecha, estado) 
+                VALUES (%s, %s, %s, %s)
+            """
+            cursor.execute(insertar_asistencia_query, (estudiante[0], id_materia, fecha_hoy, True))
+    
+    conn.commit()
+
+    # Obtener las asistencias de los últimos 3 días
     asistencias_query = """
         SELECT a.id_estudiante, a.fecha, a.estado
         FROM asistencia a
-        WHERE a.id_materia = %s AND a.fecha BETWEEN %s AND %s
+        WHERE a.id_materia = %s AND a.fecha IN (%s, %s, %s)
     """
-    cursor.execute(asistencias_query, (id_materia, fechas[-1], fechas[0]))
+    cursor.execute(asistencias_query, (id_materia, fechas[0], fechas[1], fechas[2]))
     asistencias = cursor.fetchall()
 
-    # Crear un diccionario de asistencias y calcular faltas
-    asistencia_por_estudiante = {}
-    faltas_por_estudiante = {}
+    # Organizar las asistencias por estudiante y fecha
+    asistencia_por_estudiante = {estudiante[0]: {str(fecha): 0 for fecha in fechas} for estudiante in estudiantes}
+    for id_estudiante, fecha, estado in asistencias:
+        asistencia_por_estudiante[id_estudiante][str(fecha)] = estado
 
-    for asistencia in asistencias:
-        estudiante_id = asistencia[0]
-        fecha_str = asistencia[1].strftime('%Y-%m-%d')
-        
-        if estudiante_id not in asistencia_por_estudiante:
-            asistencia_por_estudiante[estudiante_id] = {}
-            faltas_por_estudiante[estudiante_id] = 0  # Inicializar faltas
-
-        asistencia_por_estudiante[estudiante_id][fecha_str] = asistencia[2]
-
-        # Si la asistencia es "0" (falta), incrementamos el contador de faltas
-        if asistencia[2] == 0:
-            faltas_por_estudiante[estudiante_id] += 1
     cursor.close()
     conn.close()
 
-    # Pasar los datos al template
-    return render_template('detalle_materia.html', materia_id=id_materia, estudiantes=estudiantes, asistencia_por_estudiante=asistencia_por_estudiante, faltas_por_estudiante=faltas_por_estudiante, fechas=fechas)
+    return render_template('detalle_materia.html', 
+                           materia_id=id_materia, 
+                           estudiantes=estudiantes, 
+                           fechas=fechas, 
+                           asistencia_por_estudiante=asistencia_por_estudiante)
 
 @app.route('/actualizar_asistencias', methods=['POST'])
 def actualizar_asistencias():
@@ -200,7 +207,7 @@ def actualizar_asistencias():
                 INSERT INTO asistencia (id_estudiante, id_materia, fecha, estado)
                 VALUES (%s, %s, %s, %s)
                 ON CONFLICT (id_estudiante, id_materia, fecha)
-                DO UPDATE SET estado = EXCLUDED.estado
+                DO UPDATE SET estado = 
             """, (id_estudiante, id_materia, fecha, asistencia, asistencia))
 
             # Actualizar faltas en la tabla parciales
