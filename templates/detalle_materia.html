@@ -27,13 +27,6 @@
     .then(data => {
         if (data.success) {
             console.log('Asistencia actualizada correctamente');
-            
-            // Actualizar la cantidad de faltas
-            const faltasElement = document.querySelector(`#faltas-${estudianteId}`);
-            if (faltasElement) {
-                // Actualizar el texto de faltas con el nuevo valor
-                faltasElement.textContent = 'Faltas: ' + data.faltas;
-            }
         } else {
             console.log('Error al actualizar la asistencia');
         }
@@ -42,8 +35,6 @@
         console.error('Error:', error);
     });
 }
-
-
 
 </script>
 <body>
