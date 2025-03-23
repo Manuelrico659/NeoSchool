@@ -214,13 +214,13 @@ def actualizar_asistencia():
     conn.commit()
 
     # Modificar la columna faltas en la tabla parciales según el estado
-    if estado == 'false':  # Si el estado es false, incrementa la columna faltas
+    if estado == 'False':  # Si el estado es false, incrementa la columna faltas
         actualizar_faltas_query = """
             UPDATE parciales
             SET faltas = faltas + 1
             WHERE id_estudiante = %s AND parcial=1
         """
-    elif estado == 'true':  # Si el estado es true, decrementa la columna faltas
+    elif estado == 'True':  # Si el estado es true, decrementa la columna faltas
         actualizar_faltas_query = """
             UPDATE parciales
             SET faltas = faltas - 1
