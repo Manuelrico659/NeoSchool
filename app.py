@@ -127,9 +127,10 @@ def profesor():
 
 @app.route('/detalle_materia/<int:id_materia>', methods=['GET'])
 def detalle_materia(id_materia):
-    fecha_hoy = datetime.now().date()
-    fechas = [fecha_hoy - timedelta(days=i) for i in range(3)]  # Últimos 3 días
-    fecha_mas_antigua = fecha_hoy - timedelta(days=3)  # Día a eliminar
+
+    fecha_hoy = datetime.now().date()  # Fecha actual
+    fechas = [fecha_hoy - timedelta(days=i) for i in range(3)]  # Últimos 3 días (hoy y 2 días pasados)
+    fecha_mas_antigua = fecha_hoy - timedelta(days=3)  # Día a eliminar (hace 2 días)
 
     conn = get_db_connection()
     cursor = conn.cursor()
@@ -152,7 +153,6 @@ def detalle_materia(id_materia):
     # Verificar si hay registros de asistencia para hoy
     asistencia_hoy_query = "SELECT COUNT(*) FROM asistencia WHERE fecha = %s AND id_materia = %s"
     cursor.execute(asistencia_hoy_query, (fecha_hoy, id_materia))
-    conn.commit()
     asistencia_hoy = cursor.fetchone()[0]
 
     # Si no hay registros de asistencia para hoy, crearlos
@@ -162,9 +162,8 @@ def detalle_materia(id_materia):
                 INSERT INTO asistencia (id_estudiante, id_materia, fecha, estado) 
                 VALUES (%s, %s, %s, %s)
             """
-            cursor.execute(insertar_asistencia_query, (estudiante[0], id_materia, fecha_hoy, True))
-    
-    conn.commit()
+            cursor.execute(insertar_asistencia_query, (estudiante[0], id_materia, fecha_hoy, True))  # Estado inicial: Si asistio
+        conn.commit()
 
     # Obtener las asistencias de los últimos 3 días
     asistencias_query = """
