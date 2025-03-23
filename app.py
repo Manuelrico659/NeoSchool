@@ -194,6 +194,29 @@ def detalle_materia(id_materia):
                            fechas=fechas, 
                            asistencia_por_estudiante=asistencia_por_estudiante)
 
+@app.route('/actualizar_asistencia', methods=['POST'])
+def actualizar_asistencia():
+    data = request.get_json()
+    estudiante_id = data.get('estudiante_id')
+    fecha = data.get('fecha')
+    estado = data.get('estado')
+
+    conn = get_db_connection()
+    cursor = conn.cursor()
+
+    # Actualizar el estado de la asistencia
+    actualizar_asistencia_query = """
+        UPDATE asistencia 
+        SET estado = %s 
+        WHERE id_estudiante = %s AND fecha = %s
+    """
+    cursor.execute(actualizar_asistencia_query, (estado, estudiante_id, fecha))
+    conn.commit()
+
+    cursor.close()
+    conn.close()
+
+
 @app.route('/admin')
 def admin():
     return render_template('admin.html')

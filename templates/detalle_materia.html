@@ -6,6 +6,37 @@
     <title>Detalle de Materia</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/interfaces.css') }}">
 </head>
+<script>
+    function actualizarAsistencia(estudianteId, fecha, checkbox) {
+    // Obtener el estado del checkbox
+    var estado = checkbox.checked ? true : false;
+
+    // Enviar la solicitud AJAX al backend
+    fetch('/actualizar_asistencia', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+            estudiante_id: estudianteId,
+            fecha: fecha,
+            estado: estado
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            console.log('Asistencia actualizada correctamente');
+        } else {
+            console.log('Error al actualizar la asistencia');
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+    });
+}
+
+</script>
 <body>
     <div class="sidebar">
         <h2>Gestión de Materias</h2>
@@ -35,6 +66,7 @@
                                     {% if asistencia_por_estudiante[estudiante[0]].get(fecha, 0) == 1 %}checked{% endif %}
                                     data-fecha="{{ fecha }}"
                                     onchange="actualizarAsistencia({{ estudiante[0] }}, '{{ fecha }}', this)">
+
                                 {{ fecha }}
                             </label>
                         {% endfor %}
