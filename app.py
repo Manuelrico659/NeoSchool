@@ -9,7 +9,7 @@ from dotenv import load_dotenv
 from flask import session  # Asegúrate de importar session
 import psycopg2.extras
 from datetime import datetime, timedelta
-
+import pytz
 
 # Cargar variables de entorno
 load_dotenv(dotenv_path='variables.env')
@@ -127,8 +127,8 @@ def profesor():
 
 @app.route('/detalle_materia/<int:id_materia>', methods=['GET'])
 def detalle_materia(id_materia):
-
-    fecha_hoy = datetime.now().date()  # Fecha actual
+    tz = pytz.timezone('America/Mexico_City')
+    fecha_hoy = datetime.now(tz).date()
     fechas = [str(fecha_hoy - timedelta(days=i)) for i in range(3)]  # Últimos 3 días (hoy y 2 días pasados)
     fecha_mas_antigua = fecha_hoy - timedelta(days=3)  # Día a eliminar (hace 3 días)
 
