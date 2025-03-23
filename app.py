@@ -138,6 +138,7 @@ def detalle_materia(id_materia):
     # Eliminar asistencias más antiguas (hace 3 días)
     eliminar_asistencias_query = "DELETE FROM asistencia WHERE fecha = %s AND id_materia = %s"
     cursor.execute(eliminar_asistencias_query, (fecha_mas_antigua, id_materia))
+    print(eliminar_asistencias_query)
     conn.commit()
     # Obtener los estudiantes asociados con la materia
     estudiantes_query = """
@@ -153,7 +154,9 @@ def detalle_materia(id_materia):
     # Verificar si hay registros de asistencia para hoy
     asistencia_hoy_query = "SELECT COUNT(*) FROM asistencia WHERE fecha = %s AND id_materia = %s"
     cursor.execute(asistencia_hoy_query, (fecha_hoy, id_materia))
+    print(asistencia_hoy_query)
     asistencia_hoy = cursor.fetchone()[0]
+    print(asistencia_hoy)
 
     # Si no hay registros de asistencia para hoy, crearlos
     if asistencia_hoy == 0:
@@ -182,7 +185,8 @@ def detalle_materia(id_materia):
 
     cursor.close()
     conn.close()
-
+    for fecha in fechas:
+        print(fecha)
     return render_template('detalle_materia.html', 
                            materia_id=id_materia, 
                            estudiantes=estudiantes, 
