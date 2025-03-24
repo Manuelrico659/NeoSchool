@@ -74,6 +74,14 @@
         function validateStep(step) {
             var stepContent = document.getElementById("step" + step);
             var inputs = stepContent.querySelectorAll("input[required], select[required]");
+
+            // If the current step is step 2, validate the email field.
+            if (step === 2) {
+                if (!validateEmail()) {
+                    return false;
+                }
+            }
+
             for (var input of inputs) {
                 if (input.value.trim() === "") {
                     alert("Por favor, completa todos los campos obligatorios.");
