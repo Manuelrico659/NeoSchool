@@ -60,8 +60,8 @@ mailjet_api_key = os.getenv('MAILJET_API_KEY')
 mailjet_api_secret = os.getenv('MAILJET_API_SECRET')
 mailjet = Client(auth=(mailjet_api_key, mailjet_api_secret), version='v3.1')
 # IDs de las listas en Mailjet (debes obtener estos IDs desde el panel de Mailjet)
-LISTA_USUARIOS_ID = "10530275"  # Reemplaza con el ID de la lista de usuarios
-LISTA_TUTORES_ID = "10530274"    # Reemplaza con el ID de la lista de tutores
+LISTA_USUARIOS_ID = 10530275  # Reemplaza con el ID de la lista de usuarios
+LISTA_TUTORES_ID = 10530274    # Reemplaza con el ID de la lista de tutores
 
 def agregar_contacto_a_lista(email, nombre, lista_id):
     """
@@ -87,7 +87,7 @@ def agregar_contacto_a_lista(email, nombre, lista_id):
         "ListID": lista_id,
         "IsUnsubscribed": "false"
     }
-    resultado_lista = mailjet.listrecipient.create(data=data_lista)
+    resultado_lista = mailjet.contactslist_managecontact.create(data=data_lista)
 
     if resultado_lista.status_code != 201:
         print(f"Error al agregar el contacto a la lista: {resultado_lista.status_code}")
