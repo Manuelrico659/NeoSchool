@@ -461,7 +461,7 @@ def contratar():
                 "VALUES (%s, %s, %s, %s, %s, %s,%s) RETURNING id_usuario",
                 (nombre, apellido_paterno, apellido_materno, rol, contraseña_cifrada, fecha_nacimiento,correo_colaborador)
             )
-            id_usuario = cursor.fetchone()[0]
+            id_usuario = str(cursor.fetchone()[0])
             print(correo_colaborador)
             print(id_usuario)
             conn.commit()  # Guardar los cambios en la base de datos
