@@ -11,6 +11,7 @@ import psycopg2.extras
 from datetime import datetime, timedelta
 import pytz
 from mailjet_rest import Client
+import random
 
 # Cargar variables de entorno
 load_dotenv(dotenv_path='variables.env')
@@ -136,6 +137,10 @@ def enviar_correo_bienvenida(destinatario, registro, correo):
         print(f"Error al enviar el correo: {e}")
         return False
 
+def generar_contraseña():
+    numeros = ''.join([str(random.randint(0, 9)) for _ in range(5)])
+    return f"BOSCO@{numeros}"
+
 
 def enviar_correo(destinatario, contraseña):
     # ID del template de Mailjet (obtén este ID desde el panel de Mailjet)
@@ -156,7 +161,7 @@ def enviar_correo(destinatario, contraseña):
                 ],
                 "TemplateID": template_id,  # Usar el template de Mailjet
                 "TemplateLanguage": True,   # Habilitar el uso de variables
-                "Subject": "Recuperación de Contraseña - Escuela Bosco",
+                "Subject": "Recuperación de Contraseña",
                 "Variables": {  # Pasar las variables al template
                     "contraseña": contraseña  # La variable que definiste en el template
                 }
@@ -219,6 +224,31 @@ def login():
             return "Correo o contraseña incorrectos", 401
         
     return render_template('login.html')
+
+
+@app.route('/recuperar_contraseña', methods=['GET', 'POST'])
+def recuperar_contraseña():
+    if request.method == 'POST':
+        registro = request.form['registro']
+        email = request.form['email']
+
+        # Conectar a la base de datos
+        conn = get_db_connection()
+        cursor = conn.cursor()
+
+        cursor.execute("SELECT * FROM usuarios WHERE id = %s AND email = %s", (registro, email))
+        usuario = cursor.fetchone()
+
+        if usuario:
+            nueva_contraseña = generar_contraseña()
+            cursor.execute("UPDATE usuarios SET contrasena = %s WHERE id = %s", (nueva_contraseña, registro))
+            conn.commit()
+            enviar_correo(email, nueva_contraseña)
+            conn.close()
+
+        return redirect(url_for('recuperar_contraseña'))
+
+    return render_template('recuperar.html')
 
 @app.route('/profesor')
 def profesor():

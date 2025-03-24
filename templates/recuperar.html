@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Recuperar Contraseña</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/recuperar.css') }}">
+</head>
+<body>
+    <div class="overlay"></div>
+    <div class="container">
+        <img src="{{ url_for('static', filename='img/logo.png') }}" alt="Logo" class="logo">
+        <h2>Recuperar Contraseña</h2>
+        <form action="{{ url_for('recuperar_contraseña') }}" method="post">
+            <input type="text" class="input" name="registro" placeholder="Registro de Usuario" required>
+            <input type="email" class="input" name="email" placeholder="Correo Electrónico" required>
+            <button type="submit" class="btn">Recuperar Contraseña</button>
+        </form>
+        <a href="{{ url_for('login') }}" class="forgot-password">Volver al Login</a>
+    </div>
+</body>
+</html>
