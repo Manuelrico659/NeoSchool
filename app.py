@@ -10,6 +10,7 @@ from flask import session  # Asegúrate de importar session
 import psycopg2.extras
 from datetime import datetime, timedelta
 import pytz
+from mailjet_rest import Client
 
 # Cargar variables de entorno
 load_dotenv(dotenv_path='variables.env')
@@ -52,6 +53,9 @@ def get_db_connection():
         dbname=os.getenv('POSTGRES_DB')
     )
     return conn
+
+
+
 
 @app.route('/')
 def home():
@@ -274,6 +278,8 @@ def obtener_calificaciones(parcial):
     conn.close()
 
     return calificaciones
+
+
 
 @app.route('/obtener_calificaciones', methods=['POST'])
 def obtener_calificaciones_route():
