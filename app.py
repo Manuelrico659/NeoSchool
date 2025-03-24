@@ -254,6 +254,51 @@ def actualizar_asistencia():
     conn.close()
     return jsonify({"success": True})  # Respuesta JSON al frontend
 
+def obtener_calificaciones(parcial):
+    """Función para obtener calificaciones de un parcial específico"""
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    
+    query = """
+        SELECT alumno.id_alumno, alumno.nombre, alumno.apellido, 
+               parciales.parcial, parciales.participacion, 
+               parciales.ejercicios_practicas, parciales.tareas_trabajo, 
+               parciales.examen, parciales.calificacion_parcial
+        FROM parciales
+        JOIN alumno ON parciales.id_alumno = alumno.id_alumno
+        WHERE parciales.parcial = %s
+    """
+    
+    cursor.execute(query, (parcial,))
+    calificaciones = cursor.fetchall()
+    conn.close()
+
+    return calificaciones
+
+@app.route('/obtener_calificaciones', methods=['POST'])
+def obtener_calificaciones_route():
+    """Route para devolver calificaciones en formato JSON"""
+    data = request.get_json()
+    parcial = data.get('parcial', 1)  # Por defecto, parcial 1
+    
+    calificaciones = obtener_calificaciones(parcial)
+    
+    resultado = [
+        {
+            "id": fila[0],
+            "nombre": fila[1],
+            "apellido": fila[2],
+            "parcial": fila[3],
+            "participacion": fila[4],
+            "ejercicios_practicas": fila[5],
+            "tareas_trabajo": fila[6],
+            "examen": fila[7],
+            "calificacion_parcial": fila[8]
+        }
+        for fila in calificaciones
+    ]
+
+    return jsonify({"success": True, "calificaciones": resultado})
 
 @app.route('/admin')
 def admin():

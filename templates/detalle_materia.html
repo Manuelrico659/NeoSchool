@@ -49,11 +49,25 @@
                     `;
                     break;
 
-                case "calificaciones":
+                    case "calificaciones":
                     mainContent.innerHTML = `
                         <h1>Calificaciones</h1>
-                        <p>Aquí podrás administrar y ver las calificaciones de los estudiantes.</p>
+                        <div class="content-section">
+                            <label for="parcial">Selecciona un parcial:</label>
+                            <select id="parcial" onchange="cargarCalificaciones()">
+                                <option value="1">Parcial 1</option>
+                                <option value="2">Parcial 2</option>
+                                <option value="3">Parcial 3</option>
+                                <option value="4">Parcial 4</option>
+                                <option value="5">Parcial 5</option>
+                            </select>
+
+                            <div id="calificaciones-container">
+                                <p>Cargando calificaciones...</p>
+                            </div>
+                        </div>
                     `;
+                    cargarCalificaciones(); // Cargar por defecto el parcial 1
                     break;
 
                 default:
@@ -64,6 +78,49 @@
                     break;
             }
         }
+        
+
+        // Función para obtener y mostrar las calificaciones
+        function cargarCalificaciones() {
+            const parcialSeleccionado = document.getElementById("parcial").value;
+            const container = document.getElementById("calificaciones-container");
+            container.innerHTML = `<p>Cargando calificaciones...</p>`;
+
+            fetch('/obtener_calificaciones', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ parcial: parcialSeleccionado })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    let html = `<div class="calificaciones-container">`;
+                    data.calificaciones.forEach(estudiante => {
+                        html += `
+                            <div class="estudiante-card">
+                                <span class="estudiante-nombre">${estudiante.nombre} ${estudiante.apellido}</span>
+                                <div class="calificaciones-detalles">
+                                    <p>Participación: ${estudiante.participacion}</p>
+                                    <p>Ejercicios y Prácticas: ${estudiante.ejercicios_practicas}</p>
+                                    <p>Tareas y Trabajos: ${estudiante.tareas_trabajo}</p>
+                                    <p>Examen: ${estudiante.examen}</p>
+                                    <p><strong>Calificación Parcial:</strong> ${estudiante.calificacion_parcial}</p>
+                                </div>
+                            </div>
+                        `;
+                    });
+                    html += `</div>`;
+                    container.innerHTML = html;
+                } else {
+                    container.innerHTML = `<p>No se encontraron calificaciones.</p>`;
+                }
+            })
+            .catch(error => {
+                console.error("Error al cargar calificaciones:", error);
+                container.innerHTML = `<p>Error al obtener los datos.</p>`;
+            });
+        }
+
 
         // Función para actualizar la asistencia de un estudiante
         function actualizarAsistencia(estudianteId, fecha, checkbox) {
