@@ -6,14 +6,26 @@
     <title>Contratación de Personal</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/forms.css') }}">
 </head>
+<script>
+    function validateEmail() {
+            var correo = document.querySelector("input[name='correo_familiar']").value;
+            var emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+            if (!emailRegex.test(correo)) {
+                alert("Por favor ingrese un correo electrónico válido.");
+                return false;
+            }
+            return true;
+        }
+</script>
 <body>
     <div class="form-container">
         <h2>Contratación de Personal</h2>
-        <form id="contratacion-form" method="POST">
+        <form id="contratacion-form" method="POST" onsubmit="return validateEmail()">
             <input type="text" name="nombre" placeholder="Nombre" required>
             <input type="text" name="apellido_paterno" placeholder="Apellido Paterno" required>
             <input type="text" name="apellido_materno" placeholder="Apellido Materno" required>
             <input type="date" name="fecha_nacimiento" required>
+            <input type="email" name="correo_colaborador" placeholder="Correo Electrónico" required>
             <select name="rol" required>
                 <option value="profesor">Maestro</option>
                 <option value="director">Directivo</option>

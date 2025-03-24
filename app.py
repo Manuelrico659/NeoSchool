@@ -276,6 +276,7 @@ def contratar():
         apellido_materno = request.form['apellido_materno']
         fecha_nacimiento = request.form['fecha_nacimiento']
         rol = request.form['rol']
+        correo_colaborador = request.form.get('correo_colaborador')  # Campo de correo
 
         # Extraer el año de nacimiento
         año_nacimiento = fecha_nacimiento.split('-')[0]  # Formato: YYYY-MM-DD
@@ -293,9 +294,9 @@ def contratar():
         # Insertar los datos en la tabla usuarios
         try:
             cursor.execute(
-                "INSERT INTO usuarios (nombre, apellido_paterno, apellido_materno, rol, contrasena,fecha_nacimiento) "
-                "VALUES (%s, %s, %s, %s, %s, %s)",
-                (nombre, apellido_paterno, apellido_materno, rol, contraseña_cifrada, fecha_nacimiento)
+                "INSERT INTO usuarios (nombre, apellido_paterno, apellido_materno, rol, contrasena,fecha_nacimiento,correo) "
+                "VALUES (%s, %s, %s, %s, %s, %s,%s)",
+                (nombre, apellido_paterno, apellido_materno, rol, contraseña_cifrada, fecha_nacimiento,correo_colaborador)
             )
             conn.commit()  # Guardar los cambios en la base de datos
         except Exception as e:
