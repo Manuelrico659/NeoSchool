@@ -79,8 +79,6 @@ def login():
         if user and bcrypt.check_password_hash(user[-3], password):  # user[-2] es la columna de la contraseña sin encriptar
             session['id_usuario'] = user[0]  # Suponiendo que user[0] es el ID del usuario
             session['rol'] = user[-4]  # Almacenar el rol en la sesión
-            print("User:", user[-4])
-            print("Password:", password)
             # Redirigir según el rol
             if user[-4] == 'admin':
                 return redirect(url_for('admin'))
@@ -131,12 +129,6 @@ def detalle_materia(id_materia):
     fecha_hoy = datetime.now(tz).date()
     fechas = [str(fecha_hoy - timedelta(days=i)) for i in range(3)]  # Últimos 3 días (hoy y 2 días pasados)
     fecha_mas_antigua = fecha_hoy - timedelta(days=3)  # Día a eliminar (hace 3 días)
-
-
-    print(fecha_hoy)
-    print(fecha_mas_antigua)
-    for fecha in fechas:
-        print(fecha)
 
     conn = get_db_connection()
     cursor = conn.cursor()
