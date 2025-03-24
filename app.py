@@ -54,6 +54,127 @@ def get_db_connection():
     )
     return conn
 
+#Info de ApiMail
+mailjet_api_key = os.getenv('MAILJET_API_KEY')
+mailjet_api_secret = os.getenv('MAILJET_API_SECRET')
+mailjet = Client(auth=(mailjet_api_key, mailjet_api_secret), version='v3')
+# IDs de las listas en Mailjet (debes obtener estos IDs desde el panel de Mailjet)
+LISTA_USUARIOS_ID = "10530275"  # Reemplaza con el ID de la lista de usuarios
+LISTA_TUTORES_ID = "10530274"    # Reemplaza con el ID de la lista de tutores
+
+def agregar_contacto_a_lista(email, nombre, lista_id):
+    """
+    Agrega un contacto a una lista específica en Mailjet.
+    """
+    # Paso 1: Crear o obtener el contacto
+    data_contacto = {
+        "IsExcludedFromCampaigns": "True",
+        "Name": nombre,
+        "Email": email
+    }
+    resultado_contacto = mailjet.contact.create(data=data_contacto)
+
+    if resultado_contacto.status_code != 201:
+        print(f"Error al crear el contacto: {resultado_contacto.status_code}")
+        return False
+
+    contacto_id = resultado_contacto.json()['Data'][0]['ID']
+
+    # Paso 2: Agregar el contacto a la lista
+    data_lista = {
+        "ContactID": contacto_id,
+        "ListID": lista_id,
+        "IsUnsubscribed": "false"
+    }
+    resultado_lista = mailjet.listrecipient.create(data=data_lista)
+
+    if resultado_lista.status_code != 201:
+        print(f"Error al agregar el contacto a la lista: {resultado_lista.status_code}")
+        return False
+
+    return True
+
+def enviar_correo_bienvenida(destinatario, registro, correo, anio_nacimiento):
+    # ID del template de Mailjet (obtén este ID desde el panel de Mailjet)
+    template_id = "6834687"  # ID de template en Mailjet
+
+    data = {
+        'Messages': [
+            {
+                "From": {
+                    "Email": "migueromoudg@gmail.com",  # Cambia esto por tu correo
+                    "Name": "Escuela Bosco"
+                },
+                "To": [
+                    {
+                        "Email": destinatario,
+                        "Name": destinatario
+                    }
+                ],
+                "TemplateID": template_id,  # Usar el template de Mailjet
+                "TemplateLanguage": True,   # Habilitar el uso de variables
+                "Subject": "Bienvenido/a al Colegio Parroquial Don Bosco",
+                "Variables": {  # Pasar las variables al template
+                    "registro": registro,
+                    "correo": correo,
+                    "anio_nacimiento": anio_nacimiento
+                }
+            }
+        ]
+    }
+
+    try:
+        result = mailjet.send.create(data=data)
+        if result.status_code == 200:
+            return True
+        else:
+            print(f"Error al enviar el correo: {result.status_code}")
+            return False
+    except Exception as e:
+        print(f"Error al enviar el correo: {e}")
+        return False
+
+
+def enviar_correo(destinatario, contraseña):
+    # ID del template de Mailjet (obtén este ID desde el panel de Mailjet)
+    template_id = "6834746"  # Reemplaza con el ID de tu template en Mailjet
+
+    data = {
+        'Messages': [
+            {
+                "From": {
+                    "Email": "migueromoudg@gmail.com",  # Cambia esto por tu correo
+                    "Name": "Escuela Bosco"
+                },
+                "To": [
+                    {
+                        "Email": destinatario,
+                        "Name": destinatario
+                    }
+                ],
+                "TemplateID": template_id,  # Usar el template de Mailjet
+                "TemplateLanguage": True,   # Habilitar el uso de variables
+                "Subject": "Recuperación de Contraseña - Escuela Bosco",
+                "Variables": {  # Pasar las variables al template
+                    "contraseña": contraseña  # La variable que definiste en el template
+                }
+            }
+        ]
+    }
+
+    try:
+        result = mailjet.send.create(data=data)
+        if result.status_code == 200:
+            return True
+        else:
+            print(f"Error al enviar el correo: {result.status_code}")
+            return False
+    except Exception as e:
+        print(f"Error al enviar el correo: {e}")
+        return False
+
+############################################################################################################################################################################################
+
 
 
 
@@ -338,10 +459,13 @@ def contratar():
         try:
             cursor.execute(
                 "INSERT INTO usuarios (nombre, apellido_paterno, apellido_materno, rol, contrasena,fecha_nacimiento,correo) "
-                "VALUES (%s, %s, %s, %s, %s, %s,%s)",
+                "VALUES (%s, %s, %s, %s, %s, %s,%s) RETURNING id_usuario",
                 (nombre, apellido_paterno, apellido_materno, rol, contraseña_cifrada, fecha_nacimiento,correo_colaborador)
             )
+            id_usuario = cursor.fetchone()[0]
             conn.commit()  # Guardar los cambios en la base de datos
+            agregar_contacto_a_lista(correo_colaborador, nombre, LISTA_USUARIOS_ID)
+            enviar_correo_bienvenida(correo_colaborador, id_usuario, correo_colaborador, año_nacimiento)
         except Exception as e:
             conn.rollback()  # Revertir cambios en caso de error
             print(f"Error al registrar el usuario: {str(e)}")  # Opcional: Imprimir el error en la consola
@@ -404,7 +528,7 @@ def inscripcion():
                     (tutor, tel_emergencia, correo_familiar)
                 )
                 id_familia = cursor.fetchone()[0]
-
+                agregar_contacto_a_lista(correo_familiar, tutor,LISTA_TUTORES_ID)
             # Insertar los datos del alumno
             cursor.execute(
                 "INSERT INTO alumno (nombre, apellido_paterno, apellido_materno, nivel, grado, campus, id_familia) "
