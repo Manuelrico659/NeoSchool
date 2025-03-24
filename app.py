@@ -58,10 +58,11 @@ def get_db_connection():
 #Info de ApiMail
 mailjet_api_key = os.getenv('MAILJET_API_KEY')
 mailjet_api_secret = os.getenv('MAILJET_API_SECRET')
-mailjet = Client(auth=(mailjet_api_key, mailjet_api_secret), version='v3.1')
+mailjet_correos = Client(auth=(mailjet_api_key, mailjet_api_secret), version='v3.1')
+mailjet_contacto = Client(auth=(mailjet_api_key, mailjet_api_secret), version='v3')
 # IDs de las listas en Mailjet (debes obtener estos IDs desde el panel de Mailjet)
-LISTA_USUARIOS_ID = 10530275  # Reemplaza con el ID de la lista de usuarios
-LISTA_TUTORES_ID = 10530274    # Reemplaza con el ID de la lista de tutores
+LISTA_USUARIOS_ID = "10530275"  # Reemplaza con el ID de la lista de usuarios
+LISTA_TUTORES_ID = "10530274"    # Reemplaza con el ID de la lista de tutores
 
 def agregar_contacto_a_lista(email, nombre, lista_id):
     """
@@ -73,7 +74,7 @@ def agregar_contacto_a_lista(email, nombre, lista_id):
         "Name": nombre,
         "Email": email
     }
-    resultado_contacto = mailjet.contact.create(data=data_contacto)
+    resultado_contacto = mailjet_contacto.contact.create(data=data_contacto)
 
     if resultado_contacto.status_code != 201:
         print(f"Error al crear el contacto: {resultado_contacto.status_code}")
@@ -87,7 +88,7 @@ def agregar_contacto_a_lista(email, nombre, lista_id):
         "ListID": lista_id,
         "IsUnsubscribed": "false"
     }
-    resultado_lista = mailjet.contactslist_managecontact.create(data=data_lista)
+    resultado_lista = mailjet_contacto.contactslist_managecontact.create(data=data_lista)
 
     if resultado_lista.status_code != 201:
         print(f"Error al agregar el contacto a la lista: {resultado_lista.status_code}")
@@ -124,7 +125,7 @@ def enviar_correo_bienvenida(destinatario, registro, correo):
 
     try:
         print("Datos que se enviarán a Mailjet:", data)  # Depuración: Imprimir los datos
-        result = mailjet.send.create(data=data)
+        result = mailjet_correos.send.create(data=data)
         print("Respuesta de Mailjet:", result.status_code, result.json())  # Depuración: Imprimir la respuesta
 
         if result.status_code == 200:
@@ -170,7 +171,7 @@ def enviar_correo(destinatario, contraseña):
     }
 
     try:
-        result = mailjet.send.create(data=data)
+        result = mailjet_correos.send.create(data=data)
         if result.status_code == 200:
             return True
         else:
