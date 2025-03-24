@@ -5,6 +5,26 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Detalle de Materia</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/interfaces.css') }}">
+    <style>
+        .regresar-container {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+        .regresar-container button {
+            background-color: #4D869C;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        .regresar-container button:hover {
+            background-color: #3a6a85;
+        }
+    </style>
 </head>
 <script>
     function actualizarAsistencia(estudianteId, fecha, checkbox) {
@@ -54,7 +74,6 @@
             <li><a href="#">Inicio</a></li>
             <li><a href="#">Asistencias</a></li>
             <li><a href="#">Calificaciones</a></li>
-            <li><a href="#" onclick="loadContent('configuracion')">Configuración</a></li> <!-- Agregar la sección de configuración -->
         </ul>
     </div>
 
@@ -99,35 +118,12 @@
                 </div>                
                 {% endfor %}
             </div>
-            
+        </div>  
+        
+        <!-- Botón de Regresar -->
+        <div class="regresar-container">
+            <button onclick="window.location.href='{{ url_for('profesor') }}'">Regresar a la página de Profesor</button>
         </div>
     </div>
-
-    <script>
-        // Función para cargar la sección de configuración
-        function loadContent(section) {
-            const mainContent = document.querySelector(".main-content");
-
-            switch (section) {
-                case "configuracion":
-                    mainContent.innerHTML = `
-                        <h1>Configuración</h1>
-                        <div class="content-grid">
-                            <div class="content-section">
-                                <div class="button-container">
-                                    <button onclick="window.location.href='{{ url_for('cambiar_contrasena') }}'">Cambiar contraseña</button>
-                                </div>
-                                <div class="button-container">
-                                    <button onclick="window.location.href='{{ url_for('logout') }}'">Cerrar sesión</button>
-                                </div>
-                            </div>
-                        </div>
-                    `;
-                    break;
-                default:
-                    mainContent.innerHTML = "<h1>Bienvenido a la configuración</h1>";
-            }
-        }
-    </script>
 </body>
 </html>
