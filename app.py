@@ -95,6 +95,7 @@ def agregar_contacto_a_lista(email, nombre, lista_id):
     return True
 
 def enviar_correo_bienvenida(destinatario, registro):
+    print("Entro a la funcion de enviar correo")
     # ID del template de Mailjet (obtén este ID desde el panel de Mailjet)
     template_id = "6834687"  # ID de template en Mailjet
 
@@ -128,6 +129,7 @@ def enviar_correo_bienvenida(destinatario, registro):
             return True
         else:
             print(f"Error al enviar el correo: {result.status_code}")
+            print(f"Detalles del error: {result.json()}")
             return False
     except Exception as e:
         print(f"Error al enviar el correo: {e}")
