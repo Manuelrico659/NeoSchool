@@ -3,103 +3,119 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Detalle de Materia</title>
+    <title>NeoSchool - Administrativo</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/interfaces.css') }}">
-</head>
-<script>
-    function actualizarAsistencia(estudianteId, fecha, checkbox) {
-    // Deshabilitar el checkbox temporalmente para evitar múltiples clics
-    checkbox.disabled = true;  
-    // Obtener el estado del checkbox
-    var estado = checkbox.checked ? true : false;
+    <script>
+        // Función para cambiar el contenido dinámicamente
+        function loadContent(section) {
+            const mainContent = document.querySelector(".main-content");
 
-    // Enviar la solicitud AJAX al backend
-    fetch('/actualizar_asistencia', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-            estudiante_id: estudianteId,
-            fecha: fecha,
-            estado: estado
-        })
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data.success) {
-            console.log('Asistencia actualizada correctamente');
-            // Recargar la página después de la actualización
-            location.reload();
-        } else {
-            console.log('Error al actualizar la asistencia');
-            checkbox.checked = !estado;  // Revertir el estado si hay un error
+            switch (section) {
+                case "inicio":
+                    mainContent.innerHTML = `
+                        <h1>Detalles de la Materia</h1>
+                        <div class="content-section">
+                            <h2>Información General</h2>
+                            <p>Aquí se muestran los detalles generales de la materia, como nombre, descripción, etc.</p>
+                        </div>
+                    `;
+                    break;
+
+                case "asistencias":
+                    mainContent.innerHTML = `
+                        <h1>Gestión de Asistencias</h1>
+                        <div class="content-section">
+                            <h2>Asistencias</h2>
+                            <div class="asistencias-container">
+                                {% for estudiante in estudiantes %}
+                                <div class="estudiante-card">
+                                    <span class="estudiante-nombre">{{ estudiante[1] }} {{ estudiante[2] }}</span>
+                                    <div class="asistencia-dias">
+                                        {% for fecha in fechas %}
+                                            <label class="asistencia-checkbox">
+                                                <input type="checkbox" 
+                                                    {% if asistencia_por_estudiante[estudiante[0]].get(fecha, 0) == 1 %}checked{% endif %}
+                                                    data-fecha="{{ fecha }}"
+                                                    onchange="actualizarAsistencia({{ estudiante[0] }}, '{{ fecha }}', this)">
+                                                {{ fecha }}
+                                            </label>
+                                        {% endfor %}
+                                    </div>
+                                    <div class="faltas">
+                                        Faltas: {{ faltas_por_estudiante.get(estudiante[0], 0) }}
+                                    </div>
+                                </div>                
+                                {% endfor %}
+                            </div>
+                        </div>
+                    `;
+                    break;
+
+                case "calificaciones":
+                    mainContent.innerHTML = `
+                        <h1>Calificaciones</h1>
+                        <div class="content-section">
+                            <h2>Administrar Calificaciones</h2>
+                            <p>Aquí podrás administrar y ver las calificaciones de los estudiantes.</p>
+                        </div>
+                    `;
+                    break;
+
+                case "reportes":
+                    mainContent.innerHTML = `
+                        <h1>Visualizar Reportes</h1>
+                        <div class="content-section">
+                            <p>Aquí puedes visualizar los reportes detallados.</p>
+                        </div>
+                    `;
+                    break;
+
+                case "configuracion":
+                    mainContent.innerHTML = `
+                        <h1>Configuración</h1>
+                        <div class="content-grid">
+                            <div class="content-section">
+                                <div class="button-container">
+                                    <button onclick="window.location.href='{{ url_for('cambiar_contrasena') }}'">Cambiar contraseña</button>
+                                </div>
+                                <div class="button-container">
+                                    <button onclick="window.location.href='{{ url_for('logout') }}'">Cerrar sesión</button>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                    break;
+
+                default:
+                    mainContent.innerHTML = `
+                        <h1>Bienvenido, Administrativo</h1>
+                        <div class="content-section">
+                            <h2>Gestión de Usuarios</h2>
+                            <p>Aquí se podrá gestionar la información de los profesores y directivos.</p>
+                        </div>
+                    `;
+            }
         }
-    })
-    .catch(error => {
-        console.error('Error:', error);
-        checkbox.checked = !estado;  // Revertir en caso de fallo
-    })
-    .finally(() => {
-        // Rehabilitar el checkbox después de la respuesta del servidor
-        checkbox.disabled = false;
-    });
-}
 
-</script>
+        // Cargar el contenido inicial al abrir la página
+        document.addEventListener("DOMContentLoaded", () => {
+            loadContent("inicio");
+        });
+    </script>
+</head>
 <body>
     <div class="sidebar">
-        <h2>Gestión de Materias</h2>
+        <h2>NeoSchool</h2>
         <ul>
-            <li><a href="#">Inicio</a></li>
-            <li><a href="#">Asistencias</a></li>
-            <li><a href="#">Calificaciones</a></li>
+            <li><a href="#" onclick="loadContent('inicio')">Inicio</a></li>
+            <li><a href="#" onclick="loadContent('asistencias')">Asistencias</a></li>
+            <li><a href="#" onclick="loadContent('calificaciones')">Calificaciones</a></li>
+            <li><a href="#" onclick="loadContent('reportes')">Reportes</a></li>
+            <li><a href="#" onclick="loadContent('configuracion')">Configuración</a></li>
         </ul>
     </div>
-
     <div class="main-content">
-        <div class="content-section">
-            <h1>Detalles de la Materia</h1>
-
-            <h2>Asistencias</h2>
-
-            <div class="asistencias-container">
-                {% for estudiante in estudiantes %}
-                <div class="estudiante-card">
-                    <span class="estudiante-nombre">{{ estudiante[1] }} {{ estudiante[2] }}</span>
-                
-                    <div class="asistencia-dias">
-                        {% for fecha in fechas %}
-                            <label class="asistencia-checkbox">
-                                <input type="checkbox" 
-                                    {% if asistencia_por_estudiante[estudiante[0]].get(fecha, 0) == 1 %}checked{% endif %}
-                                    data-fecha="{{ fecha }}"
-                                    onchange="actualizarAsistencia({{ estudiante[0] }}, '{{ fecha }}', this)">
-
-                                {{ fecha }}
-                            </label>
-                        {% endfor %}
-                    </div>
-                    
-                    <!-- Espacio después de los checkboxes -->
-                    <div class="faltas-espacio"></div>
-
-                    <!-- Mostrar faltas si existe en la tabla parciales y coincide con el estudiante -->
-                    {% if estudiante[0] in faltas_por_estudiante %}
-                    <div class="faltas">
-                        Faltas: {{ faltas_por_estudiante[estudiante[0]] }}
-                    </div>
-                    {% else %}
-                    <div class="faltas" id="faltas-{{ estudiante[0] }}">
-                        Faltas: {{ faltas_por_estudiante.get(estudiante[0], 0) }}
-                    </div>
-                    {% endif %}
-
-                </div>                
-                {% endfor %}
-            </div>
-            
-        </div>
+        <!-- El contenido se cargará dinámicamente aquí -->
     </div>
 </body>
 </html>
