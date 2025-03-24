@@ -4,126 +4,127 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Detalle de Materia</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/interfaces.css') }}">
-    <style>
-        .regresar-container {
-            position: absolute;
-            bottom: 20px;
-            left: 50%;
-            transform: translateX(-50%);
-        }
-        .regresar-container button {
-            background-color: #4D869C;
-            color: white;
-            border: none;
-            padding: 10px 20px;
-            border-radius: 5px;
-            cursor: pointer;
-            font-size: 16px;
-        }
-        .regresar-container button:hover {
-            background-color: #3a6a85;
-        }
-    </style>
-</head>
-<script>
-    function actualizarAsistencia(estudianteId, fecha, checkbox) {
-        // Deshabilitar el checkbox temporalmente para evitar múltiples clics
-        checkbox.disabled = true;  
-        // Obtener el estado del checkbox
-        var estado = checkbox.checked ? true : false;
+    <script>
+        // Función para actualizar la asistencia
+        function actualizarAsistencia(estudianteId, fecha, checkbox) {
+            const estado = checkbox.checked ? true : false;
 
-        // Enviar la solicitud AJAX al backend
-        fetch('/actualizar_asistencia', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-                estudiante_id: estudianteId,
-                fecha: fecha,
-                estado: estado
+            // Enviar la actualización al servidor con AJAX
+            fetch('/actualizar_asistencia', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    estudiante_id: estudianteId,
+                    fecha: fecha,
+                    estado: estado,
+                }),
             })
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                console.log('Asistencia actualizada correctamente');
-                // Actualizar el número de faltas en la interfaz
-                const faltasDiv = document.getElementById('faltas-' + estudianteId);
-                faltasDiv.textContent = 'Faltas: ' + data.faltas;
-            } else {
-                console.log('Error al actualizar la asistencia');
-                checkbox.checked = !estado;  // Revertir el estado si hay un error
-            }
-        })
-        .catch(error => {
-            console.error('Error:', error);
-            checkbox.checked = !estado;  // Revertir en caso de fallo
-        })
-        .finally(() => {
-            // Rehabilitar el checkbox después de la respuesta del servidor
-            checkbox.disabled = false;
-        });
-    }
-</script>
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Actualiza las faltas si la respuesta fue exitosa
+                    const faltasElement = document.getElementById(`faltas-${estudianteId}`);
+                    const nuevoValor = estado ? parseInt(faltasElement.textContent) - 1 : parseInt(faltasElement.textContent) + 1;
+                    faltasElement.textContent = nuevoValor;
+
+                    // Actualiza el estado visualmente
+                    const estadoCell = document.getElementById(`estado-${estudianteId}-${fecha}`);
+                    estadoCell.textContent = estado ? "Asistió" : "Falta";
+                } else {
+                    alert(data.error);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Hubo un problema al actualizar la asistencia.');
+            });
+        }
+
+        // Función para actualizar calificación
+        function actualizarCalificacion(estudianteId, calificacionInput) {
+            const calificacion = calificacionInput.value;
+
+            // Enviar la actualización de calificación al servidor con AJAX
+            fetch('/actualizar_calificacion', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    estudiante_id: estudianteId,
+                    calificacion: calificacion,
+                }),
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert('Calificación actualizada con éxito');
+                } else {
+                    alert(data.error);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Hubo un problema al actualizar la calificación.');
+            });
+        }
+    </script>
+</head>
 <body>
-    <div class="sidebar">
-        <h2>Gestión de Materias</h2>
-        <ul>
-            <li><a href="#">Inicio</a></li>
-            <li><a href="#">Asistencias</a></li>
-            <li><a href="#">Calificaciones</a></li>
-        </ul>
+    <!-- Barra superior con botones de navegación -->
+    <div class="nav-bar">
+        <button onclick="window.location.href='/inicio'">Inicio</button>
+        <button onclick="window.location.href='/asistencias/{{ materia_id }}'">Asistencias</button>
+        <button onclick="window.location.href='/calificaciones/{{ materia_id }}'">Calificaciones</button>
+        <button onclick="window.location.href='/detalle_materia/{{ materia_id }}'">Detalle Materia</button>
+        <button onclick="window.location.href='/home'">Regresar</button> <!-- Botón de regresar -->
     </div>
 
-    <div class="main-content">
-        <div class="content-section">
-            <h1>Detalles de la Materia</h1>
+    <h1>Detalle de Materia</h1>
 
-            <h2>Asistencias</h2>
-
-            <div class="asistencias-container">
-                {% for estudiante in estudiantes %}
-                <div class="estudiante-card">
-                    <span class="estudiante-nombre">{{ estudiante[1] }} {{ estudiante[2] }}</span>
-                
-                    <div class="asistencia-dias">
-                        {% for fecha in fechas %}
-                            <label class="asistencia-checkbox">
-                                <input type="checkbox" 
-                                    {% if asistencia_por_estudiante[estudiante[0]].get(fecha, 0) == 1 %}checked{% endif %}
-                                    data-fecha="{{ fecha }}"
-                                    onchange="actualizarAsistencia({{ estudiante[0] }}, '{{ fecha }}', this)">
-
-                                {{ fecha }}
-                            </label>
-                        {% endfor %}
-                    </div>
-                    
-                    <!-- Espacio después de los checkboxes -->
-                    <div class="faltas-espacio"></div>
-
-                    <!-- Mostrar faltas si existe en la tabla parciales y coincide con el estudiante -->
-                    {% if estudiante[0] in faltas_por_estudiante %}
-                    <div class="faltas" id="faltas-{{ estudiante[0] }}">
-                        Faltas: {{ faltas_por_estudiante[estudiante[0]] }}
-                    </div>
-                    {% else %}
-                    <div class="faltas" id="faltas-{{ estudiante[0] }}">
-                        Faltas: {{ faltas_por_estudiante.get(estudiante[0], 0) }}
-                    </div>
-                    {% endif %}
-
-                </div>                
+    <table>
+        <thead>
+            <tr>
+                <th>Nombre</th>
+                <th>Faltas</th>
+                <th>Calificación</th>
+                {% for fecha in fechas %}
+                    <th>{{ fecha }}</th>
                 {% endfor %}
-            </div>
-        </div>  
-        
-        <!-- Botón de Regresar -->
-        <div class="regresar-container">
-            <button onclick="window.location.href='{{ url_for('profesor') }}'">Regresar a la página de Profesor</button>
-        </div>
-    </div>
+            </tr>
+        </thead>
+        <tbody>
+            {% for estudiante in estudiantes %}
+                <tr>
+                    <td>{{ estudiante.nombre }} {{ estudiante.apellido_paterno }}</td>
+                    <!-- Mostrar faltas -->
+                    <td id="faltas-{{ estudiante.id_alumno }}">{{ faltas_por_estudiante[estudiante.id_alumno] }}</td>
+                    <!-- Mostrar calificación -->
+                    <td>
+                        <input type="number" id="calificacion-{{ estudiante.id_alumno }}" value="{{ estudiante.calificacion }}" onchange="actualizarCalificacion({{ estudiante.id_alumno }}, this)" />
+                    </td>
+                    {% for fecha in fechas %}
+                        <td>
+                            <!-- Checkbox para asistencia -->
+                            <input type="checkbox" 
+                                   id="asistencia-{{ estudiante.id_alumno }}-{{ fecha }}" 
+                                   {% if asistencia_por_estudiante[estudiante.id_alumno][fecha] %} checked {% endif %}
+                                   onclick="actualizarAsistencia({{ estudiante.id_alumno }}, '{{ fecha }}', this)" />
+                            <!-- Estado de asistencia -->
+                            <span id="estado-{{ estudiante.id_alumno }}-{{ fecha }}">
+                                {% if asistencia_por_estudiante[estudiante.id_alumno][fecha] %}
+                                    Asistió
+                                {% else %}
+                                    Falta
+                                {% endif %}
+                            </span>
+                        </td>
+                    {% endfor %}
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
 </body>
 </html>
