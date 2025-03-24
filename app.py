@@ -260,7 +260,7 @@ def obtener_calificaciones(parcial):
     cursor = conn.cursor()
     
     query = """
-        SELECT alumno.id_alumno, alumno.nombre, alumno.apellido, 
+        SELECT alumno.id_alumno, alumno.nombre, alumno.apellido_paterno, 
                parciales.parcial, parciales.participacion, 
                parciales.ejercicios_practicas, parciales.tareas_trabajo, 
                parciales.examen, parciales.calificacion_parcial
