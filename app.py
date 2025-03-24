@@ -94,16 +94,14 @@ def agregar_contacto_a_lista(email, nombre, lista_id):
 
     return True
 
-def enviar_correo_bienvenida(destinatario, registro):
-    print("Entro a la funcion de enviar correo")
-    # ID del template de Mailjet (obtén este ID desde el panel de Mailjet)
+def enviar_correo_bienvenida(destinatario, registro, correo):
     template_id = "6834687"  # ID de template en Mailjet
 
     data = {
         'Messages': [
             {
                 "From": {
-                    "Email": "migueromoudg@gmail.com",  # Cambia esto por tu correo
+                    "Email": "migueromoudg@gmail.com",
                     "Name": "Escuela Bosco"
                 },
                 "To": [
@@ -112,24 +110,27 @@ def enviar_correo_bienvenida(destinatario, registro):
                         "Name": destinatario
                     }
                 ],
-                "TemplateID": template_id,  # Usar el template de Mailjet
-                "TemplateLanguage": True,   # Habilitar el uso de variables
+                "TemplateID": template_id,
+                "TemplateLanguage": True,
                 "Subject": "Bienvenido/a al Colegio Parroquial Don Bosco",
-                "Variables": {  # Pasar las variables al template
-                    "registro": registro,
-                    "correo": destinatario,
+                "Variables": {
+                    "registro": str(registro),  # Asegúrate de que sea una cadena
+                    "correo": str(correo)       # Asegúrate de que sea una cadena
                 }
             }
         ]
     }
 
     try:
+        print("Datos que se enviarán a Mailjet:", data)  # Depuración: Imprimir los datos
         result = mailjet.send.create(data=data)
+        print("Respuesta de Mailjet:", result.status_code, result.json())  # Depuración: Imprimir la respuesta
+
         if result.status_code == 200:
             return True
         else:
             print(f"Error al enviar el correo: {result.status_code}")
-            print(f"Detalles del error: {result.json()}")
+            print(f"Detalles del error: {result.json()}")  # Depuración: Imprimir detalles del error
             return False
     except Exception as e:
         print(f"Error al enviar el correo: {e}")
@@ -468,7 +469,9 @@ def contratar():
             print(id_usuario)
             conn.commit()  # Guardar los cambios en la base de datos
             agregar_contacto_a_lista(correo_colaborador, nombre, LISTA_USUARIOS_ID)
-            enviar_correo_bienvenida(correo_colaborador, id_usuario)
+            print(" - ")
+            enviar_correo_bienvenida(correo_colaborador, id_usuario, correo_colaborador)
+
         except Exception as e:
             conn.rollback()  # Revertir cambios en caso de error
             print(f"Error al registrar el usuario: {str(e)}")  # Opcional: Imprimir el error en la consola
@@ -577,9 +580,9 @@ def agregar_materia():
         if not alumnos_seleccionados:
             return render_template('agregar_materia.html', mensaje="Debes seleccionar al menos un alumno.", maestros=get_maestros(), alumnos=get_alumnos())
 
-        print(f"🔹 Nombre de la materia: {nombre}")
-        print(f"🔹 ID del maestro: {id_usuario}")
-        print(f"🔹 Alumnos seleccionados: {alumnos_seleccionados}")
+        #print(f"🔹 Nombre de la materia: {nombre}")
+        #print(f"🔹 ID del maestro: {id_usuario}")
+        #print(f"🔹 Alumnos seleccionados: {alumnos_seleccionados}")
 
         # Insertar la materia en la base de datos
         conn = get_db_connection()
