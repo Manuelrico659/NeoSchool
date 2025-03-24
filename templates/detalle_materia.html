@@ -88,6 +88,9 @@
             .then(data => {
                 if (data.success) {
                     console.log('Asistencia actualizada correctamente');
+                    // Recargar la página después de la actualización
+                    location.reload();
+
                 } else {
                     console.log('Error al actualizar la asistencia');
                     checkbox.checked = !estado;  // Revertir el estado si hay un error
