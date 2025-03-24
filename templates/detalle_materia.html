@@ -8,6 +8,7 @@
     <script>
         // Función para cargar contenido dinámicamente
         function loadContent(section) {
+            localStorage.setItem("lastSection", section); // Guarda la sección actual
             const mainContent = document.querySelector(".main-content");
 
             switch (section) {
@@ -66,18 +67,12 @@
 
         // Función para actualizar la asistencia de un estudiante
         function actualizarAsistencia(estudianteId, fecha, checkbox) {
-            // Deshabilitar el checkbox temporalmente para evitar múltiples clics
             checkbox.disabled = true;  
-
-            // Obtener el estado del checkbox
             var estado = checkbox.checked ? true : false;
 
-            // Enviar la solicitud AJAX al backend
             fetch('/actualizar_asistencia', {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
+                headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
                     estudiante_id: estudianteId,
                     fecha: fecha,
@@ -88,27 +83,25 @@
             .then(data => {
                 if (data.success) {
                     console.log('Asistencia actualizada correctamente');
-                    // Recargar la página después de la actualización
-                    location.reload();
-
+                    location.reload(); // Recargar la página para actualizar los datos
                 } else {
                     console.log('Error al actualizar la asistencia');
-                    checkbox.checked = !estado;  // Revertir el estado si hay un error
+                    checkbox.checked = !estado;  // Revertir estado si hay error
                 }
             })
             .catch(error => {
                 console.error('Error:', error);
-                checkbox.checked = !estado;  // Revertir en caso de fallo
+                checkbox.checked = !estado;
             })
             .finally(() => {
-                // Rehabilitar el checkbox después de la respuesta del servidor
                 checkbox.disabled = false;
             });
         }
 
-        // Cargar contenido inicial al abrir la página
+        // Cargar la última sección visitada al abrir la página
         document.addEventListener("DOMContentLoaded", () => {
-            loadContent("inicio");
+            const lastSection = localStorage.getItem("lastSection") || "inicio";
+            loadContent(lastSection);
         });
     </script>
 </head>
