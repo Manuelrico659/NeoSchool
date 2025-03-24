@@ -57,7 +57,7 @@ def get_db_connection():
 #Info de ApiMail
 mailjet_api_key = os.getenv('MAILJET_API_KEY')
 mailjet_api_secret = os.getenv('MAILJET_API_SECRET')
-mailjet = Client(auth=(mailjet_api_key, mailjet_api_secret), version='v3')
+mailjet = Client(auth=(mailjet_api_key, mailjet_api_secret), version='v3.1')
 # IDs de las listas en Mailjet (debes obtener estos IDs desde el panel de Mailjet)
 LISTA_USUARIOS_ID = "10530275"  # Reemplaza con el ID de la lista de usuarios
 LISTA_TUTORES_ID = "10530274"    # Reemplaza con el ID de la lista de tutores
@@ -95,7 +95,7 @@ def agregar_contacto_a_lista(email, nombre, lista_id):
     return True
 
 def enviar_correo_bienvenida(destinatario, registro, correo):
-    template_id = "6834687"  # ID de template en Mailjet
+    template_id = 6834687  # ID de template en Mailjet
 
     data = {
         'Messages': [
@@ -139,7 +139,7 @@ def enviar_correo_bienvenida(destinatario, registro, correo):
 
 def enviar_correo(destinatario, contraseña):
     # ID del template de Mailjet (obtén este ID desde el panel de Mailjet)
-    template_id = "6834746"  # Reemplaza con el ID de tu template en Mailjet
+    template_id = 6834746  # Reemplaza con el ID de tu template en Mailjet
 
     data = {
         'Messages': [
