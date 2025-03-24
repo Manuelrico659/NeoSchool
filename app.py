@@ -344,12 +344,9 @@ def inscripcion():
             tutor = request.form.get('tutor')
             tel_emergencia = request.form.get('tel_emergencia')
             
-            if not tutor or not tel_emergencia:
+            if not tutor or not tel_emergencia or not correo_familiar:
                 return "Por favor ingrese todos los campos para la nueva familia", 400
             
-            # Asegurarnos de que el correo tiene un formato válido (puedes hacer más validaciones si lo necesitas)
-            if '@' not in correo_familiar or '.' not in correo_familiar:
-                return "Por favor ingrese un correo electrónico válido", 400
         
         # Conectar a la base de datos
         conn = get_db_connection()
