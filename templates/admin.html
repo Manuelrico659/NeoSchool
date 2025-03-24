@@ -13,7 +13,7 @@
             switch (section) {
                 case "inicio":
                 mainContent.innerHTML = `
-                            <h1>Inicio</h1>
+                            <h1>Gestión</h1>
                             <div class="content-grid">
                                 <div class="content-section">
                                     <h2>Altas</h2>
@@ -23,24 +23,6 @@
                                     </div>
                                 </div>
                             </div>
-                    `;
-                    break;
-
-                case "gestion-alumnos":
-                    mainContent.innerHTML = `
-                        <h1>Gestión de Alumnos</h1>
-                        <div class="content-section">
-                            <p>Contenido de gestión de alumnos.</p>
-                        </div>
-                    `;
-                    break;
-
-                case "gestion-usuarios":
-                    mainContent.innerHTML = `
-                        <h1>Gestión de Usuarios</h1>
-                        <div class="content-section">
-                            <p>Contenido de gestión de usuarios.</p>
-                        </div>
                     `;
                     break;
 
@@ -113,9 +95,7 @@
     <div class="sidebar">
         <h2>NeoSchool</h2>
         <ul>
-            <li><a href="#" onclick="loadContent('inicio')">Inicio</a></li>
-            <li><a href="#" onclick="loadContent('gestion-alumnos')">Gestión de Alumnos</a></li>
-            <li><a href="#" onclick="loadContent('gestion-usuarios')">Gestión de Usuarios</a></li>
+            <li><a href="#" onclick="loadContent('inicio')">Gestión</a></li>
             <li><a href="#" onclick="loadContent('agregar-materias')">Agregar Materias</a></li>
             <li><a href="#" onclick="loadContent('visualizar-reportes')">Visualizar Reportes</a></li>
             <li><a href="#" onclick="loadContent('configuracion')">Configuración</a></li>
