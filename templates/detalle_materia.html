@@ -3,13 +3,76 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Detalle de Materia</title>
+    <title>Gestión de Materias</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/interfaces.css') }}">
     <script>
-        // Función para actualizar la asistencia
-        function actualizarAsistencia(estudianteId, fecha, checkbox) {
-            const estado = checkbox.checked ? true : false;
+        // Función para cargar contenido dinámicamente
+        function loadContent(section) {
+            const mainContent = document.querySelector(".main-content");
 
-            // Enviar la actualización al servidor con AJAX
+            switch (section) {
+                case "inicio":
+                    mainContent.innerHTML = `
+                        <h1>Detalles de la Materia</h1>
+                        <p>Aquí se muestran los detalles generales de la materia, como nombre, descripción, etc.</p>
+                    `;
+                    break;
+
+                case "asistencias":
+                    mainContent.innerHTML = `
+                        <h1>Gestión de Asistencias</h1>
+                        <div class="content-section">
+                            <h2>Asistencias</h2>
+                            <div class="asistencias-container">
+                                {% for estudiante in estudiantes %}
+                                <div class="estudiante-card">
+                                    <span class="estudiante-nombre">{{ estudiante[1] }} {{ estudiante[2] }}</span>
+                                    <div class="asistencia-dias">
+                                        {% for fecha in fechas %}
+                                        <label class="asistencia-checkbox">
+                                            <input type="checkbox" 
+                                                {% if asistencia_por_estudiante[estudiante[0]].get(fecha, 0) == 1 %}checked{% endif %}
+                                                data-fecha="{{ fecha }}"
+                                                onchange="actualizarAsistencia({{ estudiante[0] }}, '{{ fecha }}', this)">
+                                            {{ fecha }}
+                                        </label>
+                                        {% endfor %}
+                                    </div>
+                                    <div class="faltas">
+                                        Faltas: {{ faltas_por_estudiante.get(estudiante[0], 0) }}
+                                    </div>
+                                </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    `;
+                    break;
+
+                case "calificaciones":
+                    mainContent.innerHTML = `
+                        <h1>Calificaciones</h1>
+                        <p>Aquí podrás administrar y ver las calificaciones de los estudiantes.</p>
+                    `;
+                    break;
+
+                default:
+                    mainContent.innerHTML = `
+                        <h1>Bienvenido, Administrativo</h1>
+                        <p>Aquí podrás gestionar la información de las materias y estudiantes.</p>
+                    `;
+                    break;
+            }
+        }
+
+        // Función para actualizar la asistencia de un estudiante
+        function actualizarAsistencia(estudianteId, fecha, checkbox) {
+            // Deshabilitar el checkbox temporalmente para evitar múltiples clics
+            checkbox.disabled = true;  
+
+            // Obtener el estado del checkbox
+            var estado = checkbox.checked ? true : false;
+
+            // Enviar la solicitud AJAX al backend
             fetch('/actualizar_asistencia', {
                 method: 'POST',
                 headers: {
@@ -18,113 +81,46 @@
                 body: JSON.stringify({
                     estudiante_id: estudianteId,
                     fecha: fecha,
-                    estado: estado,
-                }),
+                    estado: estado
+                })
             })
             .then(response => response.json())
             .then(data => {
                 if (data.success) {
-                    // Actualiza las faltas si la respuesta fue exitosa
-                    const faltasElement = document.getElementById(`faltas-${estudianteId}`);
-                    const nuevoValor = estado ? parseInt(faltasElement.textContent) - 1 : parseInt(faltasElement.textContent) + 1;
-                    faltasElement.textContent = nuevoValor;
-
-                    // Actualiza el estado visualmente
-                    const estadoCell = document.getElementById(`estado-${estudianteId}-${fecha}`);
-                    estadoCell.textContent = estado ? "Asistió" : "Falta";
+                    console.log('Asistencia actualizada correctamente');
                 } else {
-                    alert(data.error);
+                    console.log('Error al actualizar la asistencia');
+                    checkbox.checked = !estado;  // Revertir el estado si hay un error
                 }
             })
             .catch(error => {
                 console.error('Error:', error);
-                alert('Hubo un problema al actualizar la asistencia.');
+                checkbox.checked = !estado;  // Revertir en caso de fallo
+            })
+            .finally(() => {
+                // Rehabilitar el checkbox después de la respuesta del servidor
+                checkbox.disabled = false;
             });
         }
 
-        // Función para actualizar calificación
-        function actualizarCalificacion(estudianteId, calificacionInput) {
-            const calificacion = calificacionInput.value;
-
-            // Enviar la actualización de calificación al servidor con AJAX
-            fetch('/actualizar_calificacion', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    estudiante_id: estudianteId,
-                    calificacion: calificacion,
-                }),
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    alert('Calificación actualizada con éxito');
-                } else {
-                    alert(data.error);
-                }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                alert('Hubo un problema al actualizar la calificación.');
-            });
-        }
+        // Cargar contenido inicial al abrir la página
+        document.addEventListener("DOMContentLoaded", () => {
+            loadContent("inicio");
+        });
     </script>
 </head>
 <body>
-    <!-- Barra superior con botones de navegación -->
-    <div class="nav-bar">
-        <button onclick="window.location.href='/inicio'">Inicio</button>
-        <button onclick="window.location.href='/asistencias/{{ materia_id }}'">Asistencias</button>
-        <button onclick="window.location.href='/calificaciones/{{ materia_id }}'">Calificaciones</button>
-        <button onclick="window.location.href='/detalle_materia/{{ materia_id }}'">Detalle Materia</button>
-        <button onclick="window.location.href='/home'">Regresar</button> <!-- Botón de regresar -->
+    <div class="sidebar">
+        <h2>Gestión de Materias</h2>
+        <ul>
+            <li><a href="#" onclick="loadContent('inicio')">Inicio</a></li>
+            <li><a href="#" onclick="loadContent('asistencias')">Asistencias</a></li>
+            <li><a href="#" onclick="loadContent('calificaciones')">Calificaciones</a></li>
+        </ul>
     </div>
 
-    <h1>Detalle de Materia</h1>
-
-    <table>
-        <thead>
-            <tr>
-                <th>Nombre</th>
-                <th>Faltas</th>
-                <th>Calificación</th>
-                {% for fecha in fechas %}
-                    <th>{{ fecha }}</th>
-                {% endfor %}
-            </tr>
-        </thead>
-        <tbody>
-            {% for estudiante in estudiantes %}
-                <tr>
-                    <td>{{ estudiante.nombre }} {{ estudiante.apellido_paterno }}</td>
-                    <!-- Mostrar faltas -->
-                    <td id="faltas-{{ estudiante.id_alumno }}">{{ faltas_por_estudiante[estudiante.id_alumno] }}</td>
-                    <!-- Mostrar calificación -->
-                    <td>
-                        <input type="number" id="calificacion-{{ estudiante.id_alumno }}" value="{{ estudiante.calificacion }}" onchange="actualizarCalificacion({{ estudiante.id_alumno }}, this)" />
-                    </td>
-                    {% for fecha in fechas %}
-                        <td>
-                            <!-- Checkbox para asistencia -->
-                            <input type="checkbox" 
-                                   id="asistencia-{{ estudiante.id_alumno }}-{{ fecha }}" 
-                                   {% if asistencia_por_estudiante[estudiante.id_alumno][fecha] %} checked {% endif %}
-                                   onclick="actualizarAsistencia({{ estudiante.id_alumno }}, '{{ fecha }}', this)" />
-                            <!-- Estado de asistencia -->
-                            <span id="estado-{{ estudiante.id_alumno }}-{{ fecha }}">
-                                {% if asistencia_por_estudiante[estudiante.id_alumno][fecha] %}
-                                    Asistió
-                                {% else %}
-                                    Falta
-                                {% endif %}
-                            </span>
-                        </td>
-                    {% endfor %}
-                </tr>
-            {% endfor %}
-        </tbody>
-    </table>
+    <div class="main-content">
+        <!-- El contenido se cargará dinámicamente aquí -->
+    </div>
 </body>
 </html>
