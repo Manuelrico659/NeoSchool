@@ -9,12 +9,12 @@
 <body>
     <div class="overlay"></div>
     <div class="container">
-        <img src="{{ url_for('static', filename='img/logo.png') }}" alt="Logo" class="logo">
+        <img src="{{ url_for('static', filename='img/bosco.png') }}" alt="Logo" class="logo">
         <h2>Recuperar Contraseña</h2>
         <form action="{{ url_for('recuperar_contraseña') }}" method="post">
             <input type="text" class="input" name="registro" placeholder="Registro de Usuario" required>
             <input type="email" class="input" name="email" placeholder="Correo Electrónico" required>
-            <button type="submit" class="btn">Recuperar Contraseña</button>
+            <button type="submit" class="btn">Recuperar</button>
         </form>
         <a href="{{ url_for('login') }}" class="forgot-password">Volver al Login</a>
     </div>

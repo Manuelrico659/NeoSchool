@@ -236,17 +236,17 @@ def recuperar_contraseña():
         conn = get_db_connection()
         cursor = conn.cursor()
 
-        cursor.execute("SELECT * FROM usuarios WHERE id = %s AND email = %s", (registro, email))
+        cursor.execute("SELECT * FROM usuarios WHERE id_usuario = %s AND correo = %s", (registro, email))
         usuario = cursor.fetchone()
 
         if usuario:
             nueva_contraseña = generar_contraseña()
-            cursor.execute("UPDATE usuarios SET contrasena = %s WHERE id = %s", (nueva_contraseña, registro))
+            cursor.execute("UPDATE usuarios SET contrasena = %s WHERE id_usuario = %s", (nueva_contraseña, registro))
             conn.commit()
             enviar_correo(email, nueva_contraseña)
             conn.close()
 
-        return redirect(url_for('recuperar_contraseña'))
+        return redirect(url_for('login'))
 
     return render_template('recuperar.html')
 
