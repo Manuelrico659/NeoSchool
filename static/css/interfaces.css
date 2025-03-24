@@ -124,6 +124,10 @@ body {
     padding: 10px;
 }
 
+.faltas {
+    margin-left: 20px; /* Ajusta el valor según el espacio que desees */
+}
+
 .estudiante-card {
     display: flex;
     align-items: center;
