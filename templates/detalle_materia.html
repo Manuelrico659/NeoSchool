@@ -80,7 +80,6 @@
         }
         
 
-        // Función para obtener y mostrar las calificaciones
         function cargarCalificaciones() {
             const parcialSeleccionado = document.getElementById("parcial").value;
             const container = document.getElementById("calificaciones-container");
@@ -94,22 +93,33 @@
             .then(response => response.json())
             .then(data => {
                 if (data.success) {
-                    let html = `<div class="calificaciones-container">`;
+                    let html = `<table class="calificaciones-tabla">
+                        <thead>
+                            <tr>
+                                <th>Nombre</th>
+                                <th>Participación</th>
+                                <th>Ejercicios y Prácticas</th>
+                                <th>Tareas y Trabajos</th>
+                                <th>Examen</th>
+                                <th>Calificación Parcial</th>
+                            </tr>
+                        </thead>
+                        <tbody>`;
+
                     data.calificaciones.forEach(estudiante => {
                         html += `
-                            <div class="estudiante-card">
-                                <span class="estudiante-nombre">${estudiante.nombre} ${estudiante.apellido}</span>
-                                <div class="calificaciones-detalles">
-                                    <p>Participación: ${estudiante.participacion}</p>
-                                    <p>Ejercicios y Prácticas: ${estudiante.ejercicios_practicas}</p>
-                                    <p>Tareas y Trabajos: ${estudiante.tareas_trabajo}</p>
-                                    <p>Examen: ${estudiante.examen}</p>
-                                    <p><strong>Calificación Parcial:</strong> ${estudiante.calificacion_parcial}</p>
-                                </div>
-                            </div>
+                            <tr>
+                                <td>${estudiante.nombre} ${estudiante.apellido}</td>
+                                <td>${estudiante.participacion}</td>
+                                <td>${estudiante.ejercicios_practicas}</td>
+                                <td>${estudiante.tareas_trabajo}</td>
+                                <td>${estudiante.examen}</td>
+                                <td><strong>${estudiante.calificacion_parcial}</strong></td>
+                            </tr>
                         `;
                     });
-                    html += `</div>`;
+
+                    html += `</tbody></table>`;
                     container.innerHTML = html;
                 } else {
                     container.innerHTML = `<p>No se encontraron calificaciones.</p>`;
@@ -120,6 +130,9 @@
                 container.innerHTML = `<p>Error al obtener los datos.</p>`;
             });
         }
+
+        // Cargar por defecto el parcial 1
+        document.addEventListener("DOMContentLoaded", cargarCalificaciones);
 
 
         // Función para actualizar la asistencia de un estudiante
@@ -162,6 +175,28 @@
         });
     </script>
 </head>
+<style>
+    .calificaciones-tabla {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 10px;
+        text-align: center;
+    }
+    
+    .calificaciones-tabla th, .calificaciones-tabla td {
+        border: 1px solid #ccc;
+        padding: 10px;
+    }
+    
+    .calificaciones-tabla th {
+        background-color: #4D869C;
+        color: white;
+    }
+    
+    .calificaciones-tabla td {
+        background-color: #EEF7FF;
+    }
+    </style>
 <body>
     <div class="sidebar">
         <h2>Gestión de Materias</h2>
