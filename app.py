@@ -76,17 +76,17 @@ def login():
         conn.close()
 
 
-        if user and bcrypt.check_password_hash(user[-2], password):  # user[-2] es la columna de la contraseña sin encriptar
+        if user and bcrypt.check_password_hash(user[-3], password):  # user[-2] es la columna de la contraseña sin encriptar
             session['id_usuario'] = user[0]  # Suponiendo que user[0] es el ID del usuario
-            session['rol'] = user[-3]  # Almacenar el rol en la sesión
-            print("User:", user[-3])
+            session['rol'] = user[-4]  # Almacenar el rol en la sesión
+            print("User:", user[-4])
             print("Password:", password)
             # Redirigir según el rol
-            if user[-3] == 'admin':
+            if user[-4] == 'admin':
                 return redirect(url_for('admin'))
-            elif user[-3] == 'profesor':
+            elif user[-4] == 'profesor':
                 return redirect(url_for('profesor'))
-            elif user[-3] == 'director':
+            elif user[-4] == 'director':
                 return redirect(url_for('director'))
             else:
                 return "Rol desconocido", 400  # Agregado para capturar cualquier rol no esperado
