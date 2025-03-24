@@ -329,6 +329,8 @@ def inscripcion():
         tipo_sangre = request.form['tipo_sangre']
 
         tiene_familia = request.form.get('tiene_familia')  # Checkbox: "Tiene familia registrada"
+        correo_familiar = request.form.get('correo_familiar')  # Campo de correo
+
 
         if tiene_familia:
             # Si el usuario tiene una familia registrada, tomamos el ID de la familia
@@ -344,17 +346,21 @@ def inscripcion():
             
             if not tutor or not tel_emergencia:
                 return "Por favor ingrese todos los campos para la nueva familia", 400
+            
+            # Asegurarnos de que el correo tiene un formato válido (puedes hacer más validaciones si lo necesitas)
+            if '@' not in correo_familiar or '.' not in correo_familiar:
+                return "Por favor ingrese un correo electrónico válido", 400
         
         # Conectar a la base de datos
         conn = get_db_connection()
         cursor = conn.cursor()
 
         try:
-            # Insertar la familia si no existe
+             # Insertar la familia si no existe
             if not tiene_familia:
                 cursor.execute(
-                    "INSERT INTO familia (tutor, tel_emergencia) VALUES (%s, %s) RETURNING id_familia",
-                    (tutor, tel_emergencia)
+                    "INSERT INTO familia (tutor, tel_emergencia, correo) VALUES (%s, %s, %s) RETURNING id_familia",
+                    (tutor, tel_emergencia, correo_familiar)
                 )
                 id_familia = cursor.fetchone()[0]
 
