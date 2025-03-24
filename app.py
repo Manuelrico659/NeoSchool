@@ -94,7 +94,7 @@ def agregar_contacto_a_lista(email, nombre, lista_id):
 
     return True
 
-def enviar_correo_bienvenida(destinatario, registro, correo, anio_nacimiento):
+def enviar_correo_bienvenida(destinatario, registro):
     # ID del template de Mailjet (obtén este ID desde el panel de Mailjet)
     template_id = "6834687"  # ID de template en Mailjet
 
@@ -116,8 +116,7 @@ def enviar_correo_bienvenida(destinatario, registro, correo, anio_nacimiento):
                 "Subject": "Bienvenido/a al Colegio Parroquial Don Bosco",
                 "Variables": {  # Pasar las variables al template
                     "registro": registro,
-                    "correo": correo,
-                    "anio_nacimiento": anio_nacimiento
+                    "correo": destinatario,
                 }
             }
         ]
@@ -463,9 +462,11 @@ def contratar():
                 (nombre, apellido_paterno, apellido_materno, rol, contraseña_cifrada, fecha_nacimiento,correo_colaborador)
             )
             id_usuario = cursor.fetchone()[0]
+            print(correo_colaborador)
+            print(id_usuario)
             conn.commit()  # Guardar los cambios en la base de datos
             agregar_contacto_a_lista(correo_colaborador, nombre, LISTA_USUARIOS_ID)
-            enviar_correo_bienvenida(correo_colaborador, id_usuario, correo_colaborador, año_nacimiento)
+            enviar_correo_bienvenida(correo_colaborador, id_usuario)
         except Exception as e:
             conn.rollback()  # Revertir cambios en caso de error
             print(f"Error al registrar el usuario: {str(e)}")  # Opcional: Imprimir el error en la consola
