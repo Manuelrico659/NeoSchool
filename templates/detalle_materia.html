@@ -143,16 +143,26 @@
             });
         }
 
-        // Función para actualizar calificación en la BD
-        function actualizarCalificacion(idAlumno, parcialId, materiaId, campo, elemento) {
-            const nuevaCalificacion = elemento.innerText.trim(); 
+        function actualizarCalificacion(idAlumno, materiaId, campo, elemento) {
+            const nuevaCalificacion = elemento.innerText.trim();
+            
+            // Obtener el ID del parcial desde el dropdown
+            const parcialDropdown = document.getElementById("parcial");
+            const parcialId = parcialDropdown ? parcialDropdown.value : null;
+
+            if (!parcialId) {
+                console.error("Error: No se pudo obtener el parcial.");
+                return;
+            }
+
+            console.log(`Actualizando calificación para Alumno: ${idAlumno}, Parcial: ${parcialId}, Materia: ${materiaId}, Campo: ${campo}, Nueva Calificación: ${nuevaCalificacion}`);
 
             fetch('/actualizar_calificacion', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
                     id_alumno: idAlumno,
-                    parcial_id: parcialId,
+                    parcial_id: parcialId,  // Ahora se obtiene desde el dropdown
                     materia_id: materiaId,
                     campo: campo,
                     nueva_calificacion: nuevaCalificacion
@@ -160,14 +170,15 @@
             })
             .then(response => response.json())
             .then(data => {
+                console.log("Respuesta del servidor:", data);
                 if (data.success) {
                     console.log("Calificación actualizada correctamente.");
                 } else {
-                    console.error("Error al actualizar la calificación.");
+                    console.error("Error al actualizar la calificación:", data.error);
                 }
             })
             .catch(error => {
-                console.error("Error:", error);
+                console.error("Error en la solicitud:", error);
             });
         }
 
