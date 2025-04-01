@@ -477,7 +477,7 @@ def actualizar_calificacion():
     campo = data.get('campo')  # Puede ser "participacion", "ejercicios_practicas", etc.
     nueva_calificacion = data.get('nueva_calificacion')
     print("Datos recibidos:", data)  # <-- Agregamos esto para depurar
-    print(parcial_id)
+    print(materia_id)
     if not id_alumno or not parcial_id or not materia_id or not campo or nueva_calificacion is None:
         print("Datos inválidos:", data)
         return jsonify({"success": False, "error": "Datos inválidos"}), 400
