@@ -489,7 +489,7 @@ def actualizar_calificacion():
         query = f"""
             UPDATE parciales
             SET {campo} = %s
-            WHERE id_alumno = %s AND id_parcial = %s AND id_materia = %s
+            WHERE id_alumno = %s AND parcial = %s AND id_materia = %s
         """
         cursor.execute(query, (nueva_calificacion, id_alumno, parcial_id, materia_id))
         print("Filas afectadas:", cursor.rowcount)  # <-- Agregamos esto para ver si se modificó algo
