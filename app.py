@@ -467,24 +467,30 @@ def obtener_calificaciones_route():
 
     return jsonify({"success": True, "calificaciones": resultado})
 
-
 @app.route('/actualizar_calificacion', methods=['POST'])
 def actualizar_calificacion():
     """Actualiza una calificación en la base de datos"""
     data = request.get_json()
     id_alumno = data.get('id_alumno')
+    parcial_id = data.get('parcial_id')  # Identificador del parcial
+    materia_id = data.get('materia_id')  # Identificador de la materia
     campo = data.get('campo')  # Puede ser "participacion", "ejercicios_practicas", etc.
     nueva_calificacion = data.get('nueva_calificacion')
 
-    if not id_alumno or not campo or nueva_calificacion is None:
+    if not id_alumno or not parcial_id or not materia_id or not campo or nueva_calificacion is None:
         return jsonify({"success": False, "error": "Datos inválidos"}), 400
 
     try:
         conn = get_db_connection()
         cursor = conn.cursor()
         
-        query = f"UPDATE parciales SET {campo} = %s WHERE id_alumno = %s"
-        cursor.execute(query, (nueva_calificacion, id_alumno))
+        # Actualización de la calificación correspondiente
+        query = f"""
+            UPDATE parciales
+            SET {campo} = %s
+            WHERE id_alumno = %s AND id_parcial = %s AND id_materia = %s
+        """
+        cursor.execute(query, (nueva_calificacion, id_alumno, parcial_id, materia_id))
         conn.commit()
         conn.close()
 
@@ -492,6 +498,7 @@ def actualizar_calificacion():
     except Exception as e:
         print("Error al actualizar la calificación:", e)
         return jsonify({"success": False, "error": "Error en la base de datos"}), 500
+
 
 
 @app.route('/admin')

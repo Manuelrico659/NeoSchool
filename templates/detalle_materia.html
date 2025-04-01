@@ -110,10 +110,22 @@
                         html += `
                             <tr>
                                 <td>${estudiante.nombre} ${estudiante.apellido}</td>
-                                <td contenteditable="true" onblur="actualizarCalificacion(${estudiante.id}, 'participacion', this)">${estudiante.participacion}</td>
-                                <td contenteditable="true" onblur="actualizarCalificacion(${estudiante.id}, 'ejercicios_practicas', this)">${estudiante.ejercicios_practicas}</td>
-                                <td contenteditable="true" onblur="actualizarCalificacion(${estudiante.id}, 'tareas_trabajo', this)">${estudiante.tareas_trabajo}</td>
-                                <td contenteditable="true" onblur="actualizarCalificacion(${estudiante.id}, 'examen', this)">${estudiante.examen}</td>
+                                <td contenteditable="true" 
+                                    onblur="actualizarCalificacion(${estudiante.id}, ${data.parcial_id}, ${data.materia_id}, 'participacion', this)">
+                                    ${estudiante.participacion}
+                                </td>
+                                <td contenteditable="true" 
+                                    onblur="actualizarCalificacion(${estudiante.id}, ${data.parcial_id}, ${data.materia_id}, 'ejercicios_practicas', this)">
+                                    ${estudiante.ejercicios_practicas}
+                                </td>
+                                <td contenteditable="true" 
+                                    onblur="actualizarCalificacion(${estudiante.id}, ${data.parcial_id}, ${data.materia_id}, 'tareas_trabajo', this)">
+                                    ${estudiante.tareas_trabajo}
+                                </td>
+                                <td contenteditable="true" 
+                                    onblur="actualizarCalificacion(${estudiante.id}, ${data.parcial_id}, ${data.materia_id}, 'examen', this)">
+                                    ${estudiante.examen}
+                                </td>
                                 <td><strong>${estudiante.calificacion_parcial}</strong></td>
                             </tr>
                         `;
@@ -132,7 +144,7 @@
         }
 
         // Función para actualizar calificación en la BD
-        function actualizarCalificacion(idAlumno, campo, elemento) {
+        function actualizarCalificacion(idAlumno, parcialId, materiaId, campo, elemento) {
             const nuevaCalificacion = elemento.innerText.trim(); 
 
             fetch('/actualizar_calificacion', {
@@ -140,6 +152,8 @@
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
                     id_alumno: idAlumno,
+                    parcial_id: parcialId,
+                    materia_id: materiaId,
                     campo: campo,
                     nueva_calificacion: nuevaCalificacion
                 })
@@ -156,6 +170,7 @@
                 console.error("Error:", error);
             });
         }
+
 
 
         // Cargar por defecto el parcial 1
