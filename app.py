@@ -414,36 +414,41 @@ def actualizar_asistencia():
     conn.close()
     return jsonify({"success": True})  # Respuesta JSON al frontend
 
-def obtener_calificaciones(parcial):
-    """Función para obtener calificaciones de un parcial específico"""
+
+def obtener_calificaciones(parcial, id_profesor):
+    """Función para obtener calificaciones de un parcial específico para un profesor"""
     conn = get_db_connection()
     cursor = conn.cursor()
     
     query = """
-        SELECT alumno.id_alumno, alumno.nombre, alumno.apellido_paterno, 
-               parciales.parcial, parciales.participacion, 
-               parciales.ejercicios_practicas, parciales.tareas_trabajo, 
-               parciales.examen, parciales.calificacion_parcial
-        FROM parciales
-        JOIN alumno ON parciales.id_alumno = alumno.id_alumno
-        WHERE parciales.parcial = %s
+        SELECT a.id_alumno, a.nombre, a.apellido_paterno, 
+               p.parcial, p.participacion, 
+               p.ejercicios_practicas, p.tareas_trabajo, 
+               p.examen, p.calificacion_parcial
+        FROM parciales p
+        JOIN alumno a ON p.id_alumno = a.id_alumno
+        JOIN materia m ON p.id_materia = m.id_materia
+        WHERE p.parcial = %s AND m.id_usuario = %s
     """
     
-    cursor.execute(query, (parcial,))
+    cursor.execute(query, (parcial, id_profesor))
     calificaciones = cursor.fetchall()
     conn.close()
 
     return calificaciones
 
 
-
 @app.route('/obtener_calificaciones', methods=['POST'])
 def obtener_calificaciones_route():
-    """Route para devolver calificaciones en formato JSON"""
+    """Route para devolver calificaciones en formato JSON solo para el profesor"""
     data = request.get_json()
     parcial = data.get('parcial', 1)  # Por defecto, parcial 1
+    id_profesor = session.get('id_usuario')  # Se obtiene el ID del profesor de la sesión
+
+    if not id_profesor:
+        return jsonify({"success": False, "error": "Acceso no autorizado"}), 403
     
-    calificaciones = obtener_calificaciones(parcial)
+    calificaciones = obtener_calificaciones(parcial, id_profesor)
     
     resultado = [
         {
@@ -461,6 +466,7 @@ def obtener_calificaciones_route():
     ]
 
     return jsonify({"success": True, "calificaciones": resultado})
+
 
 @app.route('/admin')
 def admin():
