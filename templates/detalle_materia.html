@@ -110,10 +110,10 @@
                         html += `
                             <tr>
                                 <td>${estudiante.nombre} ${estudiante.apellido}</td>
-                                <td>${estudiante.participacion}</td>
-                                <td>${estudiante.ejercicios_practicas}</td>
-                                <td>${estudiante.tareas_trabajo}</td>
-                                <td>${estudiante.examen}</td>
+                                <td contenteditable="true" onblur="actualizarCalificacion(${estudiante.id}, 'participacion', this)">${estudiante.participacion}</td>
+                                <td contenteditable="true" onblur="actualizarCalificacion(${estudiante.id}, 'ejercicios_practicas', this)">${estudiante.ejercicios_practicas}</td>
+                                <td contenteditable="true" onblur="actualizarCalificacion(${estudiante.id}, 'tareas_trabajo', this)">${estudiante.tareas_trabajo}</td>
+                                <td contenteditable="true" onblur="actualizarCalificacion(${estudiante.id}, 'examen', this)">${estudiante.examen}</td>
                                 <td><strong>${estudiante.calificacion_parcial}</strong></td>
                             </tr>
                         `;
@@ -130,6 +130,33 @@
                 container.innerHTML = `<p>Error al obtener los datos.</p>`;
             });
         }
+
+        // Función para actualizar calificación en la BD
+        function actualizarCalificacion(idAlumno, campo, elemento) {
+            const nuevaCalificacion = elemento.innerText.trim(); 
+
+            fetch('/actualizar_calificacion', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    id_alumno: idAlumno,
+                    campo: campo,
+                    nueva_calificacion: nuevaCalificacion
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    console.log("Calificación actualizada correctamente.");
+                } else {
+                    console.error("Error al actualizar la calificación.");
+                }
+            })
+            .catch(error => {
+                console.error("Error:", error);
+            });
+        }
+
 
         // Cargar por defecto el parcial 1
         document.addEventListener("DOMContentLoaded", cargarCalificaciones);

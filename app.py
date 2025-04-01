@@ -468,6 +468,32 @@ def obtener_calificaciones_route():
     return jsonify({"success": True, "calificaciones": resultado})
 
 
+@app.route('/actualizar_calificacion', methods=['POST'])
+def actualizar_calificacion():
+    """Actualiza una calificación en la base de datos"""
+    data = request.get_json()
+    id_alumno = data.get('id_alumno')
+    campo = data.get('campo')  # Puede ser "participacion", "ejercicios_practicas", etc.
+    nueva_calificacion = data.get('nueva_calificacion')
+
+    if not id_alumno or not campo or nueva_calificacion is None:
+        return jsonify({"success": False, "error": "Datos inválidos"}), 400
+
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor()
+        
+        query = f"UPDATE parciales SET {campo} = %s WHERE id_alumno = %s"
+        cursor.execute(query, (nueva_calificacion, id_alumno))
+        conn.commit()
+        conn.close()
+
+        return jsonify({"success": True})
+    except Exception as e:
+        print("Error al actualizar la calificación:", e)
+        return jsonify({"success": False, "error": "Error en la base de datos"}), 500
+
+
 @app.route('/admin')
 def admin():
     return render_template('admin.html')
