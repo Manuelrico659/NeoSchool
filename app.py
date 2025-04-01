@@ -285,14 +285,14 @@ def profesor():
 def detalle_materia(id_materia):
     tz = pytz.timezone('America/Mexico_City')
     fecha_hoy = datetime.now(tz).date()
-    fechas = [str(fecha_hoy - timedelta(days=i)) for i in range(3)]  # Últimos 3 días (hoy y 2 días pasados)
-    fecha_mas_antigua = fecha_hoy - timedelta(days=3)  # Día a eliminar (hace 3 días)
+    fechas = [str(fecha_hoy - timedelta(days=i)) for i in range(5)]  # Últimos 5 días (hoy y 4 días pasados)
+    fecha_mas_antigua = fecha_hoy - timedelta(days=5)  # Día a eliminar (hace 5 días)
 
     conn = get_db_connection()
     cursor = conn.cursor()
 
-    # Eliminar asistencias más antiguas (hace 3 días)
-    eliminar_asistencias_query = "DELETE FROM asistencia WHERE fecha = %s AND id_materia = %s"
+    # Eliminar asistencias más antiguas (todas las anteriores a hace 5 días)
+    eliminar_asistencias_query = "DELETE FROM asistencia WHERE fecha < %s AND id_materia = %s"
     cursor.execute(eliminar_asistencias_query, (fecha_mas_antigua, id_materia))
     conn.commit()
 
@@ -306,28 +306,30 @@ def detalle_materia(id_materia):
     cursor.execute(estudiantes_query, (id_materia,))
     estudiantes = cursor.fetchall()
 
-    # Verificar si hay registros de asistencia para hoy
-    asistencia_hoy_query = "SELECT COUNT(*) FROM asistencia WHERE fecha = %s AND id_materia = %s"
-    cursor.execute(asistencia_hoy_query, (fecha_hoy, id_materia))
-    asistencia_hoy = cursor.fetchone()[0]
+    # Verificar si hay registros de asistencia para los últimos 5 días y crearlos si no existen
+    for fecha in fechas:
+        asistencia_dia_query = "SELECT COUNT(*) FROM asistencia WHERE fecha = %s AND id_materia = %s"
+        cursor.execute(asistencia_dia_query, (fecha, id_materia))
+        asistencia_dia = cursor.fetchone()[0]
 
-    # Si no hay registros de asistencia para hoy, crearlos
-    if asistencia_hoy == 0:
-        for estudiante in estudiantes:
-            insertar_asistencia_query = """
-                INSERT INTO asistencia (id_estudiante, id_materia, fecha, estado) 
-                VALUES (%s, %s, %s, %s)
-            """
-            cursor.execute(insertar_asistencia_query, (estudiante[0], id_materia, fecha_hoy, True))  # Estado inicial: Si asistio
-        conn.commit()
+        # Si no hay registros de asistencia para la fecha específica, crearlos
+        if asistencia_dia == 0:
+            for estudiante in estudiantes:
+                insertar_asistencia_query = """
+                    INSERT INTO asistencia (id_estudiante, id_materia, fecha, estado) 
+                    VALUES (%s, %s, %s, %s)
+                """
+                cursor.execute(insertar_asistencia_query, (estudiante[0], id_materia, fecha, True))  # Estado inicial: Asistió
+            conn.commit()
 
-    # Obtener las asistencias de los últimos 3 días
+
+    # Obtener las asistencias de los últimos 5 días
     asistencias_query = """
         SELECT a.id_estudiante, a.fecha, a.estado
         FROM asistencia a
-        WHERE a.id_materia = %s AND a.fecha IN (%s, %s, %s)
+        WHERE a.id_materia = %s AND a.fecha IN (%s, %s, %s, %s, %s)
     """
-    cursor.execute(asistencias_query, (id_materia, fechas[0], fechas[1], fechas[2]))
+    cursor.execute(asistencias_query, (id_materia, fechas[0], fechas[1], fechas[2], fechas[3], fechas[4]))
     asistencias = cursor.fetchall()
 
     # Organizar las asistencias por estudiante y fecha
