@@ -83,6 +83,9 @@
         function cargarCalificaciones() {
             const parcialSeleccionado = document.getElementById("parcial").value;
             const container = document.getElementById("calificaciones-container");
+            const urlActual = window.location.href;
+            // Extraer el número al final (asumiendo que siempre es un número después del último '/')
+            const materiaId = urlActual.split('/').pop();
             container.innerHTML = `<p>Cargando calificaciones...</p>`;
 
             fetch('/obtener_calificaciones', {
@@ -111,19 +114,19 @@
                             <tr>
                                 <td>${estudiante.nombre} ${estudiante.apellido}</td>
                                 <td contenteditable="true" 
-                                    onblur="actualizarCalificacion(${estudiante.id}, ${parcialSeleccionado}, ${data.materia_id}, 'participacion', this)">
+                                    onblur="actualizarCalificacion(${estudiante.id}, ${parcialSeleccionado}, ${materiaId}, 'participacion', this)">
                                     ${estudiante.participacion}
                                 </td>
                                 <td contenteditable="true" 
-                                    onblur="actualizarCalificacion(${estudiante.id}, ${parcialSeleccionado}, ${data.materia_id}, 'ejercicios_practicas', this)">
+                                    onblur="actualizarCalificacion(${estudiante.id}, ${parcialSeleccionado}, ${materiaId}, 'ejercicios_practicas', this)">
                                     ${estudiante.ejercicios_practicas}
                                 </td>
                                 <td contenteditable="true" 
-                                    onblur="actualizarCalificacion(${estudiante.id}, ${parcialSeleccionado}, ${data.materia_id}, 'tareas_trabajo', this)">
+                                    onblur="actualizarCalificacion(${estudiante.id}, ${parcialSeleccionado}, ${materiaId}, 'tareas_trabajo', this)">
                                     ${estudiante.tareas_trabajo}
                                 </td>
                                 <td contenteditable="true" 
-                                    onblur="actualizarCalificacion(${estudiante.id}, ${parcialSeleccionado}, ${data.materia_id}, 'examen', this)">
+                                    onblur="actualizarCalificacion(${estudiante.id}, ${parcialSeleccionado}, ${materiaId}, 'examen', this)">
                                     ${estudiante.examen}
                                 </td>
                                 <td><strong>${estudiante.calificacion_parcial}</strong></td>

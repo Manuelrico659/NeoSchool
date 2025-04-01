@@ -444,7 +444,7 @@ def obtener_calificaciones_route():
     data = request.get_json()
     parcial = data.get('parcial', 1)  # Por defecto, parcial 1
     id_profesor = session.get('id_usuario')  # Se obtiene el ID del profesor de la sesión
-
+    
     if not id_profesor:
         return jsonify({"success": False, "error": "Acceso no autorizado"}), 403
     
