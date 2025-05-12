@@ -493,7 +493,7 @@ def actualizar_calificacion():
             WHERE id_alumno = %s AND parcial = %s AND id_materia = %s
         """
         cursor.execute(query, (nueva_calificacion, id_alumno, parcial_id, materia_id))
-        print("Filas afectadas:", cursor.rowcount)  # <-- Agregamos esto para ver si se modificó algo
+        print("Filas afectadas :", cursor.rowcount)  # <-- Agregamos esto para ver si se modificó algo
         conn.commit()
         conn.close()
 
