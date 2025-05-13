@@ -287,7 +287,19 @@ def detalle_materia(id_materia):
     fecha_hoy = datetime.now(tz).date()
     fechas = [str(fecha_hoy - timedelta(days=i)) for i in range(5)]  # Últimos 5 días (hoy y 4 días pasados)
     fecha_mas_antigua = fecha_hoy - timedelta(days=5)  # Día a eliminar (hace 5 días)
-
+    """
+    # Fechas para misa (últimos 3 domingos)
+    fechas_misa = []
+    domingos_encontrados = 0
+    dia_actual = 0
+    
+    while domingos_encontrados < 3:
+        fecha = fecha_hoy - timedelta(days=dia_actual)
+        if fecha.weekday() == 6:  # 6 es domingo
+            fechas_misa.append(str(fecha))
+            domingos_encontrados += 1
+        dia_actual += 1
+    """    
     conn = get_db_connection()
     cursor = conn.cursor()
 

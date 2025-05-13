@@ -49,41 +49,6 @@
                     `;
                     break;
 
-                    case "asistencia_misa":
-                    mainContent.innerHTML = `
-                        <h1>Asistencia a Misa</h1>
-                        <div class="content-section">
-                            <h2>Registro de Asistencia a Misa</h2>
-                            <div class="asistencias-container">
-                                {% for estudiante in estudiantes %}
-                                <div class="estudiante-card">
-                                    <span class="estudiante-nombre">{{ estudiante[1] }} {{ estudiante[2] }}</span>
-                                    <div class="asistencia-dias">
-                                        {% for fecha in fechas_misa %}
-                                        <label class="asistencia-checkbox">
-                                            <input type="checkbox" 
-                                                {% if asistencia_misa_por_estudiante[estudiante[0]].get(fecha, 0) == 1 %}checked{% endif %}
-                                                data-fecha="{{ fecha }}"
-                                                onchange="actualizarAsistencia({{ estudiante[0] }}, '{{ fecha }}', this, 'misa')">
-                                            ${fecha} (Misa)
-                                        </label>
-                                        {% endfor %}
-                                    </div>
-                                    <div class="faltas">
-                                        Asistencias a misa: {{ asistencias_misa_por_estudiante.get(estudiante[0], 0) }}
-                                    </div>
-                                </div>
-                                {% endfor %}
-                            </div>
-                            <div class="nueva-fecha-misa">
-                                <h3>Agregar nueva fecha de misa</h3>
-                                <input type="date" id="nueva-fecha-misa">
-                                <button onclick="agregarFechaMisa()">Agregar Fecha</button>
-                            </div>
-                        </div>
-                    `;
-                    break;
-
                     case "calificaciones":
                     mainContent.innerHTML = `
                         <h1>Calificaciones</h1>
@@ -286,7 +251,6 @@
         <ul>
             <li><a href="#" onclick="loadContent('inicio')">Inicio</a></li>
             <li><a href="#" onclick="loadContent('asistencias')">Asistencias</a></li>
-            <li><a href="#" onclick="loadContent('asistencia_misa')">Asistencia a Misa</a></li>
             <li><a href="#" onclick="loadContent('calificaciones')">Calificaciones</a></li>
             <li><a href="#" onclick="window.location.href='{{ url_for('profesor') }}'">Regresar</a></li>
         </ul>
