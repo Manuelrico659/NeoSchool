@@ -657,6 +657,11 @@ def inscripcion():
 def director():
     return render_template('director.html')
 
+
+@app.route('/generar_reporte')
+def reporte():
+
+
 @app.route('/agregar_materia', methods=['GET', 'POST'])
 def agregar_materia():
     if 'id_usuario' not in session or session['rol'] != 'admin':
