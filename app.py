@@ -242,7 +242,7 @@ def recuperar_contraseña():
 
         if usuario:
             nueva_contraseña = generar_contraseña()
-            contraseña_cifrada = bcrypt.generate_password_hash(nueva_contraseña).decode('utf-8')
+            contraseña_cifrada =  bcrypt.generate_password_hash(nueva_contraseña).decode('utf-8')
             cursor.execute("UPDATE usuarios SET contrasena = %s WHERE id_usuario = %s", (contraseña_cifrada, registro))
             conn.commit()
             enviar_correo(email, nueva_contraseña)
