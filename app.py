@@ -659,7 +659,7 @@ def director():
 
 
 @app.route('/generar_reporte')
-def reporte():
+def generar_reporte():
     pass
 
 @app.route('/agregar_materia', methods=['GET', 'POST'])
