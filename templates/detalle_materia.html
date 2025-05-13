@@ -165,8 +165,11 @@
             .then(data => {
                 if (data.success) {
                     console.log("Calificación actualizada correctamente.");
+                    // Vuelve a cargar las calificaciones para reflejar los cambios
+                    cargarCalificaciones();
                 } else {
                     console.error("Error al actualizar la calificación.");
+                    // Muestra un mensaje de error al usuario si lo deseas
                 }
             })
             .catch(error => {
