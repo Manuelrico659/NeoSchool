@@ -242,7 +242,8 @@ def recuperar_contraseña():
 
         if usuario:
             nueva_contraseña = generar_contraseña()
-            cursor.execute("UPDATE usuarios SET contrasena = %s WHERE id_usuario = %s", (nueva_contraseña, registro))
+            contraseña_cifrada = bcrypt.generate_password_hash(nueva_contraseña).decode('utf-8')
+            cursor.execute("UPDATE usuarios SET contrasena = %s WHERE id_usuario = %s", (contraseña_cifrada, registro))
             conn.commit()
             enviar_correo(email, nueva_contraseña)
             conn.close()
@@ -536,6 +537,7 @@ def contratar():
 
         # Generar la contraseña por defecto
         contraseña_por_defecto = f"BOSCO@{año_nacimiento}"
+        print(contraseña_por_defecto)
 
         # Cifrar la contraseña
         contraseña_cifrada = bcrypt.generate_password_hash(contraseña_por_defecto).decode('utf-8')
