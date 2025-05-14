@@ -669,9 +669,12 @@ def generar_reporte():
         cursor = conn.cursor()
         cursor.execute("SELECT id_materia, nombre FROM materia")  # Ajusta según tus columnas reales
         materias = cursor.fetchall()
+        for materia in materias():
+            print(materia)
+            print("------------------------------------------------------------------------------")
         conn.close()
 
-        return render_template("reporte.html", materias=materias, usuario_id=session["usuario_id"])
+        return render_template("director.html", materias=materias, usuario_id=session["usuario_id"])
 
 @app.route('/agregar_materia', methods=['GET', 'POST'])
 def agregar_materia():
