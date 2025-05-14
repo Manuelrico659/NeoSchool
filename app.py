@@ -658,9 +658,20 @@ def director():
     return render_template('director.html')
 
 
-@app.route('/generar_reporte')
+@app.route('/generar_reporte', methods=['GET', 'POST'])
 def generar_reporte():
-    pass
+    if request.method == 'POST':
+        # Lógica de procesamiento del formulario
+        ...
+    else:
+        # Obtener materias desde la base de datos
+        conn = get_db_connection()
+        cursor = conn.cursor()
+        cursor.execute("SELECT id, nombre FROM materia")  # Ajusta según tus columnas reales
+        materias = cursor.fetchall()
+        conn.close()
+
+        return render_template("reporte.html", materias=materias, usuario_id=session["usuario_id"])
 
 @app.route('/agregar_materia', methods=['GET', 'POST'])
 def agregar_materia():
