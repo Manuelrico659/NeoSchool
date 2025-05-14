@@ -653,6 +653,12 @@ def inscripcion():
     if request.method == 'GET':
         return render_template('Inscripcion.html')  # Muestra el formulario
 
+@app.route('/director')
+def director():
+    if 'id_usuario' not in session or session['rol'] != 'director':
+        return redirect(url_for('login'))
+    return render_template('director.html')  # Asegúrate de tener este template
+
 # Ruta para renderizar el formulario de reporte
 @app.route('/reporte', methods=['GET'])
 def reporte():
