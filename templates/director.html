@@ -105,7 +105,7 @@
                             const alumno = document.getElementById("alumno").value;
                             const reporte = document.getElementById("reporte").value;
 
-                            fetch("/api/guardar_reporte", {
+                            fetch("guardar_reporte", {
                             method: "POST",
                             headers: {
                                 "Content-Type": "application/json"

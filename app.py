@@ -698,7 +698,7 @@ def alumnos_por_materia(id_materia):
     return jsonify(alumnos)
 
 # API para guardar reporte dinámicamente vía fetch
-@app.route('/api/guardar_reporte', methods=['POST'])
+@app.route('/guardar_reporte', methods=['POST'])
 def api_guardar_reporte():
     user_id = session.get('user_id')
     data = request.get_json()
