@@ -158,13 +158,23 @@ body {
     margin-right: 5px;
 }
 
+.generar-reporte-wrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px; /* espacio entre el h1 y el formulario */
+    padding: 20px;
+}
+
+.generar-reporte-wrapper h1 {
+    margin: 0; /* elimina espacio extra */
+    font-size: 24px;
+}
 
 .generar-reporte-container {
     display: flex;
     justify-content: center;
-    align-items: center;
-    height: 100%;
-    padding: 20px;
+    width: 100%;
 }
 
 .generar-reporte-container form {

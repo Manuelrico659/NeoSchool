@@ -32,36 +32,38 @@
                 break;
 
                 case "generar-reporte":
-                    // Fecha actual en zona horaria de México
                     const mexicoTime = new Date().toLocaleDateString("en-CA", {
                         timeZone: "America/Mexico_City"
-                    }); // Formato: yyyy-mm-dd
+                    });
 
                     mainContent.innerHTML = `
-                        <h1 style="text-align: center;">Generar Reporte</h1>
-                        <div class="generar-reporte-container">
-                            <form method="POST" action="{{ url_for('generar_reporte') }}">
-                                <label for="nombre_alumno">Nombre del alumno:</label>
-                                <input type="text" id="nombre_alumno" name="nombre_alumno" required>
+                        <div class="generar-reporte-wrapper">
+                            <h1>Generar Reporte</h1>
+                            <div class="generar-reporte-container">
+                                <form method="POST" action="{{ url_for('generar_reporte') }}">
+                                    <label for="nombre_alumno">Nombre del alumno:</label>
+                                    <input type="text" id="nombre_alumno" name="nombre_alumno" required>
 
-                                <label for="id_materia">ID de la materia:</label>
-                                <input type="number" id="id_materia" name="id_materia" required>
+                                    <label for="id_materia">ID de la materia:</label>
+                                    <input type="number" id="id_materia" name="id_materia" required>
 
-                                <label for="fecha">Fecha:</label>
-                                <input type="text" id="fecha" name="fecha" value="${mexicoTime}" readonly>
+                                    <label for="fecha">Fecha:</label>
+                                    <input type="text" id="fecha" name="fecha" value="${mexicoTime}" readonly>
 
-                                <label for="comentarios">Comentarios (máx. 145 caracteres):</label>
-                                <textarea id="comentarios" name="comentarios" maxlength="145" rows="4" required></textarea>
+                                    <label for="comentarios">Comentarios (máx. 145 caracteres):</label>
+                                    <textarea id="comentarios" name="comentarios" maxlength="145" rows="4" required></textarea>
 
-                                <input type="hidden" name="usuario_id" value="{{ usuario_id }}">
+                                    <input type="hidden" name="usuario_id" value="{{ usuario_id }}">
 
-                                <div class="button-container">
-                                    <button type="submit">Generar reporte</button>
-                                </div>
-                            </form>
+                                    <div class="button-container">
+                                        <button type="submit">Generar reporte</button>
+                                    </div>
+                                </form>
+                            </div>
                         </div>
                     `;
                     break;
+
 
 
                 case "visualizar-reportes":
