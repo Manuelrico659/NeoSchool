@@ -655,35 +655,53 @@ def inscripcion():
 
 @app.route('/director')
 def director():
-    return render_template('director.html')
+    if 'usuario_id' not in session or session['tipo_usuario'] != 'director':
+        return redirect(url_for('login'))
+    return render_template('director.html', usuario_id=session['usuario_id'])
 
 @app.route('/materias_json')
 def materias_json():
+    if 'usuario_id' not in session or session['tipo_usuario'] != 'director':
+        return jsonify({"error": "No autorizado"}), 401
+    
     conn = get_db_connection()
     cursor = conn.cursor()
-    cursor.execute("SELECT id_materia, nombre FROM materia")
-    materias = cursor.fetchall()
-    conn.close()
-    return jsonify({"materias": materias})
-
-
-@app.route('/generar_reporte', methods=['GET', 'POST'])
-def generar_reporte():
-    if request.method == 'POST':
-        # Lógica de procesamiento del formulario
-        ...
-    else:
-        # Obtener materias desde la base de datos
-        conn = get_db_connection()
-        cursor = conn.cursor()
-        cursor.execute("SELECT id_materia, nombre FROM materia")  # Ajusta según tus columnas reales
+    try:
+        cursor.execute("SELECT id_materia, nombre FROM materia")
         materias = cursor.fetchall()
-        for materia in materias():
-            print(materia)
-            print("------------------------------------------------------------------------------")
+        return jsonify({"materias": materias})
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+    finally:
         conn.close()
 
-        return render_template("director.html", materias=materias, usuario_id=session["usuario_id"])
+@app.route('/generar_reporte', methods=['POST'])
+def generar_reporte():
+    if 'usuario_id' not in session or session['tipo_usuario'] != 'director':
+        return redirect(url_for('login'))
+    
+    try:
+        data = request.form
+        nombre_alumno = data['nombre_alumno']
+        id_materia = data['id_materia']
+        fecha = data['fecha']
+        comentarios = data['comentarios']
+        
+        # Aquí iría tu lógica para guardar el reporte en la base de datos
+        conn = get_db_connection()
+        cursor = conn.cursor()
+        cursor.execute("""
+            INSERT INTO reportes (nombre_alumno, id_materia, fecha, comentarios, id_usuario)
+            VALUES (%s, %s, %s, %s, %s)
+        """, (nombre_alumno, id_materia, fecha, comentarios, session['usuario_id']))
+        conn.commit()
+        
+        return jsonify({"success": True, "message": "Reporte generado exitosamente"})
+    except Exception as e:
+        return jsonify({"success": False, "error": str(e)}), 500
+    finally:
+        if conn:
+            conn.close()
 
 @app.route('/agregar_materia', methods=['GET', 'POST'])
 def agregar_materia():

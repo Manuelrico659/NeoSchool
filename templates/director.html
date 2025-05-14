@@ -19,17 +19,17 @@
                     break;
 
                 case "agregar-materias":
-                mainContent.innerHTML = `
-                    <h1>Materias</h1>
-                    <div class="content-grid">
-                            <div class="content-section">
-                                <div class="button-container">
-                                    <button onclick="window.location.href='{{ url_for('agregar_materia') }}'">Registrar nueva materia</button>
+                    mainContent.innerHTML = `
+                        <h1>Materias</h1>
+                        <div class="content-grid">
+                                <div class="content-section">
+                                    <div class="button-container">
+                                        <button onclick="window.location.href='{{ url_for('agregar_materia') }}'">Registrar nueva materia</button>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
-                `;
-                break;
+                    `;
+                    break;
 
                 case "generar-reporte":
                     const mexicoTime = new Date().toLocaleDateString("en-CA", {
@@ -37,9 +37,18 @@
                     });
 
                     fetch('/materias_json')
-                        .then(response => response.json())
+                        .then(response => {
+                            if (!response.ok) {
+                                throw new Error('Error al cargar materias');
+                            }
+                            return response.json();
+                        })
                         .then(data => {
-                            let options = '';
+                            if (data.error) {
+                                throw new Error(data.error);
+                            }
+                            
+                            let options = '<option value="">Selecciona una materia</option>';
                             data.materias.forEach(materia => {
                                 options += `<option value="${materia[0]}">${materia[1]}</option>`;
                             });
@@ -48,7 +57,7 @@
                                 <div class="generar-reporte-wrapper">
                                     <h1>Generar Reporte</h1>
                                     <div class="generar-reporte-container">
-                                        <form method="POST" action="/generar_reporte">
+                                        <form id="reporteForm">
                                             <label for="nombre_alumno">Nombre del alumno:</label>
                                             <input type="text" id="nombre_alumno" name="nombre_alumno" required>
 
@@ -63,13 +72,46 @@
                                             <label for="comentarios">Comentarios (máx. 145 caracteres):</label>
                                             <textarea id="comentarios" name="comentarios" maxlength="145" rows="4" required></textarea>
 
-                                            <input type="hidden" name="usuario_id" value="${usuario_id}">
-
                                             <div class="button-container">
                                                 <button type="submit">Generar reporte</button>
                                             </div>
                                         </form>
+                                        <div id="mensaje"></div>
                                     </div>
+                                </div>
+                            `;
+
+                            // Manejar el envío del formulario con AJAX
+                            document.getElementById('reporteForm').addEventListener('submit', function(e) {
+                                e.preventDefault();
+                                const formData = new FormData(this);
+                                
+                                fetch('/generar_reporte', {
+                                    method: 'POST',
+                                    body: formData
+                                })
+                                .then(response => response.json())
+                                .then(data => {
+                                    const mensajeDiv = document.getElementById('mensaje');
+                                    if (data.success) {
+                                        mensajeDiv.innerHTML = `<p class="success">${data.message}</p>`;
+                                        this.reset();
+                                    } else {
+                                        mensajeDiv.innerHTML = `<p class="error">Error: ${data.error}</p>`;
+                                    }
+                                })
+                                .catch(error => {
+                                    document.getElementById('mensaje').innerHTML = 
+                                        `<p class="error">Error: ${error.message}</p>`;
+                                });
+                            });
+                        })
+                        .catch(error => {
+                            mainContent.innerHTML = `
+                                <div class="error-container">
+                                    <h1>Error</h1>
+                                    <p>${error.message}</p>
+                                    <button onclick="loadContent('generar-reporte')">Reintentar</button>
                                 </div>
                             `;
                         });
