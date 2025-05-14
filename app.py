@@ -667,7 +667,7 @@ def generar_reporte():
         # Obtener materias desde la base de datos
         conn = get_db_connection()
         cursor = conn.cursor()
-        cursor.execute("SELECT id, nombre FROM materia")  # Ajusta según tus columnas reales
+        cursor.execute("SELECT id_materia, nombre FROM materia")  # Ajusta según tus columnas reales
         materias = cursor.fetchall()
         conn.close()
 
