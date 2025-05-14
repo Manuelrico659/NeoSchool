@@ -657,6 +657,15 @@ def inscripcion():
 def director():
     return render_template('director.html')
 
+@app.route('/materias_json')
+def materias_json():
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    cursor.execute("SELECT id_materia, nombre FROM materia")
+    materias = cursor.fetchall()
+    conn.close()
+    return jsonify({"materias": materias})
+
 
 @app.route('/generar_reporte', methods=['GET', 'POST'])
 def generar_reporte():

@@ -36,38 +36,45 @@
                         timeZone: "America/Mexico_City"
                     });
 
-                    mainContent.innerHTML = `
-                        <div class="generar-reporte-wrapper">
-                            <h1>Generar Reporte</h1>
-                            <div class="generar-reporte-container">
-                                <form method="POST" action="{{ url_for('generar_reporte') }}">
-                                    <label for="nombre_alumno">Nombre del alumno:</label>
-                                    <input type="text" id="nombre_alumno" name="nombre_alumno" required>
+                    fetch('/materias_json')
+                        .then(response => response.json())
+                        .then(data => {
+                            let options = '';
+                            data.materias.forEach(materia => {
+                                options += `<option value="${materia[0]}">${materia[1]}</option>`;
+                            });
 
-                                    <label for="id_materia">Materia:</label>
-                                    <select id="id_materia" name="id_materia" required>
-                                        {% for materia in materias %}
-                                            <option value="{{ materia[0] }}">{{ materia[1] }}</option>
-                                        {% endfor %}
-                                    </select>
+                            mainContent.innerHTML = `
+                                <div class="generar-reporte-wrapper">
+                                    <h1>Generar Reporte</h1>
+                                    <div class="generar-reporte-container">
+                                        <form method="POST" action="/generar_reporte">
+                                            <label for="nombre_alumno">Nombre del alumno:</label>
+                                            <input type="text" id="nombre_alumno" name="nombre_alumno" required>
 
+                                            <label for="id_materia">Materia:</label>
+                                            <select id="id_materia" name="id_materia" required>
+                                                ${options}
+                                            </select>
 
-                                    <label for="fecha">Fecha:</label>
-                                    <input type="text" id="fecha" name="fecha" value="${mexicoTime}" readonly>
+                                            <label for="fecha">Fecha:</label>
+                                            <input type="text" id="fecha" name="fecha" value="${mexicoTime}" readonly>
 
-                                    <label for="comentarios">Comentarios (máx. 145 caracteres):</label>
-                                    <textarea id="comentarios" name="comentarios" maxlength="145" rows="4" required></textarea>
+                                            <label for="comentarios">Comentarios (máx. 145 caracteres):</label>
+                                            <textarea id="comentarios" name="comentarios" maxlength="145" rows="4" required></textarea>
 
-                                    <input type="hidden" name="usuario_id" value="{{ usuario_id }}">
+                                            <input type="hidden" name="usuario_id" value="${usuario_id}">
 
-                                    <div class="button-container">
-                                        <button type="submit">Generar reporte</button>
+                                            <div class="button-container">
+                                                <button type="submit">Generar reporte</button>
+                                            </div>
+                                        </form>
                                     </div>
-                                </form>
-                            </div>
-                        </div>
-                    `;
+                                </div>
+                            `;
+                        });
                     break;
+
 
 
 
