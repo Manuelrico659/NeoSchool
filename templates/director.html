@@ -32,10 +32,14 @@
                 break;
 
                 case "generar-reporte":
-                    const today = new Date().toISOString().split('T')[0]; // Fecha actual en formato yyyy-mm-dd
+                    // Fecha actual en zona horaria de México
+                    const mexicoTime = new Date().toLocaleDateString("en-CA", {
+                        timeZone: "America/Mexico_City"
+                    }); // Formato: yyyy-mm-dd
+
                     mainContent.innerHTML = `
-                        <h1>Generar Reporte</h1>
-                        <div class="content-section">
+                        <h1 style="text-align: center;">Generar Reporte</h1>
+                        <div class="generar-reporte-container">
                             <form method="POST" action="{{ url_for('generar_reporte') }}">
                                 <label for="nombre_alumno">Nombre del alumno:</label>
                                 <input type="text" id="nombre_alumno" name="nombre_alumno" required>
@@ -44,7 +48,7 @@
                                 <input type="number" id="id_materia" name="id_materia" required>
 
                                 <label for="fecha">Fecha:</label>
-                                <input type="text" id="fecha" name="fecha" value="${today}" readonly>
+                                <input type="text" id="fecha" name="fecha" value="${mexicoTime}" readonly>
 
                                 <label for="comentarios">Comentarios (máx. 145 caracteres):</label>
                                 <textarea id="comentarios" name="comentarios" maxlength="145" rows="4" required></textarea>
@@ -58,6 +62,7 @@
                         </div>
                     `;
                     break;
+
 
                 case "visualizar-reportes":
                     mainContent.innerHTML = `

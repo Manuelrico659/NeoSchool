@@ -157,3 +157,49 @@ body {
     transform: scale(1.2);
     margin-right: 5px;
 }
+
+
+.generar-reporte-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+    padding: 20px;
+}
+
+.generar-reporte-container form {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    max-width: 400px;
+    gap: 15px;
+    background-color: #f9f9f9;
+    padding: 30px;
+    border-radius: 10px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+.generar-reporte-container label {
+    font-weight: bold;
+}
+
+.generar-reporte-container input,
+.generar-reporte-container textarea {
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
+
+.generar-reporte-container .button-container {
+    display: flex;
+    justify-content: center;
+}
+
+.generar-reporte-container button {
+    padding: 10px 20px;
+    background-color: #4D869C;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
