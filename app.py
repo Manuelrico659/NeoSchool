@@ -653,55 +653,59 @@ def inscripcion():
     if request.method == 'GET':
         return render_template('Inscripcion.html')  # Muestra el formulario
 
-@app.route('/director')
-def director():
-    if 'usuario_id' not in session or session['tipo_usuario'] != 'director':
-        return redirect(url_for('login'))
-    return render_template('director.html', usuario_id=session['usuario_id'])
 
-@app.route('/materias_json')
-def materias_json():
-    if 'usuario_id' not in session or session['tipo_usuario'] != 'director':
-        return jsonify({"error": "No autorizado"}), 401
-    
+@app.route('/reporte', methods=['GET'])
+def reporte():
+    user_id = session.get('user_id')
     conn = get_db_connection()
-    cursor = conn.cursor()
-    try:
-        cursor.execute("SELECT id_materia, nombre FROM materia")
-        materias = cursor.fetchall()
-        return jsonify({"materias": materias})
-    except Exception as e:
-        return jsonify({"error": str(e)}), 500
-    finally:
-        conn.close()
+    cur = conn.cursor()
 
-@app.route('/generar_reporte', methods=['POST'])
-def generar_reporte():
-    if 'usuario_id' not in session or session['tipo_usuario'] != 'director':
-        return redirect(url_for('login'))
-    
-    try:
-        data = request.form
-        nombre_alumno = data['nombre_alumno']
-        id_materia = data['id_materia']
-        fecha = data['fecha']
-        comentarios = data['comentarios']
-        
-        # Aquí iría tu lógica para guardar el reporte en la base de datos
-        conn = get_db_connection()
-        cursor = conn.cursor()
-        cursor.execute("""
-            INSERT INTO reportes (nombre_alumno, id_materia, fecha, comentarios, id_usuario)
-            VALUES (%s, %s, %s, %s, %s)
-        """, (nombre_alumno, id_materia, fecha, comentarios, session['usuario_id']))
-        conn.commit()
-        
-        return jsonify({"success": True, "message": "Reporte generado exitosamente"})
-    except Exception as e:
-        return jsonify({"success": False, "error": str(e)}), 500
-    finally:
-        if conn:
-            conn.close()
+    cur.execute("SELECT id_materia, nombre FROM materias WHERE id_usuario = %s", (user_id,))
+    materias = cur.fetchall()
+
+    general = False
+    if not materias:
+        general = True
+        cur.execute("SELECT id_alumno, nombre, apellido_paterno, apellido_materno FROM alumno")
+        alumnos = cur.fetchall()
+    else:
+        alumnos = []
+
+    cur.close()
+    conn.close()
+    return render_template('reporte.html', materias=materias, alumnos=alumnos, general=general)
+
+@app.route('/alumnos_por_materia/<int:id_materia>')
+def alumnos_por_materia(id_materia):
+    conn = get_db_connection()
+    cur = conn.cursor()
+    cur.execute("""
+        SELECT DISTINCT a.id_alumno, a.nombre, a.apellido_paterno, a.apellido_materno
+        FROM alumno a
+        JOIN parciales p ON a.id_alumno = p.id_alumno
+        WHERE p.id_materia = %s
+    """, (id_materia,))
+    alumnos = cur.fetchall()
+    cur.close()
+    conn.close()
+    return jsonify(alumnos)
+
+@app.route('/guardar_reporte', methods=['POST'])
+def guardar_reporte():
+    user_id = session.get('user_id')
+    fecha = datetime.now().date()
+    id_materia = request.form.get('materia')
+    id_alumno = request.form.get('alumno')
+    reporte = request.form.get('reporte')
+
+    conn = get_db_connection()
+    cur = conn.cursor()
+    cur.execute("INSERT INTO reportes (fecha, id_usuario, id_materia, id_alumno, reporte) VALUES (%s, %s, %s, %s, %s)",
+                (fecha, user_id, id_materia, id_alumno, reporte))
+    conn.commit()
+    cur.close()
+    conn.close()
+    return redirect(url_for('reporte'))
 
 @app.route('/agregar_materia', methods=['GET', 'POST'])
 def agregar_materia():
