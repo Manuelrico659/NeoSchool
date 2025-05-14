@@ -653,7 +653,7 @@ def inscripcion():
     if request.method == 'GET':
         return render_template('Inscripcion.html')  # Muestra el formulario
 
-
+# Ruta para renderizar el formulario de reporte
 @app.route('/reporte', methods=['GET'])
 def reporte():
     user_id = session.get('user_id')
@@ -675,6 +675,7 @@ def reporte():
     conn.close()
     return render_template('reporte.html', materias=materias, alumnos=alumnos, general=general)
 
+# Ruta para obtener alumnos según la materia
 @app.route('/alumnos_por_materia/<int:id_materia>')
 def alumnos_por_materia(id_materia):
     conn = get_db_connection()
@@ -690,22 +691,34 @@ def alumnos_por_materia(id_materia):
     conn.close()
     return jsonify(alumnos)
 
-@app.route('/guardar_reporte', methods=['POST'])
-def guardar_reporte():
+# API para guardar reporte dinámicamente vía fetch
+@app.route('/api/guardar_reporte', methods=['POST'])
+def api_guardar_reporte():
     user_id = session.get('user_id')
-    fecha = datetime.now().date()
-    id_materia = request.form.get('materia')
-    id_alumno = request.form.get('alumno')
-    reporte = request.form.get('reporte')
+    data = request.get_json()
 
-    conn = get_db_connection()
-    cur = conn.cursor()
-    cur.execute("INSERT INTO reportes (fecha, id_usuario, id_materia, id_alumno, reporte) VALUES (%s, %s, %s, %s, %s)",
-                (fecha, user_id, id_materia, id_alumno, reporte))
-    conn.commit()
-    cur.close()
-    conn.close()
-    return redirect(url_for('reporte'))
+    id_materia = data.get('materia')
+    id_alumno = data.get('alumno')
+    reporte = data.get('reporte')
+    fecha = datetime.now().date()
+
+    if not user_id or not id_materia or not id_alumno or not reporte:
+        return jsonify({'success': False, 'error': 'Datos incompletos'}), 400
+
+    try:
+        conn = get_db_connection()
+        cur = conn.cursor()
+        cur.execute("""
+            INSERT INTO reportes (fecha, id_usuario, id_materia, id_alumno, reporte)
+            VALUES (%s, %s, %s, %s, %s)
+        """, (fecha, user_id, id_materia, id_alumno, reporte))
+        conn.commit()
+        cur.close()
+        conn.close()
+        return jsonify({'success': True})
+    except Exception as e:
+        print("Error al guardar reporte:", e)
+        return jsonify({'success': False, 'error': 'Error al guardar en base de datos'}), 500
 
 @app.route('/agregar_materia', methods=['GET', 'POST'])
 def agregar_materia():

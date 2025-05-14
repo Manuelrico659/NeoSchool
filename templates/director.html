@@ -32,82 +32,102 @@
                     break;
 
                 case "generar-reporte":
-                    fetch('/materias_json')
-                        .then(response => {
-                            if (!response.ok) {
-                                throw new Error('Error al cargar materias');
-                            }
-                            return response.json();
-                        })
-                        .then(data => {
-                            if (data.error) {
-                                throw new Error(data.error);
-                            }
-                            
-                            let materiaOptions = '<option value="" disabled selected>Selecciona una materia</option>';
-                            data.materias.forEach(materia => {
-                                materiaOptions += `<option value="${materia[0]}">${materia[1]}</option>`;
-                            });
+                    content.innerHTML = `
+                        <form id="form-reporte">
+                        <label for="materia">Materia:</label>
+                        <select id="materia" name="materia" required>
+                            <option disabled selected value>Seleccione una materia</option>
+                            <!-- Las opciones se llenan dinámicamente -->
+                        </select>
 
-                            mainContent.innerHTML = `
-                                <section class="generar-reporte-wrapper">
-                                    <h1>Generar Reporte</h1>
-                                    <div class="generar-reporte-container">
-                                        <form action="{{ url_for('guardar_reporte') }}" method="POST">
-                                            <label for="materia">Materia:</label>
-                                            <select name="materia" id="materia" required>
-                                                ${materiaOptions}
-                                            </select>
+                        <label for="alumno">Alumno:</label>
+                        <select id="alumno" name="alumno" required>
+                            <option disabled selected value>Seleccione una materia primero</option>
+                        </select>
 
-                                            <label for="alumno">Alumno:</label>
-                                            <select name="alumno" id="alumno" required>
-                                                <option value="" disabled selected>Selecciona un alumno</option>
-                                            </select>
+                        <label for="reporte">Reporte:</label>
+                        <textarea id="reporte" name="reporte" required></textarea>
 
-                                            <label for="reporte">Reporte:</label>
-                                            <textarea name="reporte" id="reporte" rows="5" required></textarea>
+                        <button type="submit">Guardar</button>
+                        </form>
 
-                                            <div class="button-container">
-                                                <button type="submit">Generar Reporte</button>
-                                            </div>
-                                        </form>
-                                    </div>
-                                </section>
-                            `;
-
-                            // Add event listener for materia select change
-                            const materiaSelect = document.getElementById("materia");
-                            if (materiaSelect) {
-                                materiaSelect.addEventListener("change", () => {
-                                    const idMateria = materiaSelect.value;
-                                    cargarAlumnos(idMateria);
-                                });
-                            }
-                        })
-                        .catch(error => {
-                            mainContent.innerHTML = `
-                                <div class="error-container">
-                                    <h1>Error</h1>
-                                    <p>${error.message}</p>
-                                    <button onclick="loadContent('generar-reporte')">Reintentar</button>
-                                </div>
-                            `;
-                        });
-
-                    function cargarAlumnos(idMateria) {
-                        fetch(`/alumnos_por_materia/${idMateria}`)
+                        <script>
+                        // Obtener materias al cargar
+                        fetch('/reporte-datos')
                             .then(res => res.json())
                             .then(data => {
-                                const alumnoSelect = document.getElementById("alumno");
-                                alumnoSelect.innerHTML = '<option value="" disabled selected>Selecciona un alumno</option>';
-                                data.forEach(alumno => {
-                                    const option = document.createElement("option");
-                                    option.value = alumno[0];
-                                    option.textContent = alumno[1] + " " + alumno[2] + " " + alumno[3];
-                                    alumnoSelect.appendChild(option);
+                            const materiaSelect = document.getElementById("materia");
+                            const alumnoSelect = document.getElementById("alumno");
+
+                            if (data.general) {
+                                const opt = document.createElement("option");
+                                opt.value = "general";
+                                opt.textContent = "General";
+                                materiaSelect.innerHTML = "";
+                                materiaSelect.appendChild(opt);
+
+                                alumnoSelect.innerHTML = "";
+                                data.alumnos.forEach(a => {
+                                const option = document.createElement("option");
+                                option.value = a[0];
+                                option.textContent = \\${a[1]} \${a[2]} \${a[3]}\;
+                                alumnoSelect.appendChild(option);
                                 });
+                            } else {
+                                data.materias.forEach(m => {
+                                const option = document.createElement("option");
+                                option.value = m[0];
+                                option.textContent = m[1];
+                                materiaSelect.appendChild(option);
+                                });
+
+                                materiaSelect.addEventListener("change", function () {
+                                const materiaId = this.value;
+                                fetch(\/alumnos_por_materia/\${materiaId}\)
+                                    .then(res => res.json())
+                                    .then(data => {
+                                    alumnoSelect.innerHTML = "";
+                                    data.forEach(a => {
+                                        const option = document.createElement("option");
+                                        option.value = a[0];
+                                        option.textContent = \\${a[1]} \${a[2]} \${a[3]}\;
+                                        alumnoSelect.appendChild(option);
+                                    });
+                                    });
+                                });
+                            }
                             });
-                    }
+
+                        document.getElementById("form-reporte").addEventListener("submit", function (e) {
+                            e.preventDefault();
+
+                            const materia = document.getElementById("materia").value;
+                            const alumno = document.getElementById("alumno").value;
+                            const reporte = document.getElementById("reporte").value;
+
+                            fetch("/api/guardar_reporte", {
+                            method: "POST",
+                            headers: {
+                                "Content-Type": "application/json"
+                            },
+                            body: JSON.stringify({ materia, alumno, reporte })
+                            })
+                            .then(res => res.json())
+                            .then(data => {
+                                if (data.success) {
+                                alert("Reporte guardado exitosamente.");
+                                loadContent("inicio");
+                                } else {
+                                alert("Error: " + data.error);
+                                }
+                            })
+                            .catch(err => {
+                                alert("Error al enviar el reporte.");
+                                console.error(err);
+                            });
+                        });
+                        </script>
+                    `;
                     break;
 
                 case "visualizar-reportes":
