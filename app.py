@@ -730,12 +730,36 @@ def generar_reporte():
             conn.close()
 
         # Retornar el PDF directamente
-        return pdf_reporte(id_alumno)
+        return pdf_reporte(id_alumno,fecha,comentarios,id_materia,id_usuario)
     return redirect(url_for('generar_reporte'))
 
-def pdf_reporte(id_alumno):
+def pdf_reporte(id_alumno,fecha,comentarios,id_materia,id_usuario):
     conn = get_db_connection()
     cursor = conn.cursor()
+    # Obtener nombre de la materia
+    cursor.execute("""
+        SELECT nombre
+        FROM materia
+        WHERE id_materia = %s
+    """, (id_materia,))
+    nombre_materia = cursor.fetchone()
+    if not nombre_materia:
+        cursor.close()
+        conn.close()
+        return "Materia no encontrada", 404
+
+    # Obtener nombre completo del profesor
+    cursor.execute("""
+        SELECT nombre, apellido_paterno, apellido_materno
+        FROM usuario
+        WHERE id_usuario = %s
+    """, (id_usuario,))
+    datos_profesor = cursor.fetchone()
+    if not datos_profesor:
+        cursor.close()
+        conn.close()
+        return "Profesor no encontrado", 404
+
 
     # Datos del alumno
     cursor.execute("""
@@ -832,7 +856,7 @@ def pdf_reporte(id_alumno):
         <h2>Información general</h2>
         <div class="info">
             <p><strong>Materia:</strong> {{ nombre_materia }}</p>
-            <p><strong>Alumno:</strong> {{ nombre_alumno }}</p>
+            <p><strong>Alumno:</strong> {{ alumno.nombre }} {{ alumno.apellido_paterno }} {{ alumno.apellido_materno }}</p>
             <p><strong>Fecha:</strong> {{ fecha }}</p>
         </div>
     </section>
@@ -852,7 +876,7 @@ def pdf_reporte(id_alumno):
     </html>
     '''
 
-    html_rendered = render_template_string(plantilla_html, alumno=alumno)
+    html_rendered = render_template_string(plantilla_html, alumno=alumno,fecha=fecha,comentarios=comentarios,nombre_materia=nombre_materia)
     pdf = HTML(string=html_rendered).write_pdf()
 
     return send_file(BytesIO(pdf), download_name="reporte.pdf", as_attachment=True)
