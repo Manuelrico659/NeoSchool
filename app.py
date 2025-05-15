@@ -724,13 +724,13 @@ def generar_reporte():
                 cursor.execute(sql, (id_alumno, id_usuario, id_materia, fecha, comentarios))
                 conn.commit()
                 print("Reporte registrado")
+                # Retornar el PDF directamente
+                return pdf_reporte(id_alumno,fecha,comentarios,id_materia,id_usuario)
         except Exception as e:
             print("Error al guardar el reporte:", e)
         finally:
             conn.close()
 
-        # Retornar el PDF directamente
-        return pdf_reporte(id_alumno,fecha,comentarios,id_materia,id_usuario)
     return redirect(url_for('generar_reporte'))
 
 def pdf_reporte(id_alumno,fecha,comentarios,id_materia,id_usuario):
