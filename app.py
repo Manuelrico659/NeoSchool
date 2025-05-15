@@ -730,8 +730,133 @@ def generar_reporte():
             conn.close()
 
         # Retornar el PDF directamente
-        return descargar_boleta(id_alumno)
+        return pdf_reporte(id_alumno)
     return redirect(url_for('generar_reporte'))
+
+def pdf_reporte(id_alumno):
+    conn = get_db_connection()
+    cursor = conn.cursor()
+
+    # Datos del alumno
+    cursor.execute("""
+        SELECT nombre, apellido_paterno, apellido_materno, nivel, grado, campus
+        FROM alumno
+        WHERE id_alumno = %s
+    """, (id_alumno,))
+    datos_alumno = cursor.fetchone()
+    if not datos_alumno:
+        cursor.close()
+        conn.close()
+        return "Alumno no encontrado", 404
+
+    alumno = {
+        'nombre': datos_alumno[0],
+        'apellido_paterno': datos_alumno[1],
+        'apellido_materno': datos_alumno[2],
+        'nivel': datos_alumno[3],
+        'grado': datos_alumno[4],
+        'campus': datos_alumno[5],
+    }
+
+    plantilla_html = '''
+        <!DOCTYPE html>
+    <html lang="es">
+    <head>
+        <meta charset="UTF-8">
+        <title>Reporte Disciplinar</title>
+        <style>
+            body {
+                font-family: Arial, sans-serif;
+                background-color: #fff;
+                color: #000;
+                margin: 40px;
+                line-height: 1.6;
+            }
+
+            header {
+                text-align: center;
+                border-bottom: 2px solid rgb(34, 113, 169);
+                padding-bottom: 10px;
+                margin-bottom: 30px;
+            }
+
+            header h1 {
+                color: rgb(34, 113, 169);
+                font-size: 24px;
+                margin: 0;
+            }
+
+            .section {
+                margin-bottom: 20px;
+            }
+
+            .section h2 {
+                font-size: 18px;
+                color: rgb(34, 113, 169);
+                margin-bottom: 10px;
+            }
+
+            .info {
+                background-color: #f4f4f4;
+                padding: 15px;
+                border-radius: 8px;
+                border: 1px solid #ccc;
+            }
+
+            .info p {
+                margin: 5px 0;
+            }
+
+            .comentarios {
+                background-color: #eef7ff;
+                padding: 15px;
+                border-radius: 8px;
+                border: 1px solid #4D869C;
+            }
+
+            footer {
+                margin-top: 50px;
+                font-size: 12px;
+                text-align: center;
+                color: #888;
+            }
+        </style>
+    </head>
+    <body>
+
+    <header>
+        <h1>Reporte Disciplinar</h1>
+    </header>
+
+    <section class="section">
+        <h2>Información general</h2>
+        <div class="info">
+            <p><strong>Materia:</strong> {{ nombre_materia }}</p>
+            <p><strong>Alumno:</strong> {{ nombre_alumno }}</p>
+            <p><strong>Fecha:</strong> {{ fecha }}</p>
+        </div>
+    </section>
+
+    <section class="section">
+        <h2>Comentarios</h2>
+        <div class="comentarios">
+            <p>{{ comentarios }}</p>
+        </div>
+    </section>
+
+    <footer>
+        Generado automáticamente por el sistema NeoSchool.
+    </footer>
+
+    </body>
+    </html>
+    '''
+
+    html_rendered = render_template_string(plantilla_html, alumno=alumno)
+    pdf = HTML(string=html_rendered).write_pdf()
+
+    return send_file(BytesIO(pdf), download_name="reporte.pdf", as_attachment=True)
+
 
 @app.route('/descargar_calificaciones')
 def descargar_calificaciones():
