@@ -666,7 +666,8 @@ def get_materias():
     cursor.execute("SELECT id_materia, nombre FROM materia WHERE id_usuario = %s", (id_usuario,))
     materias = cursor.fetchall()
     if not materias:
-        materias.append("General")
+        cursor.execute("SELECT id_materia, nombre FROM materia WHERE id_usuario = 1")
+        materias = cursor.fetchall()
     cursor.close()
     conn.close()
     print(materias)
