@@ -280,7 +280,7 @@ def profesor():
         conn.close()
 
     # Pasar las materias a la plantilla
-    return render_template('profesor.html', materias=materias, materias=get_materias(), alumnos=get_alumnos_reportes())
+    return render_template('profesor.html', materias=materias, materias2=get_materias(), alumnos=get_alumnos_reportes())
 
 @app.route('/detalle_materia/<int:id_materia>', methods=['GET'])
 def detalle_materia(id_materia):
@@ -706,8 +706,28 @@ def get_alumnos_reportes():
 
 @app.route('/generar_reporte', methods=['GET'])
 def generar_reporte():
-    pass
+    conn = get_db_connection()
+    if request.method == 'POST':
+        id_materia = request.form.get('id_materia')
+        id_alumno = request.form.get('nombre_alumno')
+        fecha = request.form.get('fecha')
+        comentarios = request.form.get('comentarios')
+        id_usuario = request.form.get('usuario_id')
+        try:
+            with conn.cursor() as cursor:
+                sql = """
+                    INSERT INTO reportes (id_alumno, id_usuario, id_materia, fecha, reporte)
+                    VALUES (%s, %s, %s, %s, %s)
+                """
+                cursor.execute(sql, (id_alumno, id_usuario, id_materia, fecha, comentarios))
+                conn.commit()
+                print("Reporte registrado")
+        except Exception as e:
+            print("Error al guardar el reporte:", e)
+        finally:
+            conn.close()
 
+        return redirect(url_for('generar_reporte'))
 
 @app.route('/agregar_materia', methods=['GET', 'POST'])
 def agregar_materia():
