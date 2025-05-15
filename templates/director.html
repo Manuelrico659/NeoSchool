@@ -134,10 +134,34 @@
                     mainContent.innerHTML = `
                         <h1>Visualizar Reportes</h1>
                         <div class="content-section">
-                            <p>Lista de reportes generados previamente.</p>
+                            <input type="text" id="buscador-reportes" placeholder="Buscar por nombre, materia, etc..." onkeyup="filtrarReportes()">
+                            <div id="lista-reportes">
+                                {% for reporte in reportes %}
+                                    <div class="reporte-item">
+                                        <p><strong>Alumno:</strong> {{ reporte.nombre_alumno }}</p>
+                                        <p><strong>Materia:</strong> {{ reporte.nombre_materia }}</p>
+                                        <p><strong>Fecha:</strong> {{ reporte.fecha }}</p>
+                                        <p><strong>Comentario:</strong> {{ reporte.comentarios }}</p>
+                                    </div>
+                                {% endfor %}
+                            </div>
                         </div>
+
+                        <script>
+                            function filtrarReportes() {
+                                const input = document.getElementById("buscador-reportes");
+                                const filtro = input.value.toLowerCase();
+                                const reportes = document.querySelectorAll(".reporte-item");
+
+                                reportes.forEach(reporte => {
+                                    const texto = reporte.innerText.toLowerCase();
+                                    reporte.style.display = texto.includes(filtro) ? "" : "none";
+                                });
+                            }
+                        </script>
                     `;
                     break;
+
 
                 case "configuracion":
                     mainContent.innerHTML = `
