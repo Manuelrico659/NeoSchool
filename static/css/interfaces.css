@@ -213,9 +213,3 @@ body {
     border-radius: 5px;
     cursor: pointer;
 }
-
-.generar-reporte-container select {
-    padding: 10px;
-    border-radius: 5px;
-    border: 1px solid #ccc;
-}
