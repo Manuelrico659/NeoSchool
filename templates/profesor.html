@@ -73,13 +73,11 @@
                             <h1>Generar Reporte</h1>
                             <div class="generar-reporte-container">
                                 <form method="POST" action="${urlGenerarReporte}">
-
-                                    <!-- Campo para seleccionar la materia -->
                                     <label for="id_materia">ID de la materia:</label>
                                     <select id="id_materia" name="id_materia" required>
                                         <option value="">Seleccione una Materia</option>
-                                        {% for materia2 in materias2 %}
-                                            <option value="{{ materia2.id_usuario }}">{{ materia2.nombre }} (ID: {{ materia2.id_materia }})</option>
+                                        {% for materia in materias %}
+                                            <option value="{{ materia[0] }}">{{ materia[1] }} (ID: {{ materia[0] }})</option>
                                         {% endfor %}
                                     </select>
 
@@ -90,7 +88,6 @@
                                             <option value="{{ alumno.id_alumno }}">{{ alumno.nombre }} {{ alumno.apellido_paterno }} (ID: {{ alumno.id_alumno }})</option>
                                         {% endfor %}
                                     </select>
-
 
                                     <label for="fecha">Fecha:</label>
                                     <input type="text" id="fecha" name="fecha" value="${mexicoTime}" readonly>
@@ -108,6 +105,7 @@
                         </div>
                     `;
                     break;
+
 
                 case "configuracion":
                     mainContent.innerHTML = `

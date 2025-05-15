@@ -712,7 +712,7 @@ def generar_reporte():
         id_alumno = request.form.get('nombre_alumno')
         fecha = request.form.get('fecha')
         comentarios = request.form.get('comentarios')
-        id_usuario = request.form.get('usuario_id')
+        id_usuario = session['id_usuario']
         try:
             with conn.cursor() as cursor:
                 sql = """
