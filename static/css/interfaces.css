@@ -213,3 +213,12 @@ body {
     border-radius: 5px;
     cursor: pointer;
 }
+
+.generar-reporte-container select {
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    background-color: white;
+    font-family: inherit;
+    font-size: 16px;
+}
