@@ -681,6 +681,7 @@ def get_alumnos():
     cursor.close()
     conn.close()
     print (alumnos)
+    print("---------------------------------------------")
     return alumnos
 
 @app.route('/generar_reporte', methods=['GET'])
