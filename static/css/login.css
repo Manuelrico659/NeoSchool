@@ -78,3 +78,10 @@ body {
 .forgot-password:hover {
     color: #2f5d73;
 }
+
+.error {
+    color: red;
+    text-align: center;
+    margin-top: 10px;
+    font-size: 14px;
+}

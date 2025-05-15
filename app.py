@@ -224,7 +224,8 @@ def login():
             else:
                 return "Rol desconocido", 400  # Agregado para capturar cualquier rol no esperado
         else:
-            return "Correo o contraseña incorrectos", 401
+            # Aquí se agrega el mensaje de error
+            return render_template('login.html', mensaje_error="Usuario y/o contraseña incorrectos")
         
     return render_template('login.html')
 
