@@ -708,7 +708,7 @@ def get_alumnos_reportes():
 def generar_reporte():
     conn = get_db_connection()
     if request.method == 'POST':
-        id_materia = request.form.get('valuef[0]')
+        id_materia = request.form.get('id_materia')
         id_alumno = request.form.get('nombre_alumno')
         fecha = request.form.get('fecha')
         comentarios = request.form.get('comentarios')
