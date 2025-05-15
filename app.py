@@ -252,7 +252,7 @@ def recuperar_contraseña():
 
     return render_template('recuperar.html')
 
-@app.route('/profesor')
+@app.route('/profesor', methods=['GET', 'POST'])
 def profesor():
     # Verificar si el usuario está autenticado
     if 'id_usuario' not in session or session['rol'] != 'profesor':
