@@ -53,7 +53,17 @@
                                     <label for="nombre_alumno">Nombre del alumno:</label>
                                     <input type="text" id="nombre_alumno" name="nombre_alumno" required>
 
+
+                                    <!-- Campo para seleccionar la materia -->
                                     <label for="id_materia">ID de la materia:</label>
+                                    <select id="id_materia" name="id_materia" required>
+                                        <option value="">Seleccione una Materia</option>
+                                        {% for materia in materias %}
+                                            <option value="{{ materia.id_usuario }}">{{ materia.nombre }} (ID: {{ maestro.id_materia }})</option>
+                                        {% endfor %}
+                                    </select>
+
+                                    
                                     <input type="number" id="id_materia" name="id_materia" required>
 
                                     <label for="fecha">Fecha:</label>

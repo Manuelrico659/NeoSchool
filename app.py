@@ -657,7 +657,17 @@ def inscripcion():
 def director():
     if 'id_usuario' not in session or session['rol'] != 'director':
         return redirect(url_for('login'))
-    return render_template('director.html')  # Asegúrate de tener este template
+    return render_template('director.html', materias=get_materias())  # Asegúrate de tener este template
+
+def get_materias():
+    conn = get_db_connection()
+    cursor = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)  # Usa DictCursor aquí
+    cursor.execute("SELECT id_materia, nombre FROM materia WHERE id_usuario = 'id_usuario'")
+    materias = cursor.fetchall()
+    cursor.close()
+    conn.close()
+    print(materias)
+    return materias
 
 @app.route('/generar_reporte', methods=['GET'])
 def generar_reporte():
