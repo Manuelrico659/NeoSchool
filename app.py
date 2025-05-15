@@ -763,7 +763,7 @@ def descargar_boleta(id_alumno):
     cursor.execute("""
         SELECT parcial, participacion, ejercicios_practicas, tareas_trabajo,
                examen, asistencia_misa, calificacion_parcial
-        FROM calificaciones
+        FROM parciales
         WHERE id_alumno = %s
         ORDER BY parcial ASC
     """, (id_alumno,))
