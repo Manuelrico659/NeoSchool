@@ -665,6 +665,8 @@ def get_materias():
     cursor = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)  # Usa DictCursor aquí
     cursor.execute("SELECT id_materia, nombre FROM materia WHERE id_usuario = %s", (id_usuario,))
     materias = cursor.fetchall()
+    if not materias:
+        materias.append("General")
     cursor.close()
     conn.close()
     print(materias)
