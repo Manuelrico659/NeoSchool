@@ -280,7 +280,7 @@ def profesor():
         conn.close()
 
     # Pasar las materias a la plantilla
-    return render_template('profesor.html', materias=materias)
+    return render_template('profesor.html', materias=materias, materias=get_materias(), alumnos=get_alumnos_reportes())
 
 @app.route('/detalle_materia/<int:id_materia>', methods=['GET'])
 def detalle_materia(id_materia):
