@@ -673,6 +673,16 @@ def get_materias():
     print(materias)
     return materias
 
+def get_alumnos():
+    conn = get_db_connection()
+    cursor = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)  # Usa DictCursor aquí
+    cursor.execute("SELECT id_alumno, nombre, apellido_paterno, apellido_materno FROM alumno")
+    alumnos = cursor.fetchall()
+    cursor.close()
+    conn.close()
+    print (alumnos)
+    return alumnos
+
 @app.route('/generar_reporte', methods=['GET'])
 def generar_reporte():
     pass

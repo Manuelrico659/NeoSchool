@@ -50,9 +50,6 @@
                             <h1>Generar Reporte</h1>
                             <div class="generar-reporte-container">
                                 <form method="POST" action="${urlGenerarReporte}">
-                                    <label for="nombre_alumno">Nombre del alumno:</label>
-                                    <input type="text" id="nombre_alumno" name="nombre_alumno" required>
-
 
                                     <!-- Campo para seleccionar la materia -->
                                     <label for="id_materia">ID de la materia:</label>
@@ -62,6 +59,17 @@
                                             <option value="{{ materia.id_usuario }}">{{ materia.nombre }} (ID: {{ materia.id_materia }})</option>
                                         {% endfor %}
                                     </select>
+
+                                    <label for="nombre_alumno">Nombre del alumno:</label>
+                                    <select id="nombre_alumno" name="nombre_alumno" required>
+                                        <option value="">Seleccione un alumno</option>
+                                        {% for alumno in alumnos %}
+                                            <option value="{{ alumno.id_alumno }}">{{ alumno.nombre }} {{ alumno.apellido_paterno }} (ID: {{ alumno.id_alumno }})</option>
+                                        {% endfor %}
+                                    </select>
+
+                                    
+                                    <input type="text" id="nombre_alumno" name="nombre_alumno" required>
 
                                     <label for="fecha">Fecha:</label>
                                     <input type="text" id="fecha" name="fecha" value="${mexicoTime}" readonly>
