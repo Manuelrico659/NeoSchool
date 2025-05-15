@@ -662,7 +662,7 @@ def director():
 def get_materias():
     conn = get_db_connection()
     cursor = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)  # Usa DictCursor aquí
-    cursor.execute("SELECT id_materia, nombre FROM materia WHERE id_usuario = 'id_usuario'")
+    cursor.execute("SELECT id_materia, nombre FROM materia WHERE id_usuario = session['id_usuario'] ")
     materias = cursor.fetchall()
     cursor.close()
     conn.close()
