@@ -740,9 +740,9 @@ def descargar_calificaciones():
     materia_id = request.args.get('materia_id')
 
     # Aquí generas el archivo (por ejemplo, PDF o CSV) y lo devuelves con send_file o similar
-    return descargar_boleta(id_alumno)
+    return descargar_boleta(id_alumno,materia_id)
 
-def descargar_boleta(id_alumno):
+def descargar_boleta(id_alumno,materia_id):
     conn = get_db_connection()
     cursor = conn.cursor()
 
@@ -770,11 +770,11 @@ def descargar_boleta(id_alumno):
     # Calificaciones por parcial
     cursor.execute("""
         SELECT parcial, participacion, ejercicios_practicas, tareas_trabajo,
-               examen, asistencia_misa, calificacion_parcial
+            examen, asistencia_misa, calificacion_parcial
         FROM parciales
-        WHERE id_alumno = %s
+        WHERE id_alumno = %s AND id_materia = %s
         ORDER BY parcial ASC
-    """, (id_alumno,))
+    """, (id_alumno,materia_id))
     filas = cursor.fetchall()
     cursor.close()
     conn.close()
