@@ -661,8 +661,9 @@ def director():
 
 def get_materias():
     conn = get_db_connection()
+    id_usuario = session['id_usuario']  # Obtenlo desde la sesión de Flask
     cursor = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)  # Usa DictCursor aquí
-    cursor.execute("SELECT id_materia, nombre FROM materia WHERE id_usuario = session['id_usuario'] ")
+    cursor.execute("SELECT id_materia, nombre FROM materia WHERE id_usuario = %s", (id_usuario,))
     materias = cursor.fetchall()
     cursor.close()
     conn.close()
