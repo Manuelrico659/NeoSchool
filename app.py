@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, redirect, url_for, jsonify
+from flask import Flask, render_template, request, redirect, url_for, jsonify,send_file, render_template_string
 import bcrypt
 from datetime import timedelta
 import os
@@ -12,6 +12,7 @@ from datetime import datetime, timedelta
 import pytz
 from mailjet_rest import Client
 import random
+from weasyprint import HTML
 
 # Cargar variables de entorno
 load_dotenv(dotenv_path='variables.env')
@@ -727,7 +728,109 @@ def generar_reporte():
         finally:
             conn.close()
 
-        return redirect(url_for('generar_reporte'))
+        # Retornar el PDF directamente
+        return descargar_boleta(id_alumno)
+    return redirect(url_for('generar_reporte'))
+
+
+def descargar_boleta(id_alumno):
+    conn = get_db_connection()
+    cursor = conn.cursor()
+
+    # Datos del alumno
+    cursor.execute("""
+        SELECT nombre, apellido_paterno, apellido_materno, nivel, grado, campus
+        FROM alumno
+        WHERE id_alumno = %s
+    """, (id_alumno,))
+    datos_alumno = cursor.fetchone()
+    if not datos_alumno:
+        cursor.close()
+        conn.close()
+        return "Alumno no encontrado", 404
+
+    alumno = {
+        'nombre': datos_alumno[0],
+        'apellido_paterno': datos_alumno[1],
+        'apellido_materno': datos_alumno[2],
+        'nivel': datos_alumno[3],
+        'grado': datos_alumno[4],
+        'campus': datos_alumno[5],
+    }
+
+    # Calificaciones por parcial
+    cursor.execute("""
+        SELECT parcial, participacion, ejercicios_practicas, tareas_trabajo,
+               examen, asistencia_misa, calificacion_parcial
+        FROM calificaciones
+        WHERE id_alumno = %s
+        ORDER BY parcial ASC
+    """, (id_alumno,))
+    filas = cursor.fetchall()
+    cursor.close()
+    conn.close()
+
+    califs = []
+    for fila in filas:
+        califs.append({
+            'parcial': fila[0],
+            'participacion': fila[1],
+            'ejercicios': fila[2],
+            'tareas': fila[3],
+            'examen': fila[4],
+            'asistencia': fila[5],
+            'promedio': fila[6]
+        })
+
+    plantilla_html = '''
+    <html>
+    <head>
+        <style>
+            body { font-family: Arial; margin: 30px; }
+            h1, h2, p { text-align: center; }
+            table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+            th, td { border: 1px solid #000; padding: 8px; text-align: center; }
+            th { background-color: #2271a9; color: white; }
+        </style>
+    </head>
+    <body>
+        <h1>NeoSchool - Boleta de Calificaciones</h1>
+        <p><strong>Alumno:</strong> {{ alumno.nombre }} {{ alumno.apellido_paterno }} {{ alumno.apellido_materno }}</p>
+        <p><strong>Nivel:</strong> {{ alumno.nivel }} | <strong>Grado:</strong> {{ alumno.grado }} | <strong>Campus:</strong> {{ alumno.campus }}</p>
+
+        <table>
+            <tr>
+                <th>Parcial</th>
+                <th>Participación</th>
+                <th>Ejercicios</th>
+                <th>Tareas</th>
+                <th>Examen</th>
+                <th>Asistencia</th>
+                <th>Promedio</th>
+            </tr>
+            {% for c in califs %}
+            <tr>
+                <td>{{ c.parcial }}</td>
+                <td>{{ c.participacion }}</td>
+                <td>{{ c.ejercicios }}</td>
+                <td>{{ c.tareas }}</td>
+                <td>{{ c.examen }}</td>
+                <td>{{ c.asistencia }}</td>
+                <td>{{ c.promedio }}</td>
+            </tr>
+            {% endfor %}
+        </table>
+    </body>
+    </html>
+    '''
+
+    html_rendered = render_template_string(plantilla_html, alumno=alumno, califs=califs)
+    pdf = HTML(string=html_rendered).write_pdf()
+
+    return send_file(BytesIO(pdf), download_name="boleta.pdf", as_attachment=True)
+
+
+
 
 @app.route('/agregar_materia', methods=['GET', 'POST'])
 def agregar_materia():
