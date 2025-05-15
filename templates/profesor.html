@@ -62,15 +62,51 @@
                     `;
                     break;
 
-                mainContent.innerHTML = `
-                        <h1>Inicio</h1>
-                        <div class="content-section">
-                            <h2>Bienvenido, Profesor</h2>
-                            <p>Desde aquí puedes gestionar tus materias y generar reportes.</p>
+                case "generar-reporte":
+                    const mexicoTime = new Date().toLocaleDateString("en-CA", {
+                        timeZone: "America/Mexico_City"
+                    });
+
+                    mainContent.innerHTML = `
+                        <div class="generar-reporte-wrapper">
+                            <h1>Generar Reporte</h1>
+                            <div class="generar-reporte-container">
+                                <form method="POST" action="${urlGenerarReporte}">
+
+                                    <!-- Campo para seleccionar la materia -->
+                                    <label for="id_materia">ID de la materia:</label>
+                                    <select id="id_materia" name="id_materia" required>
+                                        <option value="">Seleccione una Materia</option>
+                                        {% for materia in materias %}
+                                            <option value="{{ materia.id_usuario }}">{{ materia.nombre }} (ID: {{ materia.id_materia }})</option>
+                                        {% endfor %}
+                                    </select>
+
+                                    <label for="nombre_alumno">Nombre del alumno:</label>
+                                    <select id="nombre_alumno" name="nombre_alumno" required>
+                                        <option value="">Seleccione un alumno</option>
+                                        {% for alumno in alumnos %}
+                                            <option value="{{ alumno.id_alumno }}">{{ alumno.nombre }} {{ alumno.apellido_paterno }} (ID: {{ alumno.id_alumno }})</option>
+                                        {% endfor %}
+                                    </select>
+
+
+                                    <label for="fecha">Fecha:</label>
+                                    <input type="text" id="fecha" name="fecha" value="${mexicoTime}" readonly>
+
+                                    <label for="comentarios">Comentarios (máx. 145 caracteres):</label>
+                                    <textarea id="comentarios" name="comentarios" maxlength="145" rows="4" required></textarea>
+
+                                    <input type="hidden" name="usuario_id" value="${usuarioID}">
+
+                                    <div class="button-container">
+                                        <button type="submit">Generar reporte</button>
+                                    </div>
+                                </form>
+                            </div>
                         </div>
                     `;
                     break;
-
 
                 case "configuracion":
                     mainContent.innerHTML = `
