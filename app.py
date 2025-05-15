@@ -751,7 +751,7 @@ def pdf_reporte(id_alumno,fecha,comentarios,id_materia,id_usuario):
     # Obtener nombre completo del profesor
     cursor.execute("""
         SELECT nombre, apellido_paterno, apellido_materno
-        FROM usuario
+        FROM usuarios
         WHERE id_usuario = %s
     """, (id_usuario,))
     datos_profesor = cursor.fetchone()
