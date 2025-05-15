@@ -657,7 +657,7 @@ def inscripcion():
 def director():
     if 'id_usuario' not in session or session['rol'] != 'director':
         return redirect(url_for('login'))
-    return render_template('director.html', materias=get_materias(), alumnos=get_alumnos())  # Asegúrate de tener este template
+    return render_template('director.html', materias=get_materias(), alumnos=get_alumnos_reportes())  # Asegúrate de tener este template
 
 def get_materias():
     conn = get_db_connection()
@@ -673,10 +673,30 @@ def get_materias():
     print(materias)
     return materias
 
-def get_alumnos():
+def get_alumnos_reportes():
+    rol = session['rol']
+    id_usuario = session['id_usuario'] 
+    if rol == "director":
+        conn = get_db_connection()
+        cursor = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)  # Usa DictCursor aquí
+        cursor.execute("SELECT id_alumno, nombre, apellido_paterno, apellido_materno FROM alumno")
+        alumnos = cursor.fetchall()
+        cursor.close()
+        conn.close()
+        print (alumnos)
+        print("---------------------------------------------")
+        return alumnos
+    
     conn = get_db_connection()
     cursor = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)  # Usa DictCursor aquí
-    cursor.execute("SELECT id_alumno, nombre, apellido_paterno, apellido_materno FROM alumno")
+    estudiantes_query = """
+    SELECT DISTINCT e.id_alumno, e.nombre, e.apellido_paterno
+    FROM alumno e
+    JOIN parciales m ON e.id_alumno = m.id_alumno
+    JOIN materia mat ON m.id_materia = mat.id_materia
+    WHERE mat.id_usuario = %s
+    """
+    cursor.execute(estudiantes_query, (id_usuario,))
     alumnos = cursor.fetchall()
     cursor.close()
     conn.close()
@@ -766,7 +786,7 @@ def get_maestros():
     return maestros
 
 import psycopg2.extras
-"""
+
 def get_alumnos():
     conn = get_db_connection()
     cursor = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)  # Usa DictCursor aquí
@@ -775,7 +795,7 @@ def get_alumnos():
     cursor.close()
     conn.close()
     print (alumnos)
-    return alumnos"""
+    return alumnos
 
 
 @app.route('/cambiar_contrasena', methods=['GET', 'POST'])
