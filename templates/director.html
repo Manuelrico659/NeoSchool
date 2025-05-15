@@ -49,7 +49,7 @@
                         <div class="generar-reporte-wrapper">
                             <h1>Generar Reporte</h1>
                             <div class="generar-reporte-container">
-                                <form method="POST" action="${urlGenerarReporte}">
+                                <form id="formGenerarReporte" method="POST" action="${urlGenerarReporte}">
 
                                     <!-- Campo para seleccionar la materia -->
                                     <label for="id_materia">ID de la materia:</label>
@@ -84,6 +84,23 @@
                             </div>
                         </div>
                     `;
+                    // Espera a que el DOM del contenido inyectado esté listo
+                    setTimeout(() => {
+                        const form = document.getElementById("formGenerarReporte");
+                        const comentarios = document.getElementById("comentarios");
+                        const materia = document.getElementById("id_materia");
+                        const alumno = document.getElementById("nombre_alumno");
+
+                        form.addEventListener("submit", function (e) {
+                            // Esperar un poco antes de limpiar para dejar que se envíe el formulario
+                            setTimeout(() => {
+                                materia.value = "";
+                                alumno.value = "";
+                                comentarios.value = "";
+                            }, 500); // 0.5s por seguridad
+                        });
+                    }, 100);
+
                     break;
 
                 case "visualizar-reportes":

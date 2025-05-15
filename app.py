@@ -743,6 +743,7 @@ def pdf_reporte(id_alumno,fecha,comentarios,id_materia,id_usuario):
         WHERE id_materia = %s
     """, (id_materia,))
     nombre_materia = cursor.fetchone()
+    print(nombre_materia)
     if not nombre_materia:
         cursor.close()
         conn.close()
