@@ -13,6 +13,7 @@ import pytz
 from mailjet_rest import Client
 import random
 from weasyprint import HTML
+from io import BytesIO
 
 # Cargar variables de entorno
 load_dotenv(dotenv_path='variables.env')
