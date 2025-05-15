@@ -659,6 +659,10 @@ def director():
         return redirect(url_for('login'))
     return render_template('director.html')  # Asegúrate de tener este template
 
+@app.route('/generar_reporte', methods=['GET'])
+def generar_reporte():
+    pass
+
 # Ruta para renderizar el formulario de reporte
 @app.route('/reporte', methods=['GET'])
 def reporte():
