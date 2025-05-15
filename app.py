@@ -663,76 +663,10 @@ def director():
 def generar_reporte():
     pass
 
-# Ruta para renderizar el formulario de reporte
-@app.route('/reporte', methods=['GET'])
-def reporte():
-    user_id = session.get('user_id')
-    conn = get_db_connection()
-    cur = conn.cursor()
-
-    cur.execute("SELECT id_materia, nombre FROM materias WHERE id_usuario = %s", (user_id,))
-    materias = cur.fetchall()
-
-    general = False
-    if not materias:
-        general = True
-        cur.execute("SELECT id_alumno, nombre, apellido_paterno, apellido_materno FROM alumno")
-        alumnos = cur.fetchall()
-    else:
-        alumnos = []
-
-    cur.close()
-    conn.close()
-    return render_template('reporte.html', materias=materias, alumnos=alumnos, general=general)
-
-# Ruta para obtener alumnos según la materia
-@app.route('/alumnos_por_materia/<int:id_materia>')
-def alumnos_por_materia(id_materia):
-    conn = get_db_connection()
-    cur = conn.cursor()
-    cur.execute("""
-        SELECT DISTINCT a.id_alumno, a.nombre, a.apellido_paterno, a.apellido_materno
-        FROM alumno a
-        JOIN parciales p ON a.id_alumno = p.id_alumno
-        WHERE p.id_materia = %s
-    """, (id_materia,))
-    alumnos = cur.fetchall()
-    cur.close()
-    conn.close()
-    return jsonify(alumnos)
-
-# API para guardar reporte dinámicamente vía fetch
-@app.route('/guardar_reporte', methods=['POST'])
-def api_guardar_reporte():
-    user_id = session.get('user_id')
-    data = request.get_json()
-
-    id_materia = data.get('materia')
-    id_alumno = data.get('alumno')
-    reporte = data.get('reporte')
-    fecha = datetime.now().date()
-
-    if not user_id or not id_materia or not id_alumno or not reporte:
-        return jsonify({'success': False, 'error': 'Datos incompletos'}), 400
-
-    try:
-        conn = get_db_connection()
-        cur = conn.cursor()
-        cur.execute("""
-            INSERT INTO reportes (fecha, id_usuario, id_materia, id_alumno, reporte)
-            VALUES (%s, %s, %s, %s, %s)
-        """, (fecha, user_id, id_materia, id_alumno, reporte))
-        conn.commit()
-        cur.close()
-        conn.close()
-        return jsonify({'success': True})
-    except Exception as e:
-        print("Error al guardar reporte:", e)
-        return jsonify({'success': False, 'error': 'Error al guardar en base de datos'}), 500
 
 @app.route('/agregar_materia', methods=['GET', 'POST'])
 def agregar_materia():
-    if 'id_usuario' not in session or session['rol'] != 'admin':
+    if 'id_usuario' not in session or (session['rol'] != 'admin' and session['rol'] != 'director'):
         return redirect(url_for('login'))  # Solo administradores pueden agregar materias
 
     if request.method == 'POST':
