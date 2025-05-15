@@ -653,7 +653,7 @@ def inscripcion():
     if request.method == 'GET':
         return render_template('Inscripcion.html')  # Muestra el formulario
 
-@app.route('/director')
+@app.route('/director', methods=['GET', 'POST'])
 def director():
     if 'id_usuario' not in session or session['rol'] != 'director':
         return redirect(url_for('login'))
