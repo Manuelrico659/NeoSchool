@@ -32,103 +32,88 @@
                     break;
 
                 case "generar-reporte":
-                    content.innerHTML = `
-                        <form id="form-reporte">
-                        <label for="materia">Materia:</label>
-                        <select id="materia" name="materia" required>
-                            <option disabled selected value>Seleccione una materia</option>
-                            <!-- Las opciones se llenan dinámicamente -->
-                        </select>
+                    const mexicoTime = new Date().toLocaleDateString("en-CA", {
+                        timeZone: "America/Mexico_City"
+                    });
 
-                        <label for="alumno">Alumno:</label>
-                        <select id="alumno" name="alumno" required>
-                            <option disabled selected value>Seleccione una materia primero</option>
-                        </select>
+                    fetch('/materias_json')
+                        .then(response => response.json())
+                        .then(data => {
+                            let options = '<option value="">Seleccione una materia</option>';
+                            data.materias.forEach(materia => {
+                                options += `<option value="${materia[0]}">${materia[1]}</option>`;
+                            });
 
-                        <label for="reporte">Reporte:</label>
-                        <textarea id="reporte" name="reporte" required></textarea>
+                            mainContent.innerHTML = `
+                                <div class="generar-reporte-wrapper">
+                                    <h1>Generar Reporte</h1>
+                                    <form id="reporte-form" method="POST" action="/generar_reporte">
+                                        <label for="nombre_alumno">Nombre del alumno:</label>
+                                        <input type="text" id="nombre_alumno" name="nombre_alumno" required>
 
-                        <button type="submit">Guardar</button>
-                        </form>
+                                        <label for="id_materia">Materia:</label>
+                                        <select id="id_materia" name="id_materia" required>
+                                            ${options}
+                                        </select>
 
-                        <script>
-                        // Obtener materias al cargar
-                        fetch('/reporte-datos')
-                            .then(res => res.json())
-                            .then(data => {
-                            const materiaSelect = document.getElementById("materia");
-                            const alumnoSelect = document.getElementById("alumno");
+                                        <div id="alumnos-container" class="alumnos-container" style="display:none;">
+                                            <label for="buscar-alumno">Buscar Alumno:</label>
+                                            <div class="search-box">
+                                                <input type="text" id="buscar-alumno" placeholder="Ingrese un nombre..." oninput="buscarAlumno()">
+                                                <button type="button" onclick="buscarAlumno()">Buscar</button>
+                                            </div>
+                                            <div id="lista-alumnos"></div>
+                                        </div>
 
-                            if (data.general) {
-                                const opt = document.createElement("option");
-                                opt.value = "general";
-                                opt.textContent = "General";
-                                materiaSelect.innerHTML = "";
-                                materiaSelect.appendChild(opt);
+                                        <label for="fecha">Fecha:</label>
+                                        <input type="text" id="fecha" name="fecha" value="${mexicoTime}" readonly>
 
-                                alumnoSelect.innerHTML = "";
-                                data.alumnos.forEach(a => {
-                                const option = document.createElement("option");
-                                option.value = a[0];
-                                option.textContent = \\${a[1]} \${a[2]} \${a[3]}\;
-                                alumnoSelect.appendChild(option);
-                                });
-                            } else {
-                                data.materias.forEach(m => {
-                                const option = document.createElement("option");
-                                option.value = m[0];
-                                option.textContent = m[1];
-                                materiaSelect.appendChild(option);
-                                });
+                                        <label for="comentarios">Comentarios:</label>
+                                        <textarea id="comentarios" name="comentarios" maxlength="145" rows="4" required></textarea>
 
-                                materiaSelect.addEventListener("change", function () {
+                                        <input type="hidden" name="usuario_id" value="${usuario_id}">
+
+                                        <div class="button-container">
+                                            <button type="submit">Generar reporte</button>
+                                        </div>
+                                    </form>
+                                </div>
+                            `;
+
+                            document.getElementById("id_materia").addEventListener("change", function () {
                                 const materiaId = this.value;
-                                fetch(\/alumnos_por_materia/\${materiaId}\)
+                                if (!materiaId) return;
+
+                                fetch(`/alumnos_por_materia/${materiaId}`)
                                     .then(res => res.json())
                                     .then(data => {
-                                    alumnoSelect.innerHTML = "";
-                                    data.forEach(a => {
-                                        const option = document.createElement("option");
-                                        option.value = a[0];
-                                        option.textContent = \\${a[1]} \${a[2]} \${a[3]}\;
-                                        alumnoSelect.appendChild(option);
+                                        let alumnosHtml = "";
+                                        data.alumnos.forEach(alumno => {
+                                            alumnosHtml += `
+                                                <label class="alumno-item">
+                                                    <input type="checkbox" name="alumnos" value="${alumno[0]}">
+                                                    ${alumno[1]} ${alumno[2]} ${alumno[3]}
+                                                </label>
+                                            `;
+                                        });
+                                        document.getElementById("lista-alumnos").innerHTML = alumnosHtml;
+                                        document.getElementById("alumnos-container").style.display = "block";
                                     });
-                                    });
-                                });
-                            }
-                            });
-
-                        document.getElementById("form-reporte").addEventListener("submit", function (e) {
-                            e.preventDefault();
-
-                            const materia = document.getElementById("materia").value;
-                            const alumno = document.getElementById("alumno").value;
-                            const reporte = document.getElementById("reporte").value;
-
-                            fetch("guardar_reporte", {
-                            method: "POST",
-                            headers: {
-                                "Content-Type": "application/json"
-                            },
-                            body: JSON.stringify({ materia, alumno, reporte })
-                            })
-                            .then(res => res.json())
-                            .then(data => {f
-                                if (data.success) {
-                                alert("Reporte guardado exitosamente.");
-                                loadContent("inicio");
-                                } else {
-                                alert("Error: " + data.error);
-                                }
-                            })
-                            .catch(err => {
-                                alert("Error al enviar el reporte.");
-                                console.error(err);
                             });
                         });
-                        </script>
-                    `;
+
+                    function buscarAlumno() {
+                        let filtro = document.getElementById('buscar-alumno').value.toLowerCase();
+                        let alumnos = document.querySelectorAll('.alumno-item');
+
+                        alumnos.forEach(function (alumno) {
+                            let nombre = alumno.textContent.toLowerCase();
+                            alumno.style.display = nombre.includes(filtro) ? "block" : "none";
+                        });
+                    }
+
                     break;
+
 
                 case "visualizar-reportes":
                     mainContent.innerHTML = `
