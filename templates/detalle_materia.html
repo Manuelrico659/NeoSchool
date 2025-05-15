@@ -105,6 +105,7 @@
                                 <th>Tareas y Trabajos</th>
                                 <th>Examen</th>
                                 <th>Calificación Parcial</th>
+                                <th>Descargar</th>
                             </tr>
                         </thead>
                         <tbody>`;
@@ -130,6 +131,11 @@
                                     ${estudiante.examen}
                                 </td>
                                 <td><strong>${estudiante.calificacion_parcial}</strong></td>
+                                <td>
+                                    <button onclick="descargarCalificacion(${estudiante.id}, ${parcialSeleccionado}, ${materiaId})" title="Descargar calificación">
+                                        📥
+                                    </button>
+                                </td>
                             </tr>
                         `;
                     });
@@ -177,6 +183,10 @@
             });
         }
 
+        function descargarCalificacion(idAlumno, parcialId, materiaId) {
+            const url = `/descargar_calificaciones?id_alumno=${idAlumno}&parcial_id=${parcialId}&materia_id=${materiaId}`;
+            window.open(url, '_blank'); // Abrir en nueva pestaña
+        }
 
 
         // Cargar por defecto el parcial 1

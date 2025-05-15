@@ -733,6 +733,14 @@ def generar_reporte():
         return descargar_boleta(id_alumno)
     return redirect(url_for('generar_reporte'))
 
+@app.route('/descargar_calificaciones')
+def descargar_calificaciones():
+    id_alumno = request.args.get('id_alumno')
+    parcial_id = request.args.get('parcial_id')
+    materia_id = request.args.get('materia_id')
+
+    # Aquí generas el archivo (por ejemplo, PDF o CSV) y lo devuelves con send_file o similar
+    return descargar_boleta(id_alumno)
 
 def descargar_boleta(id_alumno):
     conn = get_db_connection()
