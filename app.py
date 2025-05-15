@@ -704,7 +704,7 @@ def get_alumnos_reportes():
     print("---------------------------------------------")
     return alumnos
 
-@app.route('/generar_reporte', methods=['GET'])
+@app.route('/generar_reporte', methods=['GET', 'POST'])
 def generar_reporte():
     conn = get_db_connection()
     if request.method == 'POST':
