@@ -595,6 +595,7 @@ def inscripcion():
         tipo_sangre = request.form['tipo_sangre']
 
         tiene_familia = request.form.get('tiene_familia')  # Checkbox "Tiene familia registrada"
+        correo_familiar = request.form.get('correo_familiar')  # Campo de correo
 
         if tiene_familia:
             id_familia = request.form.get('id_familia')
