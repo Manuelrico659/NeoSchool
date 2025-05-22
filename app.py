@@ -579,7 +579,7 @@ def contratar():
 @app.route('/inscripcion', methods=['GET', 'POST'])
 def inscripcion():
     if request.method == 'POST':
-        # Obtener los datos del formulario
+        # Obtener datos del formulario
         nombre = request.form['nombre']
         apellido_paterno = request.form['apellido_paterno']
         apellido_materno = request.form['apellido_materno']
@@ -594,21 +594,17 @@ def inscripcion():
         sexo = request.form['Sexo']
         tipo_sangre = request.form['tipo_sangre']
 
-        tiene_familia = request.form.get('tiene_familia')  # Checkbox: "Tiene familia registrada"
-        correo_familiar = request.form.get('correo_familiar')  # Campo de correo
+        tiene_familia = request.form.get('tiene_familia')  # Checkbox "Tiene familia registrada"
 
         if tiene_familia:
-            # Si el usuario tiene una familia registrada, tomamos el ID de la familia
             id_familia = request.form.get('id_familia')
             if not id_familia or not id_familia.isdigit():
-                return "Por favor ingrese un ID de Familia válido", 400
+                return "Por favor seleccione un tutor válido", 400
             id_familia = int(id_familia)
-
         else:
-            # Si no tiene familia registrada, tomamos los datos de nueva familia
             tutor = request.form.get('tutor')
             tel_emergencia = request.form.get('tel_emergencia')
-
+            correo_familiar = request.form.get('correo_familiar')
             if not tutor or not tel_emergencia or not correo_familiar:
                 return "Por favor ingrese todos los campos para la nueva familia", 400
 
@@ -617,7 +613,6 @@ def inscripcion():
         cursor = conn.cursor()
 
         try:
-            # Insertar la familia si no existe
             if not tiene_familia:
                 cursor.execute(
                     "INSERT INTO familia (tutor, tel_emergencia, correo) VALUES (%s, %s, %s) RETURNING id_familia",
@@ -626,7 +621,6 @@ def inscripcion():
                 id_familia = cursor.fetchone()[0]
                 agregar_contacto_a_lista(correo_familiar, tutor, LISTA_TUTORES_ID)
 
-            # Insertar los datos del alumno
             cursor.execute(
                 "INSERT INTO alumno (nombre, apellido_paterno, apellido_materno, nivel, grado, campus, id_familia) "
                 "VALUES (%s, %s, %s, %s, %s, %s, %s) RETURNING id_alumno",
@@ -634,27 +628,25 @@ def inscripcion():
             )
             id_alumno = cursor.fetchone()[0]
 
-            # Insertar los datos generales
             cursor.execute(
                 "INSERT INTO datos_generales (id_alumno, curp, sexo, tipo_sangre, alergias, capilla, beca, fecha_nacimiento) "
                 "VALUES (%s, %s, %s, %s, %s, %s, %s, %s)",
                 (id_alumno, curp, sexo, tipo_sangre, alergias, capilla, beca, fecha_nacimiento)
             )
-            conn.commit()  # Guardar los cambios en la base de datos
+            conn.commit()
 
         except Exception as e:
-            conn.rollback()  # Revertir cambios en caso de error
-            print(f"Error al registrar el alumno: {str(e)}")  # Para debug
+            conn.rollback()
+            print(f"Error al registrar el alumno: {str(e)}")
             return "Error al registrar el alumno", 500
 
         finally:
             cursor.close()
             conn.close()
 
-        # Redirigir a la página de administración o confirmación
         return redirect(url_for('admin'))
 
-    # Método GET: muestra el formulario
+    # GET request
     return render_template('Inscripcion.html')
 
 
