@@ -597,7 +597,6 @@ def inscripcion():
         tiene_familia = request.form.get('tiene_familia')  # Checkbox: "Tiene familia registrada"
         correo_familiar = request.form.get('correo_familiar')  # Campo de correo
 
-
         if tiene_familia:
             # Si el usuario tiene una familia registrada, tomamos el ID de la familia
             id_familia = request.form.get('id_familia')
@@ -609,24 +608,24 @@ def inscripcion():
             # Si no tiene familia registrada, tomamos los datos de nueva familia
             tutor = request.form.get('tutor')
             tel_emergencia = request.form.get('tel_emergencia')
-            
+
             if not tutor or not tel_emergencia or not correo_familiar:
                 return "Por favor ingrese todos los campos para la nueva familia", 400
-            
-        
+
         # Conectar a la base de datos
         conn = get_db_connection()
         cursor = conn.cursor()
 
         try:
-             # Insertar la familia si no existe
+            # Insertar la familia si no existe
             if not tiene_familia:
                 cursor.execute(
                     "INSERT INTO familia (tutor, tel_emergencia, correo) VALUES (%s, %s, %s) RETURNING id_familia",
                     (tutor, tel_emergencia, correo_familiar)
                 )
                 id_familia = cursor.fetchone()[0]
-                agregar_contacto_a_lista(correo_familiar, tutor,LISTA_TUTORES_ID)
+                agregar_contacto_a_lista(correo_familiar, tutor, LISTA_TUTORES_ID)
+
             # Insertar los datos del alumno
             cursor.execute(
                 "INSERT INTO alumno (nombre, apellido_paterno, apellido_materno, nivel, grado, campus, id_familia) "
@@ -642,19 +641,22 @@ def inscripcion():
                 (id_alumno, curp, sexo, tipo_sangre, alergias, capilla, beca, fecha_nacimiento)
             )
             conn.commit()  # Guardar los cambios en la base de datos
+
         except Exception as e:
             conn.rollback()  # Revertir cambios en caso de error
-            print(f"Error al registrar el alumno: {str(e)}")  # Opcional: Imprimir el error en la consola
+            print(f"Error al registrar el alumno: {str(e)}")  # Para debug
             return "Error al registrar el alumno", 500
+
         finally:
             cursor.close()
             conn.close()
 
         # Redirigir a la página de administración o confirmación
         return redirect(url_for('admin'))
-    
-    if request.method == 'GET':
-        return render_template('Inscripcion.html')  # Muestra el formulario
+
+    # Método GET: muestra el formulario
+    return render_template('Inscripcion.html')
+
 
 @app.route('/director', methods=['GET', 'POST'])
 def director():
