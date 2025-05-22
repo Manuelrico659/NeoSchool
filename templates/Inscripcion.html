@@ -1,109 +1,267 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8" />
-  <title>Inscripción</title>
-  <style>
-    /* Estilo básico para el contenedor */
-    #contenedor-buscar-tutor {
-      display: none;
-      margin-top: 10px;
-      padding: 10px;
-      border: 1px solid #ccc;
-      background-color: #f9f9f9;
-      border-radius: 5px;
-    }
-  </style>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Inscripción de Alumnos</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/forms.css') }}" />
+    <style>
+        /* Estilos para el buscador y lista de tutores */
+        .tutores-container {
+            border: 1px solid #ccc;
+            padding: 10px;
+            margin-top: 15px;
+            border-radius: 5px;
+            background: #f9f9f9;
+        }
+        #lista-tutores {
+            max-height: 200px;
+            overflow-y: auto;
+            border: 1px solid #ddd;
+            padding: 5px;
+            background: white;
+            border-radius: 4px;
+        }
+        .tutor-item {
+            display: block;
+            padding: 5px;
+            border-bottom: 1px solid #eee;
+        }
+        .tutor-item:last-child {
+            border-bottom: none;
+        }
+        /* Progreso */
+        .progress-bar {
+            display: flex;
+            margin-bottom: 15px;
+            align-items: center;
+        }
+        .progress-fill {
+            background-color: #4D869C;
+            height: 5px;
+            flex-grow: 1;
+            margin: 0 10px;
+            border-radius: 3px;
+            transition: width 0.3s ease;
+        }
+        .step {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            background: #ccc;
+            color: white;
+            text-align: center;
+            line-height: 30px;
+            font-weight: bold;
+        }
+        .step.active {
+            background: #4D869C;
+        }
+    </style>
+    <script>
+        function updateGradoOptions() {
+            var nivel = document.getElementById("nivel").value;
+            var grado = document.getElementById("grado");
+            grado.innerHTML = "<option value=''>Seleccione Grado</option>";
+            var options = [];
+            // Eliminada la opción kinder
+            if (nivel === "primaria") {
+                options = ["1", "2", "3", "4", "5", "6"];
+            } else if (nivel === "secundaria") {
+                options = ["1", "2", "3"];
+            }
+            options.forEach(function (opt) {
+                var option = document.createElement("option");
+                option.value = opt;
+                option.textContent = opt;
+                grado.appendChild(option);
+            });
+        }
+
+        function nextStep(step) {
+            if (!validateStep(step - 1)) return;
+            document.querySelectorAll(".step-content").forEach(s => s.style.display = "none");
+            document.getElementById("step" + step).style.display = "block";
+            updateProgress(step);
+        }
+
+        function prevStep(step) {
+            document.querySelectorAll(".step-content").forEach(s => s.style.display = "none");
+            document.getElementById("step" + step).style.display = "block";
+            updateProgress(step);
+        }
+
+        function updateProgress(step) {
+            var steps = document.querySelectorAll(".step");
+            var progressFill = document.querySelector(".progress-fill");
+            steps.forEach((s, index) => s.classList.toggle("active", index < step));
+            progressFill.style.width = `${(step - 1) * 50}%`;
+        }
+
+        function toggleFamilia() {
+            var checkbox = document.getElementById("familia-toggle");
+            var familiaExistente = document.getElementById("familia-existente");
+            var nuevaFamilia = document.getElementById("nueva-familia");
+            var tutoresContainer = document.querySelector(".tutores-container");
+            
+            if (checkbox.checked) {
+                familiaExistente.style.display = "block";
+                nuevaFamilia.querySelectorAll("input").forEach(input => input.removeAttribute("required"));
+                nuevaFamilia.style.display = "none";
+                // Mostrar buscador de tutores
+                tutoresContainer.style.display = "block";
+            } else {
+                familiaExistente.style.display = "none";
+                nuevaFamilia.querySelectorAll("input").forEach(input => input.setAttribute("required", "true"));
+                nuevaFamilia.style.display = "block";
+                // Ocultar buscador de tutores
+                tutoresContainer.style.display = "none";
+            }
+        }
+
+        function validateEmail() {
+            var correo = document.querySelector("input[name='correo_familiar']").value;
+            var emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+            if (!emailRegex.test(correo)) {
+                alert("Por favor ingrese un correo electrónico válido.");
+                return false;
+            }
+            return true;
+        }
+
+        function validateStep(step) {
+            var stepContent = document.getElementById("step" + step);
+            if (!stepContent) return true; // En caso que no exista (por ejemplo paso 0)
+
+            var inputs = stepContent.querySelectorAll("input[required], select[required]");
+
+            if (step === 2) {
+                // Validar email solo si la familia nueva está visible
+                var nuevaFamiliaVisible = document.getElementById("nueva-familia").style.display !== "none";
+                if (nuevaFamiliaVisible && !validateEmail()) {
+                    return false;
+                }
+            }
+
+            for (var input of inputs) {
+                if (input.value.trim() === "") {
+                    alert("Por favor, completa todos los campos obligatorios.");
+                    input.focus();
+                    return false;
+                }
+            }
+            if (step === 3) {
+                // Validar beca en paso 3
+                return validateBeca();
+            }
+            return true;
+        }
+
+        function validateBeca(){
+            var beca = document.querySelector("input[name='beca']");
+            if (!beca) return true;
+            var val = Number(beca.value);
+            if (val < 0 || val > 100) {
+                alert("El valor de la beca debe estar entre 0 y 100.");
+                beca.focus();
+                return false;
+            }
+            return true;
+        }
+
+        function buscarTutor() {
+            let filtro = document.getElementById('buscar-tutor').value.toLowerCase();
+            let tutores = document.querySelectorAll('.tutor-item');
+
+            tutores.forEach(function(tutor) {
+                let nombre = tutor.textContent.toLowerCase();
+                tutor.style.display = nombre.includes(filtro) ? "block" : "none";
+            });
+        }
+
+        // Iniciar estado del formulario
+        window.onload = function () {
+            toggleFamilia();
+            updateGradoOptions();
+            updateProgress(1);
+        }
+    </script>
 </head>
 <body>
-  <h1>Formulario de Inscripción</h1>
-  <form method="POST" action="{{ url_for('inscripcion') }}">
-    <label>Nombre:</label>
-    <input type="text" name="nombre" required /><br />
+    <div class="form-container">
+        <h2>Inscripción de Alumnos</h2>
+        <div class="progress-bar">
+            <div class="step active">1</div>
+            <div class="progress-fill"></div>
+            <div class="step">2</div>
+            <div class="progress-fill"></div>
+            <div class="step">3</div>
+        </div>
+        <form id="inscripcion-form" method="POST">
+            <!-- Paso 1 -->
+            <div class="step-content" id="step1">
+                <h3>Datos del Alumno</h3>
+                <input type="text" name="nombre" placeholder="Nombre(s)" required />
+                <input type="text" name="apellido_paterno" placeholder="Apellido Paterno" required />
+                <input type="text" name="apellido_materno" placeholder="Apellido Materno" required />
+                <input type="text" name="escuela_inscripcion" placeholder="Escuela de Inscripción" required />
+                <select id="nivel" name="nivel" required onchange="updateGradoOptions()">
+                    <option value="">Seleccione Nivel</option>
+                    <option value="primaria">Primaria</option>
+                    <option value="secundaria">Secundaria</option>
+                </select>
+                <select id="grado" name="grado" required>
+                    <option value="">Seleccione Grado</option>
+                </select>
+                <button type="button" onclick="nextStep(2)">Siguiente</button>
+            </div>
 
-    <label>Apellido Paterno:</label>
-    <input type="text" name="apellido_paterno" required /><br />
+            <!-- Paso 2 -->
+            <div class="step-content" id="step2" style="display: none;">
+                <h3>Información Familiar</h3>
+                <label>¿Tiene una familia registrada?</label>
+                <input type="checkbox" id="familia-toggle" name="tiene_familia" onchange="toggleFamilia()" />
 
-    <label>Apellido Materno:</label>
-    <input type="text" name="apellido_materno" required /><br />
+                <div id="familia-existente" style="display: none;">
+                    <input type="number" name="id_familia" placeholder="ID de Familia" />
+                </div>
 
-    <label>Escuela Inscripción (Campus):</label>
-    <input type="text" name="escuela_inscripcion" required /><br />
+                <!-- Recuadro de búsqueda y selección de tutores -->
+                <div class="tutores-container" style="display:none;">
+                    <label for="buscar-tutor">Buscar Tutor:</label>
+                    <div class="search-box">
+                        <input type="text" id="buscar-tutor" placeholder="Ingrese un nombre..." oninput="buscarTutor()" />
+                        <button type="button" onclick="buscarTutor()">Buscar</button>
+                    </div>
 
-    <label>Nivel:</label>
-    <input type="text" name="nivel" required /><br />
+                    <div id="lista-tutores">
+                        {% for tutor in tutores %}
+                            <label class="tutor-item">
+                                <input type="checkbox" name="tutores" value="{{ tutor.id }}" />
+                                {{ tutor.tutor }}
+                            </label>
+                        {% endfor %}
+                    </div>
+                </div>
 
-    <label>Grado:</label>
-    <input type="text" name="grado" required /><br />
+                <div id="nueva-familia">
+                    <input type="text" name="tutor" placeholder="Tutor" required />
+                    <input type="text" name="tel_emergencia" placeholder="Teléfono de Emergencia" required />
+                    <input type="email" name="correo_familiar" placeholder="Correo Electrónico" required />
+                </div>
+                <button type="button" onclick="prevStep(1)">Atrás</button>
+                <button type="button" onclick="nextStep(3)">Siguiente</button>
+            </div>
 
-    <label>CURP:</label>
-    <input type="text" name="curp" required /><br />
-
-    <label>Fecha de Nacimiento:</label>
-    <input type="date" name="fecha_nacimiento" required /><br />
-
-    <label>Alergias:</label>
-    <input type="text" name="alergias" /><br />
-
-    <label>Capilla:</label>
-    <input type="text" name="capilla" /><br />
-
-    <label>Beca:</label>
-    <input type="text" name="beca" /><br />
-
-    <label>Sexo:</label>
-    <select name="Sexo" required>
-      <option value="">--Seleccione--</option>
-      <option value="M">Masculino</option>
-      <option value="F">Femenino</option>
-    </select><br />
-
-    <label>Tipo de Sangre:</label>
-    <input type="text" name="tipo_sangre" /><br />
-
-    <label>
-      <input type="checkbox" id="tiene_familia" name="tiene_familia" value="on" />
-      Tiene familia registrada
-    </label>
-
-    <div id="contenedor-buscar-tutor">
-      <label for="id_familia">Buscar tutor/familia (ingrese ID):</label>
-      <input type="text" id="id_familia" name="id_familia" placeholder="ID tutor/familia" />
-      <small>Seleccione el ID del tutor familiar registrado.</small>
-    </div>
-
-    <div id="nueva-familia">
-      <h3>Registrar nueva familia</h3>
-      <label>Tutor:</label>
-      <input type="text" name="tutor" /><br />
-      <label>Teléfono de emergencia:</label>
-      <input type="text" name="tel_emergencia" /><br />
-      <label>Correo familiar:</label>
-      <input type="email" name="correo_familiar" /><br />
-    </div>
-
-    <button type="submit">Enviar Inscripción</button>
-  </form>
-
-  <script>
-    const checkbox = document.getElementById('tiene_familia');
-    const contenedorTutor = document.getElementById('contenedor-buscar-tutor');
-    const nuevaFamilia = document.getElementById('nueva-familia');
-
-    function toggleTutorContainer() {
-      if (checkbox.checked) {
-        contenedorTutor.style.display = 'block';
-        nuevaFamilia.style.display = 'none';
-      } else {
-        contenedorTutor.style.display = 'none';
-        nuevaFamilia.style.display = 'block';
-      }
-    }
-
-    checkbox.addEventListener('change', toggleTutorContainer);
-
-    // Ejecutar al cargar la página para mostrar el estado correcto
-    toggleTutorContainer();
-  </script>
-</body>
-</html>
+            <!-- Paso 3 -->
+            <div class="step-content" id="step3" style="display: none;">
+                <h3>Datos Generales</h3>
+                <input type="text" name="curp" placeholder="CURP" required />
+                <input type="date" name="fecha_nacimiento" required />
+                <input type="text" name="alergias" placeholder="Alergias" required />
+                <input type="text" name="capilla" placeholder="Capilla" required />
+                <input type="number" name="beca" placeholder="Beca (0-100)" min="0" max="100" required />
+                <select name="Sexo" required>
+                    <option value="">Seleccione Sexo</option>
+                    <option value="Hombre">Hombre</option>
+                    <option value="Mujer

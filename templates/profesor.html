@@ -63,49 +63,6 @@
                     `;
                     break;
 
-                case "generar-reporte":
-                    const mexicoTime = new Date().toLocaleDateString("en-CA", {
-                        timeZone: "America/Mexico_City"
-                    });
-
-                    mainContent.innerHTML = `
-                        <div class="generar-reporte-wrapper">
-                            <h1>Generar Reporte</h1>
-                            <div class="generar-reporte-container">
-                                <form method="POST" action="${urlGenerarReporte}">
-                                    <label for="id_materia">ID de la materia:</label>
-                                    <select id="id_materia" name="id_materia" required>
-                                        <option value="">Seleccione una Materia</option>
-                                        {% for materia in materias %}
-                                            <option value="{{ materia[0] }}">{{ materia[1] }} (ID: {{ materia[0] }})</option>
-                                        {% endfor %}
-                                    </select>
-
-                                    <label for="nombre_alumno">Nombre del alumno:</label>
-                                    <select id="nombre_alumno" name="nombre_alumno" required>
-                                        <option value="">Seleccione un alumno</option>
-                                        {% for alumno in alumnos %}
-                                            <option value="{{ alumno.id_alumno }}">{{ alumno.nombre }} {{ alumno.apellido_paterno }} (ID: {{ alumno.id_alumno }})</option>
-                                        {% endfor %}
-                                    </select>
-
-                                    <label for="fecha">Fecha:</label>
-                                    <input type="text" id="fecha" name="fecha" value="${mexicoTime}" readonly>
-
-                                    <label for="comentarios">Comentarios (máx. 145 caracteres):</label>
-                                    <textarea id="comentarios" name="comentarios" maxlength="145" rows="4" required></textarea>
-
-                                    <input type="hidden" name="usuario_id" value="${usuarioID}">
-
-                                    <div class="button-container">
-                                        <button type="submit">Generar reporte</button>
-                                    </div>
-                                </form>
-                            </div>
-                        </div>
-                    `;
-                    break;
-
 
                 case "configuracion":
                     mainContent.innerHTML = `
@@ -139,7 +96,6 @@
         <ul>
             <li><a href="#" onclick="loadContent('inicio')">Inicio</a></li>
             <li><a href="#" onclick="loadContent('materias-activas')">Materias Activas</a></li>
-            <li><a href="#" onclick="loadContent('generar-reporte')">Generar Reporte</a></li>
             <li><a href="#" onclick="loadContent('configuracion')">Configuración</a></li>
         </ul>
     </div>

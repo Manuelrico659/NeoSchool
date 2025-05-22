@@ -103,38 +103,6 @@
 
                     break;
 
-                case "visualizar-reportes":
-                    mainContent.innerHTML = `
-                        <h1>Visualizar Reportes</h1>
-                        <div class="content-section">
-                            <input type="text" id="buscador-reportes" placeholder="Buscar por nombre, materia, etc..." onkeyup="filtrarReportes()">
-                            <div id="lista-reportes">
-                                {% for reporte in reportes %}
-                                    <div class="reporte-item">
-                                        <p><strong>Alumno:</strong> {{ reporte.nombre_alumno }}</p>
-                                        <p><strong>Materia:</strong> {{ reporte.nombre_materia }}</p>
-                                        <p><strong>Fecha:</strong> {{ reporte.fecha }}</p>
-                                        <p><strong>Comentario:</strong> {{ reporte.comentarios }}</p>
-                                    </div>
-                                {% endfor %}
-                            </div>
-                        </div>
-                    `;
-
-                    // Script para filtro dentro del mismo caso
-                    setTimeout(() => {
-                        window.filtrarReportes = function () {
-                            const input = document.getElementById("buscador-reportes");
-                            const filtro = input.value.toLowerCase();
-                            const reportes = document.querySelectorAll(".reporte-item");
-
-                            reportes.forEach(reporte => {
-                                const texto = reporte.innerText.toLowerCase();
-                                reporte.style.display = texto.includes(filtro) ? "" : "none";
-                            });
-                        }
-                    }, 100);
-                    break;
 
                 case "configuracion":
                     mainContent.innerHTML = `
@@ -175,7 +143,6 @@
             <li><a href="#" onclick="loadContent('inicio')">Inicio</a></li>
             <li><a href="#" onclick="loadContent('agregar-materias')">Agregar Materias</a></li>
             <li><a href="#" onclick="loadContent('generar-reporte')">Generar Reporte</a></li>
-            <li><a href="#" onclick="loadContent('visualizar-reportes')">Visualizar Reportes</a></li>
             <li><a href="#" onclick="loadContent('configuracion')">Configuración</a></li>
         </ul>
     </div>
