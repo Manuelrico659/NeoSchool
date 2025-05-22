@@ -11,7 +11,9 @@
             var grado = document.getElementById("grado");
             grado.innerHTML = "";
             var options = [];
-            if (nivel === "primaria") {
+            if (nivel === "kinder") {
+                options = ["1", "2", "3"];
+            } else if (nivel === "primaria") {
                 options = ["1", "2", "3", "4", "5", "6"];
             } else if (nivel === "secundaria") {
                 options = ["1", "2", "3"];
@@ -91,6 +93,7 @@
                     return false;
                 }
             }
+
             return true;
         }
 
@@ -123,6 +126,7 @@
                 <input type="text" name="escuela_inscripcion" placeholder="Escuela de Inscripción" required>
                 <select id="nivel" name="nivel" required onchange="updateGradoOptions()">
                     <option value="">Seleccione Nivel</option>
+                    <option value="kinder">Kinder</option>
                     <option value="primaria">Primaria</option>
                     <option value="secundaria">Secundaria</option>
                 </select>
@@ -139,7 +143,6 @@
                 <div id="familia-existente" style="display: none;">
                     <input type="number" name="id_familia" placeholder="ID de Familia">
                 </div>
-
 
 
 
