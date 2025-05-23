@@ -41,7 +41,8 @@
             var steps = document.querySelectorAll(".step");
             var progressFill = document.querySelector(".progress-fill");
             steps.forEach((s, index) => s.classList.toggle("active", index < step));
-            progressFill.style.width = ${(step - 1) * 50}%;
+            pprogressFill.style.width = (step - 1) * 50 + "%";
+
         }
 
         function toggleFamilia() {
