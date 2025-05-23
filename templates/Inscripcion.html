@@ -49,14 +49,31 @@
             var checkbox = document.getElementById("familia-toggle");
             var familiaExistente = document.getElementById("familia-existente");
             var nuevaFamilia = document.getElementById("nueva-familia");
+
+            var correoInput = document.querySelector("input[name='correo_familiar']");
+            var telInput = document.querySelector("input[name='tel_emergencia']");
+
             if (checkbox.checked) {
                 familiaExistente.style.display = "block";
-                nuevaFamilia.querySelectorAll("input").forEach(input => input.removeAttribute("required"));
                 nuevaFamilia.style.display = "none";
+
+                // Quitar "required" de los campos en nueva familia
+                nuevaFamilia.querySelectorAll("input").forEach(input => input.removeAttribute("required"));
+
+                // Asignar valores por defecto
+                correoInput.value = "roberto@gmail.com";
+                telInput.value = "3334974060";
+
             } else {
                 familiaExistente.style.display = "none";
-                nuevaFamilia.querySelectorAll("input").forEach(input => input.setAttribute("required", "true"));
                 nuevaFamilia.style.display = "block";
+
+                // Restaurar campos requeridos
+                nuevaFamilia.querySelectorAll("input").forEach(input => input.setAttribute("required", "true"));
+
+                // Limpiar valores por defecto
+                correoInput.value = "";
+                telInput.value = "";
             }
         }
 
