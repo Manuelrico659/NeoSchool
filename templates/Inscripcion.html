@@ -155,11 +155,11 @@
 
                 <div id="familia-existente" style="display: none;">
                     <input type="number" name="id_familia" placeholder="ID de Familia">
-                    <select id="id_usuario" name="id_usuario" required>
-                        <option value="">Seleccione un Maestro</option>
-                        {% for maestro in maestros %}
-                            <option value="{{ maestro.id_usuario }}">
-                                {{ maestro.nombre }} {{ maestro.apellido_paterno }} (ID: {{ maestro.id_usuario }})
+                    <select id="id_familia" name="id_familia" required>
+                        <option value="">Seleccione un Tutor</option>
+                        {% for familia in familias %}
+                            <option value="{{ tutor.id_familia }}">
+                                {{ familia.tutor }} (ID: {{ familia.id_familia }})
                             </option>
                         {% endfor %}
                     </select>
