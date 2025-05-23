@@ -648,7 +648,7 @@ def inscripcion():
         return redirect(url_for('admin'))
 
     # GET request
-    return render_template('Inscripcion.html')
+    return render_template('Inscripcion.html', familias=get_familias())
 
 
 @app.route('/director', methods=['GET', 'POST'])
@@ -1074,6 +1074,16 @@ def get_alumnos():
     conn.close()
     print (alumnos)
     return alumnos
+
+def get_familias():
+    conn = get_db_connection()
+    cursor = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)  # Usa DictCursor aquí
+    cursor.execute("SELECT id_familia, tutor FROM familias")
+    familias = cursor.fetchall()
+    cursor.close()
+    conn.close()
+    print (familias)
+    return familias
 
 
 @app.route('/cambiar_contrasena', methods=['GET', 'POST'])
