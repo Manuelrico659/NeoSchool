@@ -51,32 +51,30 @@
             var nuevaFamilia = document.getElementById("nueva-familia");
 
             var correoInput = document.querySelector("input[name='correo_familiar']");
-            var telInput = document.querySelector("input[name='tel_emergencia']");
+            var telefonoInput = document.querySelector("input[name='tel_emergencia']");
 
             if (checkbox.checked) {
                 familiaExistente.style.display = "block";
                 nuevaFamilia.style.display = "none";
 
-                // Quitar "required" de los campos en nueva familia
-                nuevaFamilia.querySelectorAll("input").forEach(input => input.removeAttribute("required"));
-
-                // Asignar valores por defecto
+                // Autocompletar valores por defecto
                 correoInput.value = "roberto@gmail.com";
-                telInput.value = "3334974060";
+                telefonoInput.value = "3334974060";
 
+                // Quitar el requerimiento de los campos de nueva familia
+                nuevaFamilia.querySelectorAll("input").forEach(input => input.removeAttribute("required"));
             } else {
                 familiaExistente.style.display = "none";
                 nuevaFamilia.style.display = "block";
 
-                // Restaurar campos requeridos
-                nuevaFamilia.querySelectorAll("input").forEach(input => input.setAttribute("required", "true"));
-
-                // Limpiar valores por defecto
+                // Limpiar valores autocompletados si se desactiva el checkbox
                 correoInput.value = "";
-                telInput.value = "";
+                telefonoInput.value = "";
+
+                // Restaurar los campos como requeridos
+                nuevaFamilia.querySelectorAll("input").forEach(input => input.setAttribute("required", "true"));
             }
         }
-
         function validateEmail() {
             var correo = document.querySelector("input[name='correo_familiar']").value;
             var emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
@@ -157,6 +155,15 @@
 
                 <div id="familia-existente" style="display: none;">
                     <input type="number" name="id_familia" placeholder="ID de Familia">
+                    <select id="id_usuario" name="id_usuario" required>
+                        <option value="">Seleccione un Maestro</option>
+                        {% for maestro in maestros %}
+                            <option value="{{ maestro.id_usuario }}">
+                                {{ maestro.nombre }} {{ maestro.apellido_paterno }} (ID: {{ maestro.id_usuario }})
+                            </option>
+                        {% endfor %}
+                    </select>
+
                 </div>
 
 
