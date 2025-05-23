@@ -97,6 +97,9 @@
             }
 
             for (var input of inputs) {
+                if (input.id === "familia-toggle") {
+                    continue; // Salta solo esta iteración, pasa al siguiente input
+                }
                 // Si el campo pertenece a 'nueva-familia' y el checkbox está activo, omitirlo
                 if (document.getElementById("familia-toggle").checked && input.closest("#nueva-familia")) {
                     continue;
