@@ -11,9 +11,7 @@
             var grado = document.getElementById("grado");
             grado.innerHTML = "";
             var options = [];
-            if (nivel === "kinder") {
-                options = ["1", "2", "3"];
-            } else if (nivel === "primaria") {
+            if (nivel === "primaria") {
                 options = ["1", "2", "3", "4", "5", "6"];
             } else if (nivel === "secundaria") {
                 options = ["1", "2", "3"];
@@ -126,7 +124,6 @@
                 <input type="text" name="escuela_inscripcion" placeholder="Escuela de Inscripción" required>
                 <select id="nivel" name="nivel" required onchange="updateGradoOptions()">
                     <option value="">Seleccione Nivel</option>
-                    <option value="kinder">Kinder</option>
                     <option value="primaria">Primaria</option>
                     <option value="secundaria">Secundaria</option>
                 </select>
@@ -180,17 +177,6 @@
                 <button type="button" onclick="prevStep(2)">Atrás</button>
                 <button type="submit">Registrar</button>
             </div>
-            <script>
-                function buscarTutor() {
-                    let filtro = document.getElementById('buscar-tutor').value.toLowerCase();
-                    let tutores = document.querySelectorAll('.tutor-item');
-
-                    tutores.forEach(function(tutor) {
-                        let nombre = tutor.textContent.toLowerCase();
-                        tutor.style.display = nombre.includes(filtro) ? "block" : "none";
-                    });
-                }
-            </script>
             <style>
                 .tutores-container {
                     border: 1px solid #ccc;
