@@ -1078,7 +1078,7 @@ def get_alumnos():
 def get_familias():
     conn = get_db_connection()
     cursor = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)  # Usa DictCursor aquí
-    cursor.execute("SELECT id_familia, tutor FROM familias")
+    cursor.execute("SELECT id_familia, tutor FROM familia")
     familias = cursor.fetchall()
     cursor.close()
     conn.close()
